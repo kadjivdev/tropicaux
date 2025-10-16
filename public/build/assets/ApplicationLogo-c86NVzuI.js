@@ -1,0 +1,1 @@
+import{j as s}from"./app-nfLeNANc.js";import{l as t}from"./logo-CPzApIsd.js";function o(r){return s.jsx(s.Fragment,{children:s.jsx("div",{className:"text-center",children:s.jsx("img",{src:t,alt:"",srcSet:"",className:"img-fluid",style:{width:"100px"}})})})}export{o as A};
