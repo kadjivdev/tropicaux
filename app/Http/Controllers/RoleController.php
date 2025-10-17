@@ -21,20 +21,9 @@ class RoleController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
-
-        if ($user->school) {
-            $roles = Role::with(['permissions', 'users'])
-                ->where('id', '!=', 1)
-                ->where('school_id', $user->school_id)
-                // ->whereNotIn('id', $user->roles->pluck('id')->toArray())
-                ->latest()
-                ->get();
-        } else {
-            $roles = Role::with(['permissions', 'users'])
-                ->where('id', '!=', 1)
-                ->latest()->get();
-        }
+        $roles = Role::with(['permissions', 'users'])
+            ->where('id', '!=', 1)
+            ->latest()->get();
 
         return Inertia::render('Role/List', [
             "roles" => $roles,
@@ -46,7 +35,7 @@ class RoleController extends Controller
      */
     public function getPermissions(Request $request, $id)
     {
-        $role = Role::with(["permissions", "school"])->find($id);
+        $role = Role::with(["permissions"])->find($id);
 
         return Inertia::render('Role/Permissions', [
             "role" => $role,
@@ -57,23 +46,9 @@ class RoleController extends Controller
     /**
      * Getting all users
      */
-    public function getUsers(Request $request, $id)
+    public function getUsers($id)
     {
-        $user = Auth::user();
-
-        if ($user->school) {
-            $role = Role::with([
-                "users" => function ($query) use ($user) {
-                    $query->where("school_id", $user->school_id);
-                },
-                "users.detail",
-                "users.school"
-            ])
-                ->find($id);
-        } else {
-            $role = Role::with(["users.detail", "users.school"])->find($id);
-        }
-
+        $role = Role::with(["users.detail", "users"])->find($id);
         return Inertia::render('Role/Users', [
             "role" => $role,
         ]);
@@ -85,7 +60,6 @@ class RoleController extends Controller
     public function create()
     {
         $permissions = Permission::latest()->get();
-
         return Inertia::render('Role/Create', [
             "permissions" => $permissions,
         ]);
@@ -95,20 +69,24 @@ class RoleController extends Controller
     {
         $request->validate([
             'name' => 'required|unique:roles,name',
-            'permissions' => 'required|array'
         ]);
 
-        $role = Role::create([
-            'name' => $request->name,
-            'guard_name' => 'web'
-        ]);
-
-        $role->syncPermissions($request->permissions);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Rôle créé avec succès'
-        ]);
+        try {
+            DB::beginTransaction();
+            Role::create([
+                'name' => $request->name,
+                'guard_name' => 'web'
+            ]);
+            DB::commit();
+            return Redirect::route("role.index");
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::debug("Erreure de validation", ["errors" => $e->errors()]);
+            return back()->withErrors($e->errors());
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::debug("Erreure de d'exception", ["exception" => $e->getMessage()]);
+            return back()->withErrors(["exception" => $e->getMessage()]);
+        }
     }
 
     /**

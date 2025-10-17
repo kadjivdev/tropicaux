@@ -20,6 +20,7 @@ use App\Http\Controllers\MagasinController;
 use App\Http\Controllers\MatiereController;
 use App\Http\Controllers\MoyenneDevoirController;
 use App\Http\Controllers\MoyenneInterrogationController;
+use App\Http\Controllers\PaiementModeController;
 use App\Http\Controllers\PartenaireController;
 use App\Http\Controllers\PayementController;
 use App\Http\Controllers\ProduitController;
@@ -100,7 +101,7 @@ Route::middleware('auth')->group(function () {
     Route::patch("role/{id}/update-users", [RoleController::class, 'updateUsers'])->name("role.update.users");
 
     // Mode de paiement
-    Route::resource("mode-paiement", PayementController::class);
+    Route::resource("mode-paiement", PaiementModeController::class);
 
     // Produits
     Route::resource("produit", ProduitController::class);

@@ -153,7 +153,7 @@ class UserController extends Controller
      */
     function update(Request $request, User $user)
     {
-        Log::info("Les datas", ["data" => $request->all()]);
+        Log::info("Les datas", ["data" => $request->all(), $request->file('profile_img')]);
 
         try {
             $validated = $request->validate([
@@ -222,7 +222,7 @@ class UserController extends Controller
             event(new Registered($user));
 
             DB::commit();
-            return redirect()->route("user.index");
+            return redirect()->back(); //->route("user.index");
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
             Log::debug("Erreure lors de la modification de l'utilisateur", ["error" => $e->errors()]);

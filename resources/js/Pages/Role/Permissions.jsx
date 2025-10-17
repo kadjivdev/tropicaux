@@ -56,33 +56,34 @@ export default function List({ role, permissions }) {
     const submit = (e) => {
         e.preventDefault();
 
-        Swal.fire({
-            title: 'Opération en cours...',
-            text: 'Veuillez patienter pendant que nous traitons vos données.',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            },
-        });
-
         patch(route('role.update.permissions', role.id), {
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             },
+            onStart: () => {
+                Swal.fire({
+                    title: '<span style="color: #facc15;">🫠 Opération en cours...</span>', // yellow text
+                    text: 'Veuillez patienter pendant que nous traitons vos données.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    },
+                });
+            },
             onSuccess: () => {
                 Swal.close();
                 Swal.fire({
-                    icon: 'success',
-                    title: 'Opération réussie',
+                    title: '<span style="color: #2a7348;">👌Opération réussie </span>',
                     text: `Permissions du rôle ${role.name} actualisées avec succès`,
+                    confirmButtonText: '😇 Fermer'
                 });
             },
             onError: (e) => {
                 Swal.close();
                 Swal.fire({
-                    icon: 'error',
-                    title: 'Opération échouée',
+                    title: '<span style="color: #facc15;">🤦‍♂️ Opération échouée </span>', // yellow text
                     text: `${e.exception ?? 'Veuillez vérifier vos informations et réessayer.'}`,
+                    confirmButtonText: '😇 Fermer'
                 });
                 console.log(e);
             },
@@ -156,13 +157,11 @@ export default function List({ role, permissions }) {
                             </table>
                             <br />
                             {/* Bouton */}
-                            {!authUser.school_id ?
-                                (<div className="flex items-center gap-4">
-                                    <PrimaryButton disabled={processing}>
-                                        <CIcon icon={cilSend} /> {processing ? 'Enregistrement ...' : 'Enregistrer les modifications'}
-                                    </PrimaryButton>
-                                </div>) : ''
-                            }
+                            <div className="flex items-center gap-4">
+                                <PrimaryButton disabled={processing}>
+                                    <CIcon icon={cilSend} /> {processing ? 'Enregistrement ...' : 'Enregistrer les modifications'}
+                                </PrimaryButton>
+                            </div>
                         </form>
                     </div>
                 </div>

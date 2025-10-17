@@ -53,7 +53,7 @@ export default function List({ users, roles }) {
         'checked': false
     })))
 
-    const { data, errors, setData, processing, post } = useForm({
+    const { data, errors, setData, processing, post, delete: destroy } = useForm({
         role_id: '',
         user_id: currentUser?.id,
     })
@@ -78,20 +78,22 @@ export default function List({ users, roles }) {
     const submit = (e) => {
         e.preventDefault();
 
-        Swal.fire({
-            title: '<span style="color: #facc15;">🫠 Affectation de rôle en cours...</span>', // yellow text
-            text: 'Veuillez patienter pendant que nous traitons vos données.',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            },
-        });
 
         post(route('affect.role'), {
+            onStart: () => {
+                Swal.fire({
+                    title: '<span style="color: #facc15;">🫠 Opération en cours...</span>', // yellow text
+                    text: 'Veuillez patienter pendant que nous traitons vos données.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    },
+                });
+            },
+
             onSuccess: () => {
                 Swal.close();
                 Swal.fire({
-                    // icon: 'success',
                     title: '<span style="color: #2a7348;">👌Opération réussie </span>',
                     text: `Rôle affecté au user (${currentUser?.firstname} - ${currentUser?.lastname}) avec succès`,
                     confirmButtonText: '😇 Fermer'
@@ -131,10 +133,8 @@ export default function List({ users, roles }) {
                         Swal.showLoading();
                     },
                 });
-                axios.post(route('user.destroy', user.id), {
-                    _method: 'DELETE',
-                })
-                    .then(() => {
+                destroy(route('user.destroy', user.id), {
+                    onSuccess: () => {
                         Swal.close();
                         Swal.fire({
                             // icon: 'success',
@@ -142,17 +142,16 @@ export default function List({ users, roles }) {
                             text: `L'utilisateur (${user.firstname} - ${user.lastname}) a été supprimé avec succès.`,
                             confirmButtonText: '😇 Fermer'
                         });
-
-                    })
-                    .catch((error) => {
+                    },
+                    onError: (e) => {
                         Swal.close();
                         Swal.fire({
                             title: '<span style="color: #facc15;">🤦‍♂️ Suppression échouée </span>', // yellow text
-                            text: `Erreur lors de la suppression : ${error.response?.data?.message ?? 'Veuillez réessayer.'}`,
+                            text: `${e.exception ?? 'Veuillez réessayer.'}`,
                             confirmButtonText: '😇 Fermer'
                         });
-                        console.error("There was an error!", error);
-                    });
+                    },
+                })
             }
         });
     }

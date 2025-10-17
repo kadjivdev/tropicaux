@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage, router } from '@inertiajs/react';
 import PrimaryButton from '@/Components/PrimaryButton';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
@@ -10,7 +10,6 @@ import Swal from 'sweetalert2';
 import Select from 'react-select'
 
 export default function Create({ roles, user, rolesIds }) {
-    console.log("rolesIds :", rolesIds);
 
     const permissions = usePage().props.auth.permissions;
 
@@ -30,29 +29,32 @@ export default function Create({ roles, user, rolesIds }) {
         email: user.email ?? "",
         firstname: user.firstname ?? "",
         lastname: user.lastname ?? "",
-        profile_img: "",
+        profile_img: null,
     });
+    
 
     const submit = (e) => {
         e.preventDefault();
-
-        Swal.fire({
-            title: '<span style="color: #facc15;">🫠 Modification en cours ...</span>', // yellow text
-            text: 'Veuillez patienter pendant que nous traitons vos données.',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            },
-        });
+        console.log("data à envoyer debut :", data);
 
         patch(route('user.update', user.id), {
+            // forceFormData: true,
+            onStart: () => {
+                Swal.fire({
+                    title: '<span style="color: #facc15;">🫠 Modification en cours ...</span>',
+                    text: 'Veuillez patienter...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading(),
+                });
+            },
             onSuccess: () => {
                 Swal.close();
                 Swal.fire({
                     title: '<span style="color: #2a7348;">👌Opération réussie </span>', // yellow text
                     text: 'Utilisateur modifié.e avec succès',
                     confirmButtonText: '😇 Fermer'
-                });
+                })
+                router.visit(route('user.index'));
             },
             onError: (e) => {
                 Swal.close();
@@ -61,6 +63,7 @@ export default function Create({ roles, user, rolesIds }) {
                     text: `${e.exception ?? 'Veuillez vérifier vos informations et réessayer.'}`,
                     confirmButtonText: '😇 Fermer'
                 });
+                console.log("data envoyé :", data);
             },
         });
     };
@@ -179,26 +182,6 @@ export default function Create({ roles, user, rolesIds }) {
                                             <InputError className="mt-2" message={errors.email} />
                                         </div>
 
-                                        <div className='mb-3'>
-                                            <InputLabel htmlFor="profile_img" value="Photo de profil" ></InputLabel>
-
-                                            <TextInput
-                                                id="profile_img"
-                                                type="file"
-                                                className="mt-1 block w-full"
-                                                // required
-                                                onChange={(e) => setData('profile_img', e.target.files[0])}
-                                                autoComplete="profile_img"
-                                            />
-
-                                            {progress && (
-                                                <progress value={progress.percentage} max="100">
-                                                    {progress.percentage}%
-                                                </progress>
-                                            )}
-
-                                            <InputError className="mt-2" message={errors.profile_img} />
-                                        </div>
                                     </div>
                                 </div>
 

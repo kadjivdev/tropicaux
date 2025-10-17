@@ -10,7 +10,7 @@ class PaiementMode extends Model
 {
     use SoftDeletes;
     
-    protected $table = 'paiement_mode';
+    // protected $table = 'paiement_mode';
 
     protected $fillable = [
         'libelle',
