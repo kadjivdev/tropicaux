@@ -18,6 +18,9 @@ class FondSuperviseur extends Model
         'document',
         'commentaire',
 
+        'validated_by',
+        'validated_at',
+
         'user_id',
     ];
 
@@ -58,6 +61,12 @@ class FondSuperviseur extends Model
     function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**Validated by */
+    function validatedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'validated_by');
     }
 
     /**Boot */

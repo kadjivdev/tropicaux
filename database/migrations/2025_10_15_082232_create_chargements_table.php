@@ -43,6 +43,12 @@ return new class extends Migration
                 ->constrained("users")
                 ->onUpdate("CASCADE")
                 ->onDelete("SET NULL");
+            $table->foreignId('validated_by')
+                ->nullable()
+                ->constrained('users')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->date("validated_at")->nullable();
             $table->date("adresse")->nullable();
             $table->text("observation")->nullable();
             $table->softDeletes();

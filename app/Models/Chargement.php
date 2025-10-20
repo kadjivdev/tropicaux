@@ -19,6 +19,13 @@ class Chargement extends Model
         'adresse',
         'observation',
         'user_id',
+        'validated_by',
+        'validated_at'
+    ];
+
+    /**Casts */
+    protected $casts = [
+        'validated_at' => 'date'
     ];
 
     /**Produit */
@@ -55,6 +62,12 @@ class Chargement extends Model
     function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**Validated by */
+    function validatedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'validated_by');
     }
 
     /**Boot */

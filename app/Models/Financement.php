@@ -17,12 +17,15 @@ class Financement extends Model
         'date_financement',
         'document',
         'user_id',
+        'validated_by',
+        'validated_at'
     ];
 
     /**Cast */
     protected $casts = [
         'date_financement' => 'date',
         'montant' => 'decimal:2',
+        'validated_at'=>'date'
     ];
 
     /**Fournisseur */
@@ -34,7 +37,7 @@ class Financement extends Model
     /**Gestionnaire */
     function gestionnaire(): BelongsTo
     {
-        return $this->belongsTo(Fournisseur::class, 'gestionnaire_id');
+        return $this->belongsTo(User::class, 'gestionnaire_id');
     }
 
     /**Handle document */
@@ -57,6 +60,12 @@ class Financement extends Model
     function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**Validated by */
+    function validatedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'validated_by');
     }
 
     /**Boot */

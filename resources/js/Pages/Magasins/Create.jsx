@@ -48,7 +48,7 @@ export default function Create({ }) {
                 Swal.close();
                 Swal.fire({
                     title: '<span style="color: #2a7348;">👌Opération réussie </span>',
-                    title: 'Opération réussie',
+                    text: 'Opération réussie',
                     confirmButtonText: '😇 Fermer'
                 });
             },
@@ -110,7 +110,7 @@ export default function Create({ }) {
                                                 id="description"
                                                 className="mt-1 block w-full"
                                                 value={data.description}
-                                                placeholder="Ex: Produit naturel pour la peau"
+                                                placeholder="Ex: Magasin situé à Cotonou"
                                                 onChange={(e) => setData('description', e.target.value)}
                                                 autoComplete="description"
                                             />

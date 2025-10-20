@@ -1,7 +1,8 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import CIcon from '@coreui/icons-react';
-import { cibAddthis, cibMyspace, cilLibraryAdd } from "@coreui/icons";
+import { cibAddthis, cibMyspace, cilMenu, cilPencil, cilUserX } from "@coreui/icons";
+import Swal from 'sweetalert2';
 
 export default function List({ fournisseurs }) {
     const permissions = usePage().props.auth.permissions;
@@ -9,6 +10,52 @@ export default function List({ fournisseurs }) {
     const checkPermission = (name) => {
         return permissions.some(per => per.name == name);
     }
+
+    const {delete:destroy} = useForm({})
+
+    const deleteFournisseur = (e, fournisseur) => {
+        e.preventDefault();
+        Swal.fire({
+            title: '<span style="color: #facc15;">⚠️ Êtes-vous sûr ?</span>', // yellow text
+            text: `Le fournisseur (${fournisseur.raison_sociale}) sera supprimé de façon permanente !`,
+            showCancelButton: true,
+            confirmButtonColor: '#2a7348',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: '😇 Oui, supprimer !',
+            cancelButtonText: 'Annuler'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: '<span style="color: #facc15;">🫠 Suppression en cours...</span>', // yellow text
+                    text: 'Veuillez patienter pendant que nous traitons vos données.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    },
+                });
+                destroy(route('fournisseur.destroy', fournisseur.id), {
+                    onSuccess: () => {
+                        Swal.close();
+                        Swal.fire({
+                            // icon: 'success',
+                            title: '<span style="color: #2a7348;">👌Suppression réussie </span>',
+                            text: `L'utilisateur (${fournisseur.raison_sociale}) a été supprimé avec succès.`,
+                            confirmButtonText: '😇 Fermer'
+                        });
+                    },
+                    onError: (e) => {
+                        Swal.close();
+                        Swal.fire({
+                            title: '<span style="color: #facc15;">🤦‍♂️ Suppression échouée </span>', // yellow text
+                            text: `${e.exception ?? 'Veuillez réessayer.'}`,
+                            confirmButtonText: '😇 Fermer'
+                        });
+                    },
+                })
+            }
+        });
+    }
+
 
     return (
         <AuthenticatedLayout
@@ -40,6 +87,7 @@ export default function List({ fournisseurs }) {
                                     <th scope="col">Email</th>
                                     <th scope="col">Adresse</th>
                                     <th scope="col">Crée par</th>
+                                    <th scope='col' >Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -52,6 +100,37 @@ export default function List({ fournisseurs }) {
                                             <td>{fournisseur.email || '---'}</td>
                                             <td>{fournisseur.adresse || '---'}</td>
                                             <td><span className="badge bg-light border text-dark"> {`${fournisseur.createdBy?.firstname} - ${fournisseur.createdBy?.lastname}`}</span></td>
+                                            <td>
+                                                <div className="dropstart">
+                                                    <button className="dropdown-toggle inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none dark:bg-gray-800 dark:text-gray-400 dark:hover:text-gray-300" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <CIcon icon={cilMenu} /> Gérer
+                                                    </button>
+
+                                                    <ul className="dropdown-menu p-2 border rounded shadow">
+                                                        <li>
+                                                            {checkPermission('fournisseur.edit') ?
+                                                                (<Link
+                                                                    className='btn'
+                                                                    href={route('fournisseur.edit', fournisseur.id)}
+                                                                >
+                                                                    <CIcon icon={cilPencil} />  Modifier
+                                                                </Link>) : null
+                                                            }
+                                                        </li>
+                                                        <li>
+                                                            {checkPermission('fournisseur.delete') ?
+                                                                (<Link
+                                                                    href="#"
+                                                                    className='btn'
+                                                                    onClick={(e) => deleteFournisseur(e, fournisseur)}
+                                                                >
+                                                                    <CIcon icon={cilUserX} />  Supprimer
+                                                                </Link>) : null
+                                                            }
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
                                         </tr>
                                     ))
                                 }

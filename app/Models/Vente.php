@@ -22,6 +22,9 @@ class Vente extends Model
         'montant_total',
         'commentaire',
 
+        'validated_by',
+        'validated_at',
+
         'user_id',
     ];
 
@@ -33,6 +36,7 @@ class Vente extends Model
         'nbre_sac_rejete' => 'decimal:2',
         'prix_unitaire_sac_rejete' => 'decimal:2',
         'montant_total' => 'decimal:2',
+        'validated_at'=>'date'
     ];
 
     /**Partenaire */
@@ -61,6 +65,12 @@ class Vente extends Model
     function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**Validated by */
+    function validatedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'validated_by');
     }
 
     /**Boot */

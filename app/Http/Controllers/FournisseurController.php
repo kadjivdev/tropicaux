@@ -74,4 +74,82 @@ class FournisseurController extends Controller
             return back()->withErrors(["error" => "Une erreur est survenue lors de l'enregistrement du fournisseur"]);
         }
     }
+
+
+    /**
+     * Edit
+     */
+    function edit(Fournisseur $fournisseur)
+    {
+        return inertia("Fournisseurs/Update", [
+            'fournisseur' => $fournisseur,
+        ]);
+    }
+
+    /**
+     * Update
+     */
+    function update(Request $request, Fournisseur $fournisseur)
+    {
+        Log::info("Les datas", ["data" => $request->all()]);
+
+        try {
+            $validated = $request->validate([
+                'raison_sociale' => "nullable|string",
+                'phone' => "nullable|string",
+                'adresse' => "nullable|string",
+                'email' => "nullable|email|unique:fournisseurs,email," . $fournisseur->id,
+            ], [
+                'raison_sociale.string' => 'Le nom de l’entreprise doit être une chaîne de caractères.',
+
+                'phone.string' => 'Le numéro de téléphone doit être une chaîne de caractères.',
+
+                'adresse.string' => 'L’adresse doit être une chaîne de caractères.',
+
+                'email.email' => 'L’adresse e-mail doit être valide.',
+                'email.unique' => 'Cette adresse e-mail est déjà utilisée.',
+            ]);
+
+            DB::beginTransaction();
+
+            $fournisseur->update($validated);
+
+            DB::commit();
+            return redirect()->route("fournisseur.index");
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            Log::debug("Erreure lors de la modification du fournisseur", ["error" => $e->errors()]);
+            return back()->withErrors($e->errors());
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::debug("Erreure lors de la modification du fournisseur", ["error" => $e->getMessage()]);
+            return back()->withErrors(["exception" => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Destroy
+     */
+    function destroy(Fournisseur $fournisseur)
+    {
+        try {
+            DB::beginTransaction();
+
+            if (!$fournisseur) {
+                throw new \Exception("Ce fournisseur n'existe pas");
+            }
+            $fournisseur->delete();
+
+            DB::commit();
+            return redirect()->route("fournisseur.index");
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            Log::debug("Erreure lors de la suppression du fournisseurs", ["error" => $e->errors()]);
+            return back()->withErrors($e->errors());
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::debug("Erreure lors de la suppression du fournisseurs", ["error" => $e->getMessage()]);
+            return back()->withErrors(["exception" => $e->getMessage()]);
+        }
+    }
 }

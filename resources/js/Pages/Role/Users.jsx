@@ -64,7 +64,7 @@ export default function List({ role }) {
                 Swal.close();
                 Swal.fire({
                     title: 'Opération réussie',
-                    title: '<span style="color: #2a7348;">👌Opération réussie </span>',
+                    text: '<span style="color: #2a7348;">👌Opération réussie </span>',
                     confirmButtonText: '😇 Fermer'
                 });
             },

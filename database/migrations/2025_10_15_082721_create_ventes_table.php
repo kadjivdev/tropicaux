@@ -25,6 +25,13 @@ return new class extends Migration
                 ->onUpdate("CASCADE")
                 ->onDelete("SET NULL");
 
+            $table->foreignId('validated_by')
+                ->nullable()
+                ->constrained('users')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->date("validated_at")->nullable();
+
             $table->decimal('prix')->nullable();
             $table->decimal('montant')->nullable();
             $table->decimal('poids')->nullable();

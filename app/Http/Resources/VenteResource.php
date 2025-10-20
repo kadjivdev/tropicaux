@@ -15,19 +15,19 @@ class VenteResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        // return parent::toArray($request);
         return [
             "id" => $this->id,
-            "partenaire"=>PartenaireResource::collection($this->partenaire),
-            "prix" => $this->firstname,
-            "montant" => $this->lastname,
+            "partenaire" => $this->partenaire,
+            "prix" => $this->prix,
+            "montant" => $this->montant,
             "document" => $this->document,
-
             "poids" => $this->poids,
             "nbre_sac_rejete" => $this->nbre_sac_rejete,
             "prix_unitaire_sac_rejete" => $this->prix_unitaire_sac_rejete,
             "montant_total" => $this->montant_total,
             "commentaire" => $this->commentaire,
+            "createdBy" => $this->createdBy,
+            "validated_at" => Carbon::parse($this->validated_at)->locale('fr')->isoFormat("D MMMM YYYY")
         ];
     }
 }

@@ -49,7 +49,7 @@ export default function Create({ }) {
                 Swal.close();
                 Swal.fire({
                     title: '<span style="color: #2a7348;">👌Opération réussie </span>',
-                    title: 'Opération réussie',
+                    text: 'Opération réussie',
                     confirmButtonText: '😇 Fermer'
                 });
             },
