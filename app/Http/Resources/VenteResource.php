@@ -17,6 +17,7 @@ class VenteResource extends JsonResource
     {
         return [
             "id" => $this->id,
+            "reference" => $this->reference,
             "partenaire" => $this->partenaire,
             "prix" => $this->prix,
             "montant" => $this->montant,

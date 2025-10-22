@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('chargements', function (Blueprint $table) {
             $table->id();
+            $table->text("reference")->nullable();
             $table->foreignId("produit_id")
                 ->nullable()
                 ->constrained("produits")
@@ -49,7 +50,7 @@ return new class extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
             $table->date("validated_at")->nullable();
-            $table->date("adresse")->nullable();
+            $table->string("adresse")->nullable();
             $table->text("observation")->nullable();
             $table->softDeletes();
             $table->timestamps();

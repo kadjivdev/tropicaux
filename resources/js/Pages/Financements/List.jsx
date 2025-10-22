@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import CIcon from '@coreui/icons-react';
-import { cibAddthis, cilCloudDownload, cilList, cilMenu, cilPencil, cilUserX } from "@coreui/icons";
+import { cibAddthis, cilCheckCircle, cilCloudDownload, cilList, cilMenu, cilPencil, cilUserX } from "@coreui/icons";
 import Swal from 'sweetalert2';
 
 export default function List({ financements }) {
@@ -11,13 +11,13 @@ export default function List({ financements }) {
         return permissions.some(per => per.name == name);
     }
 
-    const { delete: destroy } = useForm({})
+    const { patch, delete: destroy } = useForm({})
 
-    const deleteUser = (e, financement) => {
+    const deleteFinancement = (e, financement) => {
         e.preventDefault();
         Swal.fire({
             title: '<span style="color: #facc15;">⚠️ Êtes-vous sûr ?</span>', // yellow text
-            text: `Le superviseur (${financement.raison_sociale}) sera supprimé de façon permanente !`,
+            text: `Le financement sera supprimé de façon permanente !`,
             showCancelButton: true,
             confirmButtonColor: '#2a7348',
             cancelButtonColor: '#3085d6',
@@ -38,7 +38,7 @@ export default function List({ financements }) {
                         Swal.close();
                         Swal.fire({
                             title: '<span style="color: #2a7348;">👌Suppression réussie </span>',
-                            text: `Le financement (${financement.raison_sociale}) a été supprimé avec succès.`,
+                            text: `Le financement a été supprimé avec succès.`,
                             confirmButtonText: '😇 Fermer'
                         });
                     },
@@ -46,6 +46,48 @@ export default function List({ financements }) {
                         Swal.close();
                         Swal.fire({
                             title: '<span style="color: #facc15;">🤦‍♂️ Suppression échouée </span>', // yellow text
+                            text: `${e.exception ?? 'Veuillez réessayer.'}`,
+                            confirmButtonText: '😇 Fermer'
+                        });
+                    },
+                })
+            }
+        });
+    }
+
+    const validateFinancement = (e, financement) => {
+        e.preventDefault();
+        Swal.fire({
+            title: '<span style="color: #facc15;">⚠️ Êtes-vous sûr ?</span>', // yellow text
+            text: `Ce financement sera validé de façon permanente !`,
+            showCancelButton: true,
+            confirmButtonColor: '#2a7348',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: '😇 Oui, valider !',
+            cancelButtonText: 'Annuler'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: '<span style="color: #facc15;">🫠 Validation en cours...</span>', // yellow text
+                    text: 'Veuillez patienter pendant que nous traitons vos données.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    },
+                });
+                patch(route('financement.validate', financement.id), {
+                    onSuccess: () => {
+                        Swal.close();
+                        Swal.fire({
+                            title: '<span style="color: #2a7348;">Validation réussie </span>',
+                            text: `Le financement a été validé avec succès.`,
+                            confirmButtonText: '😇 Fermer'
+                        });
+                    },
+                    onError: (e) => {
+                        Swal.close();
+                        Swal.fire({
+                            title: '<span style="color: #facc15;">🤦‍♂️ Validation échouée </span>', // yellow text
                             text: `${e.exception ?? 'Veuillez réessayer.'}`,
                             confirmButtonText: '😇 Fermer'
                         });
@@ -78,27 +120,25 @@ export default function List({ financements }) {
                             <thead>
                                 <tr>
                                     <th scope="col">N°</th>
+                                    <th scope="col text-center">Action</th>
+                                    <th scope="col">Reference</th>
                                     <th scope="col">Fournisseur</th>
                                     <th scope="col">Gestionnaire</th>
                                     <th scope="col">Montant</th>
                                     <th scope="col">Date de financement</th>
                                     <th scope="col">Preuve</th>
                                     <th scope="col">Inséré par</th>
-                                    <th scope="col">Action</th>
+                                    <th scope="col">Validé le</th>
+                                    <th scope="col">Validé par</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {
                                     financements.data.map((financement, index) => (
-                                        <tr key={superviseur.id}>
+                                        <tr key={financement.id}>
                                             <th scope="row">{index + 1}</th>
-                                            <td>{financement?.fournisseur?.raison_sociale ?? '---'}</td>
-                                            <td>{`${financement?.gestionnaire?.lastname} - ${financement?.gestionnaire?.firstname}`}</td>
-                                            <td>{financement.montant}</td>
-                                            <td>{financement.date_financement}</td>
-                                            <td><Link className='btn btn-sm shadow border rounded text-dark' href={financement.document} > <CIcon className='text-success' icon={cilCloudDownload} /> </Link></td>
                                             <td>
-                                                {financement.validated_at ?
+                                                {!financement.validated_at ?
                                                     (
                                                         <div className="dropstart">
                                                             <button className="dropdown-toggle inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none dark:bg-gray-800 dark:text-gray-400 dark:hover:text-gray-300" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -109,7 +149,7 @@ export default function List({ financements }) {
                                                                 <li>
                                                                     {checkPermission('financement.edit') ?
                                                                         (<Link
-                                                                            className='btn'
+                                                                            className='btn text-warning'
                                                                             href={route('financement.edit', financement.id)}
                                                                         >
                                                                             <CIcon icon={cilPencil} />  Modifier
@@ -117,11 +157,22 @@ export default function List({ financements }) {
                                                                     }
                                                                 </li>
                                                                 <li>
+                                                                    {checkPermission('financement.validate') ?
+                                                                        (<Link
+                                                                            href="#"
+                                                                            className='btn text-success'
+                                                                            onClick={(e) => validateFinancement(e, financement)}
+                                                                        >
+                                                                            <CIcon icon={cilCheckCircle} />  Valider
+                                                                        </Link>) : null
+                                                                    }
+                                                                </li>
+                                                                <li>
                                                                     {checkPermission('financement.delete') ?
                                                                         (<Link
                                                                             href="#"
-                                                                            className='btn'
-                                                                            onClick={(e) => deleteUser(e, financement)}
+                                                                            className='btn text-danger'
+                                                                            onClick={(e) => deleteFinancement(e, financement)}
                                                                         >
                                                                             <CIcon icon={cilUserX} />  Supprimer
                                                                         </Link>) : null
@@ -133,6 +184,27 @@ export default function List({ financements }) {
                                                 }
 
                                             </td>
+                                            <td><span className="badge bg-light rounded text-dark rounded shadow-sm"> {financement?.reference ?? '---'}</span> </td>
+                                            <td>{financement?.fournisseur?.raison_sociale ?? '---'}</td>
+                                            <td>{`${financement?.gestionnaire?.lastname} - ${financement?.gestionnaire?.firstname}`}</td>
+                                            <td>{financement.montant}</td>
+                                            <td>{financement.date_financement}</td>
+                                            <td>
+                                                {financement.document ? (
+                                                    <a
+                                                        className='btn btn-sm shadow border rounded text-dark'
+                                                        target='_blank'
+                                                        href={financement.document}
+                                                    >
+                                                        <CIcon className='text-success' icon={cilCloudDownload} />
+                                                    </a>
+                                                ) : (
+                                                    <span className="text-muted">---</span>
+                                                )}
+                                            </td>
+                                            <td> <span className="badge bg-light border rounded text-dark">{`${financement.createdBy?.firstname} - ${financement.createdBy?.lastname}`}</span> </td>
+                                            <td> <span className="badge bg-light border rounded text-dark">{`${financement.validated_at || '--'}`}</span> </td>
+                                            <td> <span className="badge bg-light border rounded text-dark">{`${financement.validatedBy?.firstname || ''} - ${financement.validatedBy?.lastname || ''}`}</span> </td>
                                         </tr>
                                     ))
                                 }

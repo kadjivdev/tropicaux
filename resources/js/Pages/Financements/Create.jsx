@@ -9,7 +9,7 @@ import { cilSend, cilList, cibAddthis } from "@coreui/icons";
 import Swal from 'sweetalert2';
 import Select from 'react-select'
 
-export default function Create({ fournisseurs,gestionnaires}) {
+export default function Create({ fournisseurs, gestionnaires }) {
     const permissions = usePage().props.auth.permissions;
 
     const checkPermission = (name) => {
@@ -26,10 +26,11 @@ export default function Create({ fournisseurs,gestionnaires}) {
         processing,
         progress
     } = useForm({
-        raison_sociale: "",
-        phone: "",
-        adresse: "",
-        email: "",
+        fournisseur_id: "",
+        gestionnaire_id: "",
+        montant: "",
+        date_financement: "",
+        document: "",
     });
 
     const submit = (e) => {
@@ -128,21 +129,6 @@ export default function Create({ fournisseurs,gestionnaires}) {
                                             />
                                             <InputError className="mt-2" message={errors.montant} />
                                         </div>
-
-                                        <div className='mb-3'>
-                                            <InputLabel htmlFor="date_financement" value="Date de financement" > <span className="text-danger">*</span> </InputLabel>
-                                            <TextInput
-                                                id="date_financement"
-                                                type="file"
-                                                className="mt-1 block w-full"
-                                                value={data.phone}
-                                                onChange={(e) => setData('date_financement', e.target.value)}
-                                                autoComplete="date_financement"
-                                                required
-                                            />
-                                            <InputError className="mt-2" message={errors.date_financement} />
-                                        </div>
-
                                     </div>
                                     <div className="col-md-6">
                                         <div className="mb-3">
@@ -168,32 +154,34 @@ export default function Create({ fournisseurs,gestionnaires}) {
 
                                             <InputError className="mt-2" message={errors.gestionnaire_id} />
                                         </div>
-                                        <div className='mb-3'>
-                                            <InputLabel htmlFor="adresse" value="Adresse" > </InputLabel>
-                                            <TextInput
-                                                id="adresse"
-                                                className="mt-1 block w-full"
-                                                value={data.adresse}
-                                                placeholder="Ex: Cotonou"
-                                                onChange={(e) => setData('adresse', e.target.value)}
-                                                autoComplete="adresse"
-                                            />
 
-                                            <InputError className="mt-2" message={errors.adresse} />
+                                        <div className='mb-3'>
+                                            <InputLabel htmlFor="date_financement" value="Date de financement" > <span className="text-danger">*</span> </InputLabel>
+                                            <TextInput
+                                                id="date_financement"
+                                                type="date"
+                                                className="mt-1 block w-full"
+                                                value={data.date_financement}
+                                                onChange={(e) => setData('date_financement', e.target.value)}
+                                                autoComplete="date_financement"
+                                                required
+                                            />
+                                            <InputError className="mt-2" message={errors.date_financement} />
                                         </div>
+                                    </div>
 
+                                    <div className="col-12">
                                         <div className='mb-3'>
-                                            <InputLabel htmlFor="email" value="Email" > </InputLabel>
+                                            <InputLabel htmlFor="document" value="Document(preuve)" > </InputLabel>
                                             <TextInput
-                                                id="email"
+                                                id="document"
+                                                type="file"
                                                 className="mt-1 block w-full"
-                                                value={data.email}
-                                                placeholder="Ex: gogochristian009@gmail.com"
-                                                onChange={(e) => setData('email', e.target.value)}
-                                                autoComplete="email"
+                                                onChange={(e) => setData('document',e.target.files[0])}
+                                                autoComplete="document"
                                             />
 
-                                            <InputError className="mt-2" message={errors.email} />
+                                            <InputError className="mt-2" message={errors.document} />
                                         </div>
                                     </div>
                                 </div>

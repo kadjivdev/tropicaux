@@ -5,11 +5,19 @@ import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import InputError from '@/Components/InputError';
 import CIcon from '@coreui/icons-react';
-import { cilSend, cilList, cibAddthis, cilPencil } from "@coreui/icons";
+import { cilSend, cilList, cibAddthis, cilCut, cilTruck, cilPencil } from "@coreui/icons";
 import Swal from 'sweetalert2';
+import Select from 'react-select'
+import { Textarea } from '@headlessui/react';
+import { useEffect, useState } from 'react';
 
-export default function Update({ superviseur }) {
+export default function Update({ chargement, produits, convoyeurs, superviseurs, magasins, chauffeurs, fournisseurs, camions }) {
     const permissions = usePage().props.auth.permissions;
+    const [i, setI] = useState(1);
+    const [iCamion, setIcamion] = useState(1);
+
+    const [lignes, setLignes] = useState(chargement.details || []);
+    const [ligneCamions, setCamionLignes] = useState(chargement.camions || []);
 
     const checkPermission = (name) => {
         return permissions.some(per => per.name == name);
@@ -19,23 +27,81 @@ export default function Update({ superviseur }) {
         data,
         setData,
         errors,
-        put,
-        post,
         patch,
-        reset,
         processing,
-        progress
+        // progress
     } = useForm({
-        raison_sociale: superviseur.raison_sociale,
-        phone: superviseur.phone,
-        adresse: superviseur.adresse,
-        email: superviseur.email,
+        produit_id: chargement.produit_id || "",
+        chauffeur_id: chargement.chauffeur_id || "",
+        superviseur_id: chargement.superviseur_id || "",
+        convoyeur_id: chargement.convoyeur_id || "",
+        magasin_id: chargement.magasin_id || "",
+        adresse: chargement.adresse || '',
+        observation: chargement.observation || "",
+        details: lignes,
+        camions: ligneCamions,
     });
 
+
+    // Gestion des camions
+    const addCamionLine = (e) => {
+        e.preventDefault()
+
+        setCamionLignes([...ligneCamions, {
+            id: iCamion,
+            commentaire: '',
+        }]);
+
+        setIcamion(iCamion + 1)
+        console.log("initial lignes ", ligneCamions)
+    };
+
+    useEffect(() => {
+        setData("camions", ligneCamions);
+    }, [ligneCamions])
+
+    const removeCamionLine = (id) => {
+        let updatedLines = ligneCamions.filter(function (ligne) {
+            return ligne.id != id
+        });
+
+        setCamionLignes(updatedLines);
+    };
+
+    // Gestion des détails
+    const addLine = (e) => {
+        e.preventDefault()
+
+        setLignes([...lignes, {
+            id: i,
+            fournisseur_id: '',
+            sac_jute: '',
+            sac_pp: '',
+            tonnage: '',
+            prix_achat: ''
+        }]);
+
+        setI(i + 1)
+        console.log("initial lignes ", lignes)
+    };
+
+    useEffect(() => {
+        setData("details", lignes);
+    }, [lignes]);
+
+    const removeLine = (id) => {
+        let updatedLines = lignes.filter(function (ligne) {
+            return ligne.id != id
+        });
+
+        setLignes(updatedLines);
+    };
+
+    // Submitting form
     const submit = (e) => {
         e.preventDefault();
 
-        patch(route('superviseur.update',superviseur.id), {
+        patch(route('chargement.update', chargement.id), {
             onStart: () => {
                 Swal.fire({
                     title: '<span style="color: #facc15;">🫠 Opération en cours...</span>', // yellow text
@@ -58,7 +124,7 @@ export default function Update({ superviseur }) {
                 Swal.close();
                 Swal.fire({
                     title: '<span style="color: #facc15;">🤦‍♂️ Opération échouée </span>', // yellow text
-                    text: `${e.exception ?? 'Veuillez vérifier vos informations et réessayer.'}`,
+                    text: `${e.error ?? 'Veuillez vérifier vos informations et réessayer.'}`,
                     confirmButtonText: '😇 Fermer'
                 });
                 console.log(e);
@@ -70,86 +136,375 @@ export default function Update({ superviseur }) {
         <AuthenticatedLayout
             header={
                 <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                    <CIcon className='text-success' icon={cilPencil} /> Modification du superviseur <span className="badge bg-light text-warning border rounded">{superviseur?.raison_sociale}</span>
+                    <CIcon className='text-success' icon={cilPencil} /> Modification du Chargement <span className="badge bg-light text-success border rounded">{chargement.reference ?? '---'}</span>
                 </h2>
             }
         >
-            <Head title="Modifier un superviseur" />
+            <Head title="Modifier un Chargement" />
 
             <div className="row py-12 justify-content-center">
                 <div className="col-md-10 bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
                     <div className="mx-auto _max-w-7xl space-y-6 sm:px-6 lg:px-8 ">
 
                         <div className="bg-light p-3 rounded border mb-5">
-                            {checkPermission('superviseur.view') ?
+                            {checkPermission('chargement.view') ?
                                 (<div className=" text-center  items-center gap-4">
-                                    <Link className="btn btn-sm bg-success bg-hover text-white" href={route("superviseur.index")}> <CIcon icon={cilList} /> Liste des superviseurs</Link>
+                                    <Link className="btn btn-sm bg-success bg-hover text-white" href={route("chargement.index")}> <CIcon icon={cilList} /> Liste des chargements</Link>
                                 </div>) : null
                             }
 
                             <form onSubmit={submit} className="mt-6 space-y-6">
                                 <div className="row">
                                     <div className="col-md-6">
-                                        <div className='mb-3'>
-                                            <InputLabel htmlFor="raison_sociale" value="Raison Sociale" >  <span className="text-danger">*</span> </InputLabel>
-                                            <TextInput
-                                                id="raison_sociale"
-                                                className="mt-1 block w-full"
-                                                value={data.raison_sociale}
-                                                placeholder="Ex: Kocou Emmanuel"
-                                                onChange={(e) => setData('raison_sociale', e.target.value)}
-                                                autoComplete="raison_sociale"
+                                        <div className="mb-3">
+                                            <InputLabel htmlFor="produit_id" value="Produit" >  <span className="text-danger">*</span> </InputLabel>
+                                            <Select
+                                                placeholder="Rechercher un produit ..."
+                                                name="produit_id"
+                                                id="produit_id"
                                                 required
+                                                className="form-control mt-1 block w-full"
+                                                options={produits.map((produit) => ({
+                                                    value: produit.id,
+                                                    label: `${produit.libelle}`,
+                                                }))}
+                                                value={produits
+                                                    .map((produit) => ({
+                                                        value: produit.id,
+                                                        label: `${produit.libelle}`,
+                                                    }))
+                                                    .find((option) => option.value === data.produit_id)} // set selected option
+                                                onChange={(option) => setData('produit_id', option.value)} // update state with id
                                             />
-                                            <InputError className="mt-2" message={errors.raison_sociale} />
-                                        </div>
 
-                                        <div className='mb-3'>
-                                            <InputLabel htmlFor="phone" value="Téléphone" > </InputLabel>
-                                            <TextInput
-                                                id="phone"
-                                                className="mt-1 block w-full"
-                                                value={data.phone}
-                                                placeholder="Ex: +2290156854397"
-                                                onChange={(e) => setData('phone', e.target.value)}
-                                                autoComplete="phone"
+                                            <InputError className="mt-2" message={errors.produit_id} />
+                                        </div>
+                                        <div className="mb-3">
+                                            <InputLabel htmlFor="chauffeur_id" value="Chauffeur" >  <span className="text-danger">*</span> </InputLabel>
+                                            <Select
+                                                placeholder="Rechercher un chauffeur ..."
+                                                name="chauffeur_id"
+                                                id="chauffeur_id"
                                                 required
+                                                className="form-control mt-1 block w-full"
+                                                options={chauffeurs.map((chauffeur) => ({
+                                                    value: chauffeur.id,
+                                                    label: `${chauffeur.raison_sociale}`,
+                                                }))}
+                                                value={chauffeurs
+                                                    .map((chauffeur) => ({
+                                                        value: chauffeur.id,
+                                                        label: `${chauffeur.raison_sociale}`,
+                                                    }))
+                                                    .find((option) => option.value === data.chauffeur_id)} // set selected option
+                                                onChange={(option) => setData('chauffeur_id', option.value)} // update state with id
                                             />
-                                            <InputError className="mt-2" message={errors.phone} />
-                                        </div>
 
+                                            <InputError className="mt-2" message={errors.chauffeur_id} />
+                                        </div>
+                                        <div className="mb-3">
+                                            <InputLabel htmlFor="magasin_id" value="Magasin" >  <span className="text-danger">*</span> </InputLabel>
+                                            <Select
+                                                placeholder="Rechercher un magasin ..."
+                                                name="magasin_id"
+                                                id="magasin_id"
+                                                required
+                                                className="form-control mt-1 block w-full"
+                                                options={magasins.map((magasin) => ({
+                                                    value: magasin.id,
+                                                    label: `${magasin.libelle}`,
+                                                }))}
+                                                value={magasins
+                                                    .map((magasin) => ({
+                                                        value: magasin.id,
+                                                        label: `${magasin.libelle}`,
+                                                    }))
+                                                    .find((option) => option.value === data.magasin_id)} // set selected option
+                                                onChange={(option) => setData('magasin_id', option.value)} // update state with id
+                                            />
+
+                                            <InputError className="mt-2" message={errors.magasin_id} />
+                                        </div>
                                     </div>
                                     <div className="col-md-6">
+                                        <div className="mb-3">
+                                            <InputLabel htmlFor="superviseur_id" value="Superviseur" >  <span className="text-danger">*</span> </InputLabel>
+                                            <Select
+                                                placeholder="Rechercher un superviseur ..."
+                                                name="superviseur_id"
+                                                id="superviseur_id"
+                                                required
+                                                className="form-control mt-1 block w-full"
+                                                options={superviseurs.map((superviseur) => ({
+                                                    value: superviseur.id,
+                                                    label: `${superviseur.raison_sociale}`,
+                                                }))}
+                                                value={superviseurs
+                                                    .map((superviseur) => ({
+                                                        value: superviseur.id,
+                                                        label: `${superviseur.raison_sociale}`,
+                                                    }))
+                                                    .find((option) => option.value === data.superviseur_id)} // set selected option
+                                                onChange={(option) => setData('superviseur_id', option.value)} // update state with id
+                                            />
+
+                                            <InputError className="mt-2" message={errors.superviseur_id} />
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <InputLabel htmlFor="convoyeur_id" value="Convoyeur" ></InputLabel>
+                                            <Select
+                                                placeholder="Rechercher un convoyeur ..."
+                                                name="convoyeur_id"
+                                                id="convoyeur_id"
+                                                className="form-control mt-1 block w-full"
+                                                options={convoyeurs.map((convoyeur) => ({
+                                                    value: convoyeur.id,
+                                                    label: `${convoyeur.raison_sociale}`,
+                                                }))}
+                                                value={convoyeurs
+                                                    .map((convoyeur) => ({
+                                                        value: convoyeur.id,
+                                                        label: `${convoyeur.raison_sociale}`,
+                                                    }))
+                                                    .find((option) => option.value === data.convoyeur_id)} // set selected option
+                                                onChange={(option) => setData('convoyeur_id', option.value)} // update state with id
+                                            />
+
+                                            <InputError className="mt-2" message={errors.convoyeur_id} />
+                                        </div>
+
                                         <div className='mb-3'>
-                                            <InputLabel htmlFor="adresse" value="Adresse" > </InputLabel>
+                                            <InputLabel htmlFor="adresse" value="Lieu de chargement" >  <span className="text-danger">*</span> </InputLabel>
                                             <TextInput
+                                                type="text"
                                                 id="adresse"
                                                 className="mt-1 block w-full"
                                                 value={data.adresse}
-                                                placeholder="Ex: Cotonou"
+                                                placeholder="Abomey"
                                                 onChange={(e) => setData('adresse', e.target.value)}
                                                 autoComplete="adresse"
+                                                min={1}
+                                                required
                                             />
-
                                             <InputError className="mt-2" message={errors.adresse} />
-                                        </div>
-
-                                        <div className='mb-3'>
-                                            <InputLabel htmlFor="email" value="Email" > </InputLabel>
-                                            <TextInput
-                                                id="email"
-                                                className="mt-1 block w-full"
-                                                value={data.email}
-                                                placeholder="Ex: gogochristian009@gmail.com"
-                                                onChange={(e) => setData('email', e.target.value)}
-                                                autoComplete="email"
-                                            />
-
-                                            <InputError className="mt-2" message={errors.email} />
                                         </div>
                                     </div>
                                 </div>
 
+                                <br />
+                                {/* Camions */}
+                                <div className="d-flex" style={{ justifyContent: 'space-between' }}>
+                                    <span className="text-success"><CIcon icon={cilTruck} /> Détail des camions</span>
+                                    <button className="btn btn-success bg-hover"
+                                        onClick={(e) => addCamionLine(e)}> <CIcon className='' icon={cilTruck} /> Ajouter un camion</button>
+                                </div>
+                                <table className="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">N°</th>
+                                            <th scope="col">Camion</th>
+                                            <th scope="col">Commentaire</th>
+                                            <th scope='col'>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="camion">
+                                        {
+                                            ligneCamions.length > 0 ?
+                                                ligneCamions.map((data, index) => (
+                                                    <tr key={index}>
+                                                        <td>{index + 1}</td>
+                                                        <td>
+                                                            <div className="mb-3">
+                                                                <Select
+                                                                    placeholder="Rechercher un camion ..."
+                                                                    name="magasin_id"
+                                                                    className="form-control mt-1 block w-full"
+                                                                    options={camions.map((camion) => ({
+                                                                        value: camion.id,
+                                                                        label: camion.libelle,
+                                                                    }))}
+                                                                    value={camions
+                                                                        .map((camion) => ({
+                                                                            value: camion.id,
+                                                                            label: camion.libelle,
+                                                                        }))
+                                                                        .find((option) => option.value === data.camion_id)}
+                                                                    onChange={(option) => {
+                                                                        const updated = [...ligneCamions];
+                                                                        updated[index].camion_id = option.value;
+                                                                        setCamionLignes(updated);
+                                                                    }}
+                                                                    required
+                                                                />
+                                                            </div>
+                                                        </td>
+
+                                                        <td>
+                                                            <Textarea
+                                                                type="text"
+                                                                className="mt-1 block w-full form-control"
+                                                                value={data.commentaire}
+                                                                placeholder="Ex : Ceci est le camion qui a éffectué au premier chargement"
+                                                                onChange={(e) => {
+                                                                    const updated = [...ligneCamions];
+                                                                    updated[index].commentaire = e.target.value;
+                                                                    setCamionLignes(updated);
+                                                                }}
+                                                                required
+                                                            />
+                                                        </td>
+
+                                                        <td className='items-center'>
+                                                            <button className="btn btn-sm btn-danger shadow-sm rounded"
+                                                                onClick={() => removeCamionLine(data.id)}> <CIcon icon={cilCut} /> </button>
+                                                        </td>
+                                                    </tr>
+                                                )) : <tr className='text-center'><td colSpan={4}>Aucun camion disponible <InputError className="mt-2" message={errors.camions} /></td></tr>}
+                                    </tbody>
+                                </table>
+
+                                <br />
+                                {/* Détail */}
+                                <div className="d-flex" style={{ justifyContent: 'space-between' }}>
+                                    <span className="text-success"><CIcon icon={cilList} /> Détail du chargement</span>
+                                    <button className="btn btn-success bg-hover"
+                                        onClick={(e) => addLine(e)}> <CIcon className='' icon={cibAddthis} /> Ajouter</button>
+                                </div>
+                                <table className="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">N°</th>
+                                            <th scope="col">Fournisseur</th>
+                                            <th scope="col">Sac de Jute</th>
+                                            <th scope="col">Sac PP</th>
+                                            <th scope="col">Tonnage</th>
+                                            <th scope="col">Prix d'achat</th>
+                                            <th scope='col'>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="lignes">
+                                        {
+                                            lignes.length > 0 ?
+                                                lignes.map((data, index) => (
+                                                    <tr key={index}>
+                                                        <td>{index + 1}</td>
+                                                        <td>
+                                                            <div className="mb-3">
+                                                                <Select
+                                                                    placeholder="Rechercher un fournisseur ..."
+                                                                    name="fournisseur_id"
+                                                                    className="form-control mt-1 block w-full"
+                                                                    options={fournisseurs.map((fournisseur) => ({
+                                                                        value: fournisseur.id,
+                                                                        label: fournisseur.raison_sociale,
+                                                                    }))}
+                                                                    value={fournisseurs
+                                                                        .map((fournisseur) => ({
+                                                                            value: fournisseur.id,
+                                                                            label: fournisseur.raison_sociale,
+                                                                        }))
+                                                                        .find((option) => option.value === data.fournisseur_id)}
+                                                                    onChange={(option) => {
+                                                                        const updated = [...lignes];
+                                                                        updated[index].fournisseur_id = option.value;
+                                                                        setLignes(updated);
+                                                                    }}
+                                                                    required
+                                                                />
+                                                            </div>
+                                                        </td>
+
+                                                        <td>
+                                                            <TextInput
+                                                                type="number"
+                                                                className="mt-1 block w-full"
+                                                                value={data.sac_jute}
+                                                                placeholder="Ex : 10"
+                                                                onChange={(e) => {
+                                                                    const updated = [...lignes];
+                                                                    updated[index].sac_jute = e.target.value;
+                                                                    setLignes(updated);
+                                                                }}
+                                                                required
+                                                            />
+                                                        </td>
+
+                                                        <td>
+                                                            <TextInput
+                                                                type="number"
+                                                                className="mt-1 block w-full"
+                                                                value={data.sac_pp}
+                                                                placeholder="Ex : 10"
+                                                                onChange={(e) => {
+                                                                    const updated = [...lignes];
+                                                                    updated[index].sac_pp = e.target.value;
+                                                                    setLignes(updated);
+                                                                }}
+                                                                min={0}
+                                                                required
+                                                            />
+                                                        </td>
+
+                                                        <td>
+                                                            <TextInput
+                                                                type="number"
+                                                                className="mt-1 block w-full"
+                                                                value={data.tonnage}
+                                                                placeholder="Ex : 10"
+                                                                onChange={(e) => {
+                                                                    const updated = [...lignes];
+                                                                    updated[index].tonnage = e.target.value;
+                                                                    setLignes(updated);
+                                                                }}
+                                                                min={0}
+                                                                required
+                                                            />
+                                                        </td>
+
+                                                        <td>
+                                                            <TextInput
+                                                                type="number"
+                                                                className="mt-1 block w-full"
+                                                                value={data.prix_achat}
+                                                                placeholder="Ex : 75.000"
+                                                                onChange={(e) => {
+                                                                    const updated = [...lignes];
+                                                                    updated[index].prix_achat = e.target.value;
+                                                                    setLignes(updated);
+                                                                }}
+                                                                min={1}
+                                                                required
+                                                            />
+                                                        </td>
+
+                                                        <td className='items-center'>
+                                                            <button className="btn btn-sm btn-danger shadow-sm rounded"
+                                                                onClick={() => removeLine(data.id)}> <CIcon icon={cilCut} /> </button>
+                                                        </td>
+                                                    </tr>
+                                                )) : <tr className='text-center'><td colSpan={7}>Aucune ligne disponible <InputError className="mt-2" message={errors.details} /></td></tr>}
+                                    </tbody>
+                                </table>
+
+                                {/* Observation */}
+                                <div className="row">
+                                    <div className="col-12">
+                                        <div className='mb-3'>
+                                            <InputLabel htmlFor="observation" value="Observation" > </InputLabel>
+                                            <Textarea
+                                                id="observation"
+                                                type="text"
+                                                className="mt-1 block w-full form-control"
+                                                placeholder='Laissez une observation ici ...'
+                                                value={data.observation}
+                                                onChange={(e) => setData('observation', e.target.value)}
+                                                autoComplete="observation"
+                                            />
+                                            <InputError className="mt-2" message={errors.observation} />
+                                        </div>
+                                    </div>
+                                </div>
                                 <div className="flex items-center gap-4">
                                     <PrimaryButton disabled={processing}> <CIcon icon={cilSend} /> {processing ? 'Enregistrement ...' : 'Enregistrer'} </PrimaryButton>
                                 </div>

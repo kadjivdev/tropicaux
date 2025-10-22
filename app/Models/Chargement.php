@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Chargement extends Model
@@ -11,6 +12,7 @@ class Chargement extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'reference',
         'produit_id',
         'chauffeur_id',
         'superviseur_id',
@@ -70,12 +72,26 @@ class Chargement extends Model
         return $this->belongsTo(User::class, 'validated_by');
     }
 
+    /**Detail */
+    function details(): HasMany
+    {
+        return $this->hasMany(ChargementDetail::class, "chargement_id");
+    }
+
+    /**Camions */
+    function camions(): HasMany
+    {
+        return $this->hasMany(ChargementCamion::class, "chargement_id");
+    }
+
     /**Boot */
     protected static function booted()
     {
-        static::creating(function ($produit) {
+        static::creating(function ($chargement) {
+            
+            $chargement->reference = "CHARGE-" . time() . "-MENT";
             if (auth()->check()) {
-                $produit->user_id = auth()->id();
+                $chargement->user_id = auth()->id();
             }
         });
     }

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('financements', function (Blueprint $table) {
             $table->id();
+            $table->text("reference")->nullable();
             $table->foreignId("fournisseur_id")
                 ->nullable()
                 ->constrained("fournisseurs")

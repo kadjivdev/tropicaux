@@ -9,7 +9,7 @@ import { cilSend, cilList, cibAddthis } from "@coreui/icons";
 import Swal from 'sweetalert2';
 import Select from 'react-select'
 
-export default function Create({ fournisseurs,gestionnaires}) {
+export default function Create({ chargements, superviseurs }) {
     const permissions = usePage().props.auth.permissions;
 
     const checkPermission = (name) => {
@@ -20,22 +20,21 @@ export default function Create({ fournisseurs,gestionnaires}) {
         data,
         setData,
         errors,
-        put,
         post,
-        reset,
         processing,
         progress
     } = useForm({
-        raison_sociale: "",
-        phone: "",
-        adresse: "",
-        email: "",
+        chargement_id: "",
+        superviseur_id: "",
+        montant: "",
+        document: "",
+        commentaire:''
     });
 
     const submit = (e) => {
         e.preventDefault();
 
-        post(route('financement.store'), {
+        post(route('fond-superviseur.store'), {
             onStart: () => {
                 Swal.fire({
                     title: '<span style="color: #facc15;">🫠 Opération en cours...</span>', // yellow text
@@ -58,7 +57,7 @@ export default function Create({ fournisseurs,gestionnaires}) {
                 Swal.close();
                 Swal.fire({
                     title: '<span style="color: #facc15;">🤦‍♂️ Opération échouée </span>', // yellow text
-                    text: `${e.exception ?? 'Veuillez vérifier vos informations et réessayer.'}`,
+                    text: `${e.error ?? 'Veuillez vérifier vos informations et réessayer.'}`,
                     confirmButtonText: '😇 Fermer'
                 });
                 console.log(e);
@@ -70,20 +69,20 @@ export default function Create({ fournisseurs,gestionnaires}) {
         <AuthenticatedLayout
             header={
                 <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                    <CIcon className='text-success' icon={cibAddthis} /> Ajout des financements
+                    <CIcon className='text-success' icon={cibAddthis} /> Ajout des fonds superviseurs
                 </h2>
             }
         >
-            <Head title="Ajouter un financement" />
+            <Head title="Ajouter un Fond" />
 
             <div className="row py-12 justify-content-center">
                 <div className="col-md-10 bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
                     <div className="mx-auto _max-w-7xl space-y-6 sm:px-6 lg:px-8 ">
 
                         <div className="bg-light p-3 rounded border mb-5">
-                            {checkPermission('financement.view') ?
+                            {checkPermission('fond.superviseur.view') ?
                                 (<div className=" text-center  items-center gap-4">
-                                    <Link className="btn btn-sm bg-success bg-hover text-white" href={route("financement.index")}> <CIcon icon={cilList} /> Liste des financements</Link>
+                                    <Link className="btn btn-sm bg-success bg-hover text-white" href={route("fond-superviseur.index")}> <CIcon icon={cilList} /> Liste des fonds aux superviseurs</Link>
                                 </div>) : null
                             }
 
@@ -91,27 +90,27 @@ export default function Create({ fournisseurs,gestionnaires}) {
                                 <div className="row">
                                     <div className="col-md-6">
                                         <div className="mb-3">
-                                            <InputLabel htmlFor="fournisseur_id" value="Fournisseur" >  <span className="text-danger">*</span> </InputLabel>
+                                            <InputLabel htmlFor="chargement_id" value="Chargement" >  <span className="text-danger">*</span> </InputLabel>
                                             <Select
                                                 placeholder="Rechercher un fournisseur ..."
-                                                name="fournisseur_id"
-                                                id="fournisseur_id"
+                                                name="chargement_id"
+                                                id="chargement_id"
                                                 required
                                                 className="form-control mt-1 block w-full"
-                                                options={fournisseurs.map((fournisseur) => ({
-                                                    value: fournisseur.id,
-                                                    label: `${fournisseur.raison_sociale}`,
+                                                options={chargements.map((chargement) => ({
+                                                    value: chargement.id,
+                                                    label: `${chargement.reference}`,
                                                 }))}
-                                                value={fournisseurs
-                                                    .map((fournisseur) => ({
-                                                        value: fournisseur.id,
-                                                        label: `${fournisseur.raison_sociale}`,
+                                                value={chargements
+                                                    .map((chargement) => ({
+                                                        value: chargement.id,
+                                                        label: `${chargement.reference}`,
                                                     }))
-                                                    .find((option) => option.value === data.fournisseur_id)} // set selected option
-                                                onChange={(option) => setData('fournisseur_id', option.value)} // update state with id
+                                                    .find((option) => option.value === data.chargement_id)} // set selected option
+                                                onChange={(option) => setData('chargement_id', option.value)} // update state with id
                                             />
 
-                                            <InputError className="mt-2" message={errors.fournisseur_id} />
+                                            <InputError className="mt-2" message={errors.chargement_id} />
                                         </div>
                                         <div className='mb-3'>
                                             <InputLabel htmlFor="montant" value="Le montant" >  <span className="text-danger">*</span> </InputLabel>
@@ -130,70 +129,61 @@ export default function Create({ fournisseurs,gestionnaires}) {
                                         </div>
 
                                         <div className='mb-3'>
-                                            <InputLabel htmlFor="date_financement" value="Date de financement" > <span className="text-danger">*</span> </InputLabel>
+                                            <InputLabel htmlFor="document" value="Document(preuve)" ></InputLabel>
                                             <TextInput
-                                                id="date_financement"
+                                                id="file"
                                                 type="file"
                                                 className="mt-1 block w-full"
                                                 value={data.phone}
-                                                onChange={(e) => setData('date_financement', e.target.value)}
-                                                autoComplete="date_financement"
-                                                required
+                                                onChange={(e) => setData('document', e.target.file[0])}
+                                                autoComplete="document"
                                             />
-                                            <InputError className="mt-2" message={errors.date_financement} />
+                                            <InputError className="mt-2" message={errors.document} />
+
+                                            {progress && (
+                                                <progress value={progress.percentage} max="100">
+                                                    {progress.percentage}%
+                                                </progress>
+                                            )}
                                         </div>
 
                                     </div>
                                     <div className="col-md-6">
                                         <div className="mb-3">
-                                            <InputLabel htmlFor="gestionnaire_id" value="Gestionnaire" >  <span className="text-danger">*</span> </InputLabel>
+                                            <InputLabel htmlFor="superviseur_id" value="Superviseur" >  <span className="text-danger">*</span> </InputLabel>
                                             <Select
-                                                placeholder="Rechercher un gestionnaire ..."
-                                                name="gestionnaire_id"
-                                                id="gestionnaire_id"
+                                                placeholder="Rechercher un superviseur ..."
+                                                name="superviseur_id"
+                                                id="superviseur_id"
                                                 required
                                                 className="form-control mt-1 block w-full"
-                                                options={gestionnaires.map((gestionnaire) => ({
-                                                    value: gestionnaire.id,
-                                                    label: `${gestionnaire.firstname} - ${gestionnaire.lastname}`,
+                                                options={superviseurs.map((superviseur) => ({
+                                                    value: superviseur.id,
+                                                    label: `${superviseur.raison_sociale}`,
                                                 }))}
-                                                value={gestionnaires
-                                                    .map((gestionnaire) => ({
-                                                        value: gestionnaire.id,
-                                                        label: `${gestionnaire.firstname} - ${gestionnaire.lastname}`,
+                                                value={superviseurs
+                                                    .map((superviseur) => ({
+                                                        value: superviseur.id,
+                                                        label: `${superviseur.raison_sociale}`,
                                                     }))
-                                                    .find((option) => option.value === data.gestionnaire_id)} // set selected option
-                                                onChange={(option) => setData('gestionnaire_id', option.value)} // update state with id
+                                                    .find((option) => option.value === data.superviseur_id)} // set selected option
+                                                onChange={(option) => setData('superviseur_id', option.value)} // update state with id
                                             />
 
-                                            <InputError className="mt-2" message={errors.gestionnaire_id} />
+                                            <InputError className="mt-2" message={errors.superviseur_id} />
                                         </div>
                                         <div className='mb-3'>
-                                            <InputLabel htmlFor="adresse" value="Adresse" > </InputLabel>
+                                            <InputLabel htmlFor="commentaire" value="Commentaire" > </InputLabel>
                                             <TextInput
-                                                id="adresse"
+                                                id="commentaire"
                                                 className="mt-1 block w-full"
-                                                value={data.adresse}
-                                                placeholder="Ex: Cotonou"
-                                                onChange={(e) => setData('adresse', e.target.value)}
-                                                autoComplete="adresse"
+                                                value={data.commentaire}
+                                                placeholder="Ex: Fond attribué su superviseur Emmannuel"
+                                                onChange={(e) => setData('commentaire', e.target.value)}
+                                                autoComplete="commentaire"
                                             />
 
-                                            <InputError className="mt-2" message={errors.adresse} />
-                                        </div>
-
-                                        <div className='mb-3'>
-                                            <InputLabel htmlFor="email" value="Email" > </InputLabel>
-                                            <TextInput
-                                                id="email"
-                                                className="mt-1 block w-full"
-                                                value={data.email}
-                                                placeholder="Ex: gogochristian009@gmail.com"
-                                                onChange={(e) => setData('email', e.target.value)}
-                                                autoComplete="email"
-                                            />
-
-                                            <InputError className="mt-2" message={errors.email} />
+                                            <InputError className="mt-2" message={errors.commentaire} />
                                         </div>
                                     </div>
                                 </div>

@@ -62,18 +62,18 @@ Route::middleware('auth')->group(function () {
 
     // Financements
     Route::resource("financement", FinancementController::class);
-    Route::patch("/financement/{financement}/validate", [FinancementController::class, "validatedFinancement"]);
+    Route::patch("/financement/{financement}/validate", [FinancementController::class, "validatedFinancement"])->name("financement.validate");
 
     // Fournisseur
     Route::resource("fournisseur", FournisseurController::class);
 
     // Chargements
     Route::resource("chargement", ChargementController::class);
-    Route::patch("/chargement/{chargement}/validate", [FinancementController::class, "validatedChargement"]);
+    Route::patch("/chargement/{chargement}/validate", [ChargementController::class, "validatedChargement"])->name("chargement.validate");
 
     // Fonds aux superviseur
     Route::resource("fond-superviseur", FondSuperviseurController::class);
-    Route::patch("/fond-superviseur/{fond}/validate", [FondSuperviseurController::class, "validatedFond"]);
+    Route::patch("/fond-superviseur/{fond}/validate", [FondSuperviseurController::class, "validatedFond"])->name("fond-superviseur.validate");
 
     // Dépenses superviseur
     Route::resource("depense-superviseur", DepenseSuperviseurController::class);

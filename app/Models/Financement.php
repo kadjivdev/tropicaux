@@ -11,6 +11,7 @@ class Financement extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        "reference",
         'fournisseur_id',
         'gestionnaire_id',
         'montant',
@@ -25,7 +26,7 @@ class Financement extends Model
     protected $casts = [
         'date_financement' => 'date',
         'montant' => 'decimal:2',
-        'validated_at'=>'date'
+        'validated_at' => 'date'
     ];
 
     /**Fournisseur */
@@ -75,7 +76,8 @@ class Financement extends Model
             if (auth()->check()) {
                 $financement->user_id = auth()->id();
             }
-
+            
+            $financement->reference = "FINAN-" . time() . "-CE";
             /**insertion du document */
             $financement->document = $financement->handleDocumentUploading();
         });

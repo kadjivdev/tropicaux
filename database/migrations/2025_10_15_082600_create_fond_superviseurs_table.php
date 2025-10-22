@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('fond_superviseurs', function (Blueprint $table) {
             $table->id();
+            $table->text("reference")->nullable();
             $table->foreignId("chargement_id")
                 ->nullable()
                 ->constrained("chargements")

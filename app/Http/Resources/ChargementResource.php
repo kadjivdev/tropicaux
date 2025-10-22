@@ -17,16 +17,19 @@ class ChargementResource extends JsonResource
     {
         return [
             "id" => $this->id,
+            "reference" => $this->reference,
             "produit" => $this->produit,
             "chauffeur" => $this->chauffeur,
             "superviseur" => $this->superviseur,
             "convoyeur" => $this->convoyeur,
             "magasin" => $this->magasin,
+            "camions" => $this->camions->load("camion"),
+            "details" => $this->details->load("fournisseur"),
             "adresse" => $this->adresse,
             "observation" => $this->observation,
             "createdBy" => $this->createdBy,
             "validatedBy" => $this->validatedBy,
-            "validated_at" => Carbon::parse($this->validated_at)->locale('fr')->isoFormat("D MMMM YYYY")
+            "validated_at" => $this->validated_at ? Carbon::parse($this->validated_at)->locale('fr')->isoFormat("D MMMM YYYY") : null
         ];
     }
 }

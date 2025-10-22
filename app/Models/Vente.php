@@ -11,6 +11,7 @@ class Vente extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        "reference",
         'partenaire_id',
         'prix',
 
@@ -36,7 +37,7 @@ class Vente extends Model
         'nbre_sac_rejete' => 'decimal:2',
         'prix_unitaire_sac_rejete' => 'decimal:2',
         'montant_total' => 'decimal:2',
-        'validated_at'=>'date'
+        'validated_at' => 'date'
     ];
 
     /**Partenaire */
@@ -80,6 +81,8 @@ class Vente extends Model
             if (auth()->check()) {
                 $model->user_id = auth()->id();
             }
+            $model->reference = "VEN-" . time() . "-TE";
+
             // Handle document uploading
             $model->document = $model->handleDocumentUploading();
         });

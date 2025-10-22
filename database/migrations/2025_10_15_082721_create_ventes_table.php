@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('ventes', function (Blueprint $table) {
             $table->id();
+            $table->text("reference")->nullable();
             $table->foreignId("partenaire_id")
                 ->nullable()
                 ->constrained("partenaires")

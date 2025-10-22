@@ -11,6 +11,7 @@ class DepenseSuperviseur extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        "reference",
         'chargement_id',
         'superviseur_id',
 
@@ -76,6 +77,8 @@ class DepenseSuperviseur extends Model
             if (auth()->check()) {
                 $model->user_id = auth()->id();
             }
+            $model->reference = "DEPEN-" . time() . "-SE";
+
             // Handle document uploading
             $model->document = $model->handleDocumentUploading();
         });

@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Log;
 class FinancementController extends Controller
 {
     /**
-     * Listes des financements
+     * Liste des financements
      */
 
     function index()
@@ -28,7 +28,7 @@ class FinancementController extends Controller
     /**
      * Formulaire de création
      */
-    
+
     function create()
     {
         $fournisseurs = Fournisseur::all();
@@ -83,18 +83,24 @@ class FinancementController extends Controller
         } catch (\Exception $e) {
             Log::debug("Erreure lors de la création du financement", ["error" => $e->getMessage()]);
             DB::rollBack();
-            return back()->withErrors(["error" => "Une erreur est survenue lors de l'enregistrement du financement"]);
+            return back()->withErrors(["exception" => "Une erreur est survenue lors de l'enregistrement du financement : " . $e->getMessage()]);
         }
     }
-
 
     /**
      * Edit
      */
     function edit(Financement $financement)
     {
+        $fournisseurs = Fournisseur::all();
+        $gestionnaires = User::whereHas("roles", function ($role) {
+            $role->where("name", "Gestionnaire de fonds");
+        })->get();
+
         return inertia("Financements/Update", [
             'financement' => $financement,
+            "fournisseurs" => $fournisseurs,
+            "gestionnaires" => $gestionnaires
         ]);
     }
 
@@ -156,7 +162,7 @@ class FinancementController extends Controller
             if (!$financement) {
                 throw new \Exception("Ce financement n'existe pas");
             }
-            
+
             $financement->update([
                 "validated_by" => Auth::id(),
                 "validated_at" => now()
@@ -166,11 +172,11 @@ class FinancementController extends Controller
             return redirect()->route("financement.index");
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
-            Log::debug("Erreure lors de la suppression du financements", ["error" => $e->errors()]);
+            Log::debug("Erreure lors de la suppression du financement", ["error" => $e->errors()]);
             return back()->withErrors($e->errors());
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::debug("Erreure lors de la suppression du financements", ["error" => $e->getMessage()]);
+            Log::debug("Erreure lors de la suppression du financement", ["error" => $e->getMessage()]);
             return back()->withErrors(["exception" => $e->getMessage()]);
         }
     }

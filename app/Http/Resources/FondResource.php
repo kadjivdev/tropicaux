@@ -17,6 +17,7 @@ class FondResource extends JsonResource
     {
         return [
             "id" => $this->id,
+            "reference" => $this->reference,
             "chargement" => ChargementResource::collection($this->chargement) ,
             "superviseur" => $this->superviseur ,
             "montant" => $this->montant,

@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ChargementResource;
+use App\Models\Camion;
 use App\Models\Chargement;
+use App\Models\Chauffeur;
 use App\Models\Convoyeur;
+use App\Models\Fournisseur;
 use App\Models\Magasin;
 use App\Models\Produit;
 use App\Models\Superviseur;
@@ -12,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class ChargementController extends Controller
 {
@@ -36,13 +40,18 @@ class ChargementController extends Controller
         $superviseurs = Superviseur::all();
         $convoyeurs = Convoyeur::all();
         $magasins = Magasin::all();
+        $chauffeurs = Chauffeur::all();
+        $fournisseurs = Fournisseur::all();
+        $camions = Camion::all();
 
         return inertia("Chargements/Create", [
             "produits" => $produits,
+            "chauffeurs" => $chauffeurs,
             "superviseurs" => $superviseurs,
             "convoyeurs" => $convoyeurs,
-            "superviseurs" => $superviseurs,
             "magasins" => $magasins,
+            "fournisseurs" => $fournisseurs,
+            "camions" => $camions,
         ]);
     }
 
@@ -51,14 +60,19 @@ class ChargementController extends Controller
      */
     function store(Request $request)
     {
+        Log::debug("Les donnéees entrantes", [$request->all()]);
+
         $validated = $request->validate([
             "produit_id" => ["required", "integer"],
             "chauffeur_id" => ["required", "integer"],
             "superviseur_id" => ["required", "integer"],
-            "convoyeur_id" => ["required", "integer"],
+            "convoyeur_id" => ["nullable", "integer"],
             "magasin_id" => ["required", "integer"],
-            "adresse" => ["required", "numeric"],
+            "adresse" => ["required"],
             "observation" => ["nullable"],
+
+            "details" => ["required", "array"],
+            "camions" => ["required", "array"],
         ], [
             "produit_id.required" => "Le produit est requis.",
             "produit_id.integer" => "Le produit doit être un entier.",
@@ -69,31 +83,44 @@ class ChargementController extends Controller
             "superviseur_id.required" => "Le superviseur est requis.",
             "superviseur_id.integer" => "Le superviseur doit être un entier.",
 
-            "convoyeur_id.required" => "Le convoyeur est requis.",
+            // "convoyeur_id.required" => "Le convoyeur est requis.",
             "convoyeur_id.integer" => "Le convoyeur doit être un entier.",
 
             "magasin_id.required" => "Le magasin est requis.",
             "magasin_id.integer" => "Le magasin doit être un entier.",
 
             "adresse.required" => "L’adresse est requise.",
-            "adresse.numeric" => "L’adresse doit être une valeur numérique.",
+
+            "details.required" => "Ajouter au moins un détail",
+            "details.array" => "Les détails doivent être un tableau",
+
+            "camions.required" => "Ajouter au moins un camion",
+            "camions.array" => "Les camions doivent être un tableau",
         ]);
 
         try {
             DB::beginTransaction();
             $chargement = Chargement::create($validated);
 
+            // Détail du chargement
+            $chargement->details()
+                ->createMany($validated["details"]);
+
+            // Camions du chargement
+            $chargement->camions()
+                ->createMany($validated["camions"]);
+
             DB::commit();
             Log::info("Nouveau Chargement créé avec succès", ["chargement_id" => $chargement->id, "created_by" => auth()->user()->id]);
             return redirect()->route("chargement.index");
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::debug("Erreure lors de la création du chargement", ["error" => $e->getMessage()]);
+        } catch (ValidationException $e) {
+            Log::debug("Erreure lors de la création du chargement", ["error" => $e->errors()]);
             DB::rollBack();
-            return back()->withErrors(["error" => "Une erreur est survenue lors de l'enregistrement du chargement"]);
+            return back()->withErrors(["error" => $e->errors()]);
         } catch (\Exception $e) {
             Log::debug("Erreure lors de la création du chargement", ["error" => $e->getMessage()]);
             DB::rollBack();
-            return back()->withErrors(["error" => "Une erreur est survenue lors de l'enregistrement du chargement"]);
+            return back()->withErrors(["error" => "Une erreur est survenue lors de l'enregistrement du chargement :" . $e->getMessage()]);
         }
     }
 
@@ -103,8 +130,23 @@ class ChargementController extends Controller
      */
     function edit(Chargement $chargement)
     {
+        $produits = Produit::all();
+        $superviseurs = Superviseur::all();
+        $convoyeurs = Convoyeur::all();
+        $magasins = Magasin::all();
+        $chauffeurs = Chauffeur::all();
+        $fournisseurs = Fournisseur::all();
+        $camions = Camion::all();
+
         return inertia("Chargements/Update", [
-            'chargement' => $chargement,
+            'chargement' => $chargement->load(["camions", "details"]),
+            "produits" => $produits,
+            "chauffeurs" => $chauffeurs,
+            "superviseurs" => $superviseurs,
+            "convoyeurs" => $convoyeurs,
+            "magasins" => $magasins,
+            "fournisseurs" => $fournisseurs,
+            "camions" => $camions,
         ]);
     }
 
@@ -113,51 +155,75 @@ class ChargementController extends Controller
      */
     function update(Request $request, Chargement $chargement)
     {
-        Log::info("Les datas", ["data" => $request->all()]);
+        Log::debug("Les donnéees entrantes", [$request->all()]);
+
+        $validated = $request->validate([
+            "produit_id" => ["required", "integer"],
+            "chauffeur_id" => ["required", "integer"],
+            "superviseur_id" => ["required", "integer"],
+            "convoyeur_id" => ["nullable", "integer"],
+            "magasin_id" => ["required", "integer"],
+            "adresse" => ["required"],
+            "observation" => ["nullable"],
+
+            "details" => ["required", "array"],
+            "camions" => ["required", "array"],
+        ], [
+            "produit_id.required" => "Le produit est requis.",
+            "produit_id.integer" => "Le produit doit être un entier.",
+
+            "chauffeur_id.required" => "Le chauffeur est requis.",
+            "chauffeur_id.integer" => "Le chauffeur doit être un entier.",
+
+            "superviseur_id.required" => "Le superviseur est requis.",
+            "superviseur_id.integer" => "Le superviseur doit être un entier.",
+
+            // "convoyeur_id.required" => "Le convoyeur est requis.",
+            "convoyeur_id.integer" => "Le convoyeur doit être un entier.",
+
+            "magasin_id.required" => "Le magasin est requis.",
+            "magasin_id.integer" => "Le magasin doit être un entier.",
+
+            "adresse.required" => "L’adresse est requise.",
+
+            "details.required" => "Ajouter au moins un détail",
+            "details.array" => "Les détails doivent être un tableau",
+
+            "camions.required" => "Ajouter au moins un camion",
+            "camions.array" => "Les camions doivent être un tableau",
+        ]);
 
         try {
-            $validated = $request->validate([
-                "produit_id" => ["required", "integer"],
-                "chauffeur_id" => ["required", "integer"],
-                "superviseur_id" => ["required", "integer"],
-                "convoyeur_id" => ["required", "integer"],
-                "magasin_id" => ["required", "integer"],
-                "adresse" => ["required", "numeric"],
-                "observation" => ["nullable"],
-            ], [
-                "produit_id.required" => "Le produit est requis.",
-                "produit_id.integer" => "Le produit doit être un entier.",
-
-                "chauffeur_id.required" => "Le chauffeur est requis.",
-                "chauffeur_id.integer" => "Le chauffeur doit être un entier.",
-
-                "superviseur_id.required" => "Le superviseur est requis.",
-                "superviseur_id.integer" => "Le superviseur doit être un entier.",
-
-                "convoyeur_id.required" => "Le convoyeur est requis.",
-                "convoyeur_id.integer" => "Le convoyeur doit être un entier.",
-
-                "magasin_id.required" => "Le magasin est requis.",
-                "magasin_id.integer" => "Le magasin doit être un entier.",
-
-                "adresse.required" => "L’adresse est requise.",
-                "adresse.numeric" => "L’adresse doit être une valeur numérique.",
-            ]);
-
             DB::beginTransaction();
 
+            //updating
             $chargement->update($validated);
 
+            //suppression des anciennes insertions
+            $chargement->details()->delete();
+            $chargement->camions()->delete();
+
+            /**Nouvelles insertion */
+
+            // Détail du chargement
+            $chargement->details()
+                ->createMany($validated["details"]);
+
+            // Camions du chargement
+            $chargement->camions()
+                ->createMany($validated["camions"]);
+
             DB::commit();
+            Log::info("Chargement modifié avec succès", ["chargement_id" => $chargement->id, "created_by" => auth()->user()->id]);
             return redirect()->route("chargement.index");
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            DB::rollBack();
+        } catch (ValidationException $e) {
             Log::debug("Erreure lors de la modification du chargement", ["error" => $e->errors()]);
-            return back()->withErrors($e->errors());
-        } catch (\Exception $e) {
             DB::rollBack();
+            return back()->withErrors(["error" => $e->errors()]);
+        } catch (\Exception $e) {
             Log::debug("Erreure lors de la modification du chargement", ["error" => $e->getMessage()]);
-            return back()->withErrors(["exception" => $e->getMessage()]);
+            DB::rollBack();
+            return back()->withErrors(["error" => "Une erreur est survenue lors de la modification du chargement :" . $e->getMessage()]);
         }
     }
 
@@ -182,12 +248,12 @@ class ChargementController extends Controller
             return redirect()->route("chargement.index");
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
-            Log::debug("Erreure lors de la suppression du chargements", ["error" => $e->errors()]);
-            return back()->withErrors($e->errors());
+            Log::debug("Erreure lors de la validation du chargements", ["error" => $e->errors()]);
+            return back()->withErrors(["error" => $e->errors()]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::debug("Erreure lors de la suppression du chargements", ["error" => $e->getMessage()]);
-            return back()->withErrors(["exception" => $e->getMessage()]);
+            Log::debug("Erreure lors de la validation du chargements", ["error" => $e->getMessage()]);
+            return back()->withErrors(["error" => $e->getMessage()]);
         }
     }
 
@@ -208,11 +274,11 @@ class ChargementController extends Controller
             return redirect()->route("chargement.index");
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
-            Log::debug("Erreure lors de la suppression du chargements", ["error" => $e->errors()]);
+            Log::debug("Erreure lors de la suppression du chargement", ["error" => $e->errors()]);
             return back()->withErrors($e->errors());
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::debug("Erreure lors de la suppression du chargements", ["error" => $e->getMessage()]);
+            Log::debug("Erreure lors de la suppression du chargement", ["error" => $e->getMessage()]);
             return back()->withErrors(["exception" => $e->getMessage()]);
         }
     }

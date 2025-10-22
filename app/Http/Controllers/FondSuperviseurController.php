@@ -44,6 +44,8 @@ class FondSuperviseurController extends Controller
      */
     function store(Request $request)
     {
+        Log::info("Les données entrantes ",["datas"=>$request->all()]);
+        
         $validated = $request->validate([
             "chargement_id" => ["required", "integer"],
             "superviseur_id" => ["required", "integer"],
@@ -72,13 +74,13 @@ class FondSuperviseurController extends Controller
             Log::info("Nouveau fond créé avec succès", ["fond_id" => $fond->id, "created_by" => auth()->user()->id]);
             return redirect()->route("chargement.index");
         } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::debug("Erreure lors de la création du fond", ["error" => $e->getMessage()]);
+            Log::debug("Erreure lors de la création du fond", ["error" => $e->errors()]);
             DB::rollBack();
-            return back()->withErrors(["error" => "Une erreur est survenue lors de l'enregistrement du fond"]);
+            return back()->withErrors(["error" => "Une erreur est survenue lors de l'enregistrement du fond : ".$e->errors()]);
         } catch (\Exception $e) {
             Log::debug("Erreure lors de la création du fond", ["error" => $e->getMessage()]);
             DB::rollBack();
-            return back()->withErrors(["error" => "Une erreur est survenue lors de l'enregistrement du fond"]);
+            return back()->withErrors(["error" => "Une erreur est survenue lors de l'enregistrement du fond : ".$e->getMessage()]);
         }
     }
 

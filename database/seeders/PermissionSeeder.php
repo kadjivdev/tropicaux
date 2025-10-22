@@ -2,10 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
 class PermissionSeeder extends Seeder
 {
@@ -19,6 +17,7 @@ class PermissionSeeder extends Seeder
             "Créer des $name" => "$permission.create",
             "Modifier les $name" => "$permission.edit",
             "Supprimer des $name" => "$permission.delete",
+            "Valider les $name" => "$permission.validate",
         ];
     }
 

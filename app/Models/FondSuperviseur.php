@@ -11,6 +11,7 @@ class FondSuperviseur extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        "reference",
         'chargement_id',
         'superviseur_id',
 
@@ -76,6 +77,8 @@ class FondSuperviseur extends Model
             if (auth()->check()) {
                 $model->user_id = auth()->id();
             }
+            $model->reference = "FOND-" . time() . "-SUP";
+
             // Handle document uploading
             $model->document = $model->handleDocumentUploading();
         });
