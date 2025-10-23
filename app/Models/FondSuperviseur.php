@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 
 class FondSuperviseur extends Model
 {
@@ -48,13 +49,16 @@ class FondSuperviseur extends Model
         $documentPath = null;
         $request = request();
 
+        Log::debug("Document handling ...", ["document" => $request->file('document')]);
         if ($request->hasFile('document')) {
+            Log::debug("Document existe ...", ["document" => $request->file('document')]);
             $file = $request->file('document');
             $name = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('documents'), $name);
             $documentPath = asset('documents/' . $name);
         }
 
+        Log::debug("documentPath handling ...", ["documentPath" => $documentPath]);
         return $documentPath;
     }
 

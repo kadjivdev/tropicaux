@@ -27,13 +27,14 @@ export default function Create({ chargements, superviseurs }) {
         chargement_id: "",
         superviseur_id: "",
         montant: "",
+        commentaire: '',
         document: "",
-        commentaire:''
     });
 
     const submit = (e) => {
         e.preventDefault();
-
+        console.log("datas", data);
+        
         post(route('fond-superviseur.store'), {
             onStart: () => {
                 Swal.fire({
@@ -92,7 +93,7 @@ export default function Create({ chargements, superviseurs }) {
                                         <div className="mb-3">
                                             <InputLabel htmlFor="chargement_id" value="Chargement" >  <span className="text-danger">*</span> </InputLabel>
                                             <Select
-                                                placeholder="Rechercher un fournisseur ..."
+                                                placeholder="Rechercher un chargement ..."
                                                 name="chargement_id"
                                                 id="chargement_id"
                                                 required
@@ -131,10 +132,9 @@ export default function Create({ chargements, superviseurs }) {
                                         <div className='mb-3'>
                                             <InputLabel htmlFor="document" value="Document(preuve)" ></InputLabel>
                                             <TextInput
-                                                id="file"
+                                                id="document"
                                                 type="file"
                                                 className="mt-1 block w-full"
-                                                value={data.phone}
                                                 onChange={(e) => setData('document', e.target.file[0])}
                                                 autoComplete="document"
                                             />

@@ -44,14 +44,14 @@ class FondSuperviseurController extends Controller
      */
     function store(Request $request)
     {
-        Log::info("Les données entrantes ",["datas"=>$request->all()]);
-        
+        Log::info("Les données entrantes ", ["datas" => $request->all()]);
+
         $validated = $request->validate([
             "chargement_id" => ["required", "integer"],
             "superviseur_id" => ["required", "integer"],
             "montant" => ["required", "numeric"],
-            "document" => ["nullable", "file", "mimes:pdf,png,jpg,jpeg"],
             "commentaire" => ["nullable"],
+            "document" => ["nullable", "file", "mimes:pdf,png,jpg,jpeg"],
         ], [
             "chargement_id.required" => "Le chargement est requis.",
             "chargement_id.integer" => "Le chargement doit être un entier.",
@@ -72,26 +72,31 @@ class FondSuperviseurController extends Controller
 
             DB::commit();
             Log::info("Nouveau fond créé avec succès", ["fond_id" => $fond->id, "created_by" => auth()->user()->id]);
-            return redirect()->route("chargement.index");
+            return redirect()->route("fond-superviseur.index");
         } catch (\Illuminate\Validation\ValidationException $e) {
             Log::debug("Erreure lors de la création du fond", ["error" => $e->errors()]);
             DB::rollBack();
-            return back()->withErrors(["error" => "Une erreur est survenue lors de l'enregistrement du fond : ".$e->errors()]);
+            return back()->withErrors(["error" => "Une erreur est survenue lors de l'enregistrement du fond : " . $e->errors()]);
         } catch (\Exception $e) {
             Log::debug("Erreure lors de la création du fond", ["error" => $e->getMessage()]);
             DB::rollBack();
-            return back()->withErrors(["error" => "Une erreur est survenue lors de l'enregistrement du fond : ".$e->getMessage()]);
+            return back()->withErrors(["error" => "Une erreur est survenue lors de l'enregistrement du fond : " . $e->getMessage()]);
         }
     }
-
 
     /**
      * Edit
      */
-    function edit(FondSuperviseur $fond)
+    function edit($id)
     {
+        $fond = FondSuperviseur::find($id);
+        $chargements = Chargement::all();
+        $superviseurs = Superviseur::all();
+
         return inertia("Fonds/Update", [
             'fond' => $fond,
+            "chargements" => $chargements,
+            "superviseurs" => $superviseurs,
         ]);
     }
 
@@ -107,7 +112,7 @@ class FondSuperviseurController extends Controller
                 "chargement_id" => ["required", "integer"],
                 "superviseur_id" => ["required", "integer"],
                 "montant" => ["required", "numeric"],
-                "document" => ["nullable", "file", "mimes:pdf,png,jpg,jpeg"],
+                // "document" => ["nullable", "file", "mimes:pdf,png,jpg,jpeg"],
                 "commentaire" => ["nullable"],
             ], [
                 "chargement_id.required" => "Le chargement est requis.",
@@ -119,8 +124,8 @@ class FondSuperviseurController extends Controller
                 "montant.required" => "Le montant est requis.",
                 "montant.numeric" => "Le montant doit être un nombre.",
 
-                "document.file" => "Le document doit être un fichier.",
-                "document.mimes" => "Le document doit être au format PDF, PNG, JPG ou JPEG.",
+                // "document.file" => "Le document doit être un fichier.",
+                // "document.mimes" => "Le document doit être au format PDF, PNG, JPG ou JPEG.",
             ]);
 
             DB::beginTransaction();
@@ -132,11 +137,11 @@ class FondSuperviseurController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
             Log::debug("Erreure lors de la modification du fond", ["error" => $e->errors()]);
-            return back()->withErrors($e->errors());
+            return back()->withErrors(["error"=>"Erreure lors de la modification du fond : ".$e->errors()]);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::debug("Erreure lors de la modification du fond", ["error" => $e->getMessage()]);
-            return back()->withErrors(["exception" => $e->getMessage()]);
+            return back()->withErrors(["error" => "Erreure lors de la modification du fond : ".$e->getMessage()]);
         }
     }
 
@@ -173,14 +178,16 @@ class FondSuperviseurController extends Controller
     /**
      * Destroy
      */
-    function destroy(FondSuperviseur $fond)
+    function destroy($fondId)
     {
         try {
             DB::beginTransaction();
 
+            $fond = FondSuperviseur::find($fondId);
             if (!$fond) {
                 throw new \Exception("Ce fond n'existe pas");
             }
+            
             $fond->delete();
 
             DB::commit();
@@ -188,11 +195,11 @@ class FondSuperviseurController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
             Log::debug("Erreure lors de la suppression du fonds", ["error" => $e->errors()]);
-            return back()->withErrors($e->errors());
+            return back()->withErrors(["error"=>$e->errors()]);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::debug("Erreure lors de la suppression du fonds", ["error" => $e->getMessage()]);
-            return back()->withErrors(["exception" => $e->getMessage()]);
+            return back()->withErrors(["error" => $e->getMessage()]);
         }
     }
 }

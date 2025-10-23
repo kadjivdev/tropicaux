@@ -18,13 +18,14 @@ class FondResource extends JsonResource
         return [
             "id" => $this->id,
             "reference" => $this->reference,
-            "chargement" => ChargementResource::collection($this->chargement) ,
+            "chargement" => $this->chargement ,
             "superviseur" => $this->superviseur ,
             "montant" => $this->montant,
             "commentaire" => $this->commentaire,
             "document" => $this->document,
             "createdBy" => $this->createdBy,
-            "validated_at" => Carbon::parse($this->validated_at)->locale('fr')->isoFormat("D MMMM YYYY")
+            "validatedBy" => $this->validatedBy,
+            "validated_at" => $this->validated_at?Carbon::parse($this->validated_at)->locale('fr')->isoFormat("D MMMM YYYY"):null
         ];
     }
 }

@@ -17,7 +17,7 @@ export default function List({ fonds }) {
         e.preventDefault();
         Swal.fire({
             title: '<span style="color: #facc15;">⚠️ Êtes-vous sûr ?</span>', // yellow text
-            text: `Le fond ${fond.reference} sera supprimé de façon permanente !`,
+            text: `Le fond (${fond.reference}) sera supprimé de façon permanente !`,
             showCancelButton: true,
             confirmButtonColor: '#2a7348',
             cancelButtonColor: '#3085d6',
@@ -59,7 +59,7 @@ export default function List({ fonds }) {
         e.preventDefault();
         Swal.fire({
             title: '<span style="color: #facc15;">⚠️ Êtes-vous sûr ?</span>', // yellow text
-            text: `Le fond ${fond.reference} sera validé de façon permanente !`,
+            text: `Le fond (${fond.reference}) sera validé de façon permanente !`,
             showCancelButton: true,
             confirmButtonColor: '#2a7348',
             cancelButtonColor: '#3085d6',
@@ -80,7 +80,7 @@ export default function List({ fonds }) {
                         Swal.close();
                         Swal.fire({
                             title: '<span style="color: #2a7348;">Validation réussie </span>',
-                            text: `Le fond ${fond.reference} a été validé avec succès.`,
+                            text: `Le fond (${fond.reference}) a été validé avec succès.`,
                             confirmButtonText: '😇 Fermer'
                         });
                     },
@@ -126,6 +126,7 @@ export default function List({ fonds }) {
                                     <th scope="col">Superviseur</th>
                                     <th scope="col">Montant</th>
                                     <th scope="col">Preuve</th>
+                                    <th scope="col">Observation</th>
                                     <th scope="col">Inséré par</th>
                                     <th scope="col">Validé le</th>
                                     <th scope="col">Validé par</th>
@@ -200,6 +201,7 @@ export default function List({ fonds }) {
                                                     <span className="text-muted">---</span>
                                                 )}
                                             </td>
+                                            <td> <textarea rows={1} className='form-control' disabled={true} placeholder={fond.commentaire || '---'}></textarea> </td>
                                             <td> <span className="badge bg-light border rounded text-dark">{`${fond.createdBy?.firstname} - ${fond.createdBy?.lastname}`}</span> </td>
                                             <td> <span className="badge bg-light border rounded text-dark">{`${fond.validated_at || '--'}`}</span> </td>
                                             <td> <span className="badge bg-light border rounded text-dark">{`${fond.validatedBy?.firstname || ''} - ${fond.validatedBy?.lastname || ''}`}</span> </td>
