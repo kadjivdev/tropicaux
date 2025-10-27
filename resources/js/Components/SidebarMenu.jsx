@@ -75,7 +75,7 @@ export default function SidebarMenu(props) {
                                         Liste des Fournisseurs
                                     </Link>) : null}
 
-                                {checkPermission('financement.create') ? (<Link href={route('financement.create')} className="nav-link">
+                                {checkPermission('fournisseur.create') ? (<Link href={route('fournisseur.create')} className="nav-link">
                                     <span className="nav-icon">
                                         <span className="nav-icon-bullet"></span>
                                     </span>
@@ -178,14 +178,14 @@ export default function SidebarMenu(props) {
                                         <span className="nav-icon">
                                             <span className="nav-icon-bullet text-danger"></span>
                                         </span>
-                                        Liste des fonds
+                                        Liste des dépenses
                                     </Link>) : null}
 
                                 {checkPermission('depense.superviseur.create') ? (<Link href={route('depense-superviseur.create')} className="nav-link">
                                     <span className="nav-icon">
                                         <span className="nav-icon-bullet"></span>
                                     </span>
-                                    Ajouter un fonds
+                                    Ajouter une dépense
                                 </Link>) : null}
                             </CNavGroup> : null
                         }

@@ -20,7 +20,7 @@ class UserController extends Controller
      */
     function index()
     {
-        $users = User::with("roles")->get();
+        $users = User::where('id', '!=', 1)->with("roles")->get();
         $roles = Role::where('id', '!=', 1)
             ->latest()->get();
 

@@ -35,7 +35,7 @@ return new class extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
             $table->date("validated_at")->nullable();
-            $table->decimal("montant", 15, 2)->default(0);
+            $table->decimal("montant", 20, 2)->default(0);
             $table->date("date_financement")->nullable();
             $table->text("document")->nullable();
             $table->softDeletes();

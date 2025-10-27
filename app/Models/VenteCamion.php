@@ -11,7 +11,7 @@ class VenteCamion extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'chargement_id',
+        'vente_id',
         'camion_id',
 
         'commentaire',

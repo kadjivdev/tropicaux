@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('partenaires', function (Blueprint $table) {
             $table->id();
-            $table->string('libelle');
-            $table->text('description')->nullable();
+            $table->string('raison_sociale');
+            $table->string('phone')->nullable();
+            $table->text('adresse')->nullable();
+            $table->text('email')->nullable();
             $table->foreignId("user_id")
                 ->nullable()
                 ->constrained("users")

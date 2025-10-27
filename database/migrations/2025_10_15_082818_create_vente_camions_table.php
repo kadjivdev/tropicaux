@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('vente_camions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("chargement_id")
+            $table->foreignId("vente_id")
                 ->nullable()
-                ->constrained("chargements")
+                ->constrained("ventes")
                 ->onUpdate("CASCADE")
                 ->onDelete("SET NULL");
 

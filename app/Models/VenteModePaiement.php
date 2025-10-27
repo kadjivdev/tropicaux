@@ -11,7 +11,7 @@ class VenteModePaiement extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'chargement_id',
+        'vente_id',
         'paiement_mode_id',
 
         'commentaire',
@@ -25,7 +25,7 @@ class VenteModePaiement extends Model
     }
 
     /**Paiement Mode */
-    function paiementMode(): BelongsTo
+    function mode(): BelongsTo
     {
         return $this->belongsTo(PaiementMode::class, 'paiement_mode_id');
     }

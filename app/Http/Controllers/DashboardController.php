@@ -17,6 +17,7 @@ use App\Models\Inscription;
 use App\Models\School;
 use App\Models\User;
 use App\Models\Vente;
+use BcMath\Number;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -36,10 +37,10 @@ class DashboardController extends Controller
         $ventes = Vente::all();
 
         return Inertia::render('Dashboard', [
-            "financementsAmount" => $financementsAmount,
-            "fondSuperviseursAmount" => $fondSuperviseursAmount,
-            "depensesSuperviseursAmount" => $depensesSuperviseursAmount,
-            "ventesAmount" => $ventes->sum("montant_total"),
+            "financementsAmount" => number_format($financementsAmount,2,","," "),
+            "fondSuperviseursAmount" => number_format($fondSuperviseursAmount,2,","," "),
+            "depensesSuperviseursAmount" => number_format($depensesSuperviseursAmount,2,","," "),
+            "ventesAmount" => number_format($ventes->sum("montant_total"),2,","," "),
             "chargements" => ChargementResource::collection($chargements),
             "ventes" => VenteResource::collection($ventes),
         ]);

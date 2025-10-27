@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Chauffeur;
 use App\Models\Superviseur;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -41,7 +40,7 @@ class SuperviseurController extends Controller
                 'raison_sociale' => "required|string",
                 'phone' => "nullable|string",
                 'adresse' => "nullable|string",
-                'email' => "nullable|email|unique:chauffeurs,email",
+                'email' => "nullable|email|unique:superviseurs,email",
             ], [
                 'raison_sociale.required' => 'Le nom de l’entreprise est obligatoire.',
                 'raison_sociale.string' => 'Le nom de l’entreprise doit être une chaîne de caractères.',

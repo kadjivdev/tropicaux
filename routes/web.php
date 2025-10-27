@@ -81,10 +81,11 @@ Route::middleware('auth')->group(function () {
 
     // Partenanires
     Route::resource("partenaire", PartenaireController::class);
+    Route::get("partenaire/{partenaire}/ventes", [PartenaireController::class, "ventes"])->name("partenaire.ventes");
 
     // Ventes
     Route::resource("vente", VenteController::class);
-    Route::patch("/vente/{vente}/validate", [VenteController::class, "validatedVente"]);
+    Route::patch("/vente/{vente}/validate", [VenteController::class, "validatedVente"])->name("vente.validate");
 
     // Profils utilisateurs
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

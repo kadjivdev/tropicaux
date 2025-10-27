@@ -1,29 +1,32 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import CIcon from '@coreui/icons-react';
-import { cibAddthis, cilCheckCircle, cilCloudDownload, cilList, cilMenu, cilPencil, cilTruck, cilUserX } from "@coreui/icons";
-import Swal from 'sweetalert2';
+import {cilCloudDownload, cilList, cilTruck} from "@coreui/icons";
 import { useState } from 'react';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import TextInput from '@/Components/TextInput';
 import { Textarea } from '@headlessui/react';
 
-export default function List({ ventes }) {
+export default function List({ partenaire,total_amount }) {
     const permissions = usePage().props.auth.permissions;
+
+    console.log("Le partenaire ",partenaire)
 
     const checkPermission = (name) => {
         return permissions.some(per => per.name == name);
     }
 
-    const [currentVente, setCurrentVente] = useState(null);
+    const [vente, setVente] = useState(null);
     const [showCamions, setShowCamions] = useState(false);
     const [showDetails, setShowDetails] = useState(false);
 
     const showCamionsModal = (e, vente) => {
         e.preventDefault();
-        setCurrentVente(vente);
+        setVente(vente);
         setShowCamions(true);
+
+        console.log("Current vente",vente.camions)
     }
 
     const closeCamionModal = () => {
@@ -31,9 +34,8 @@ export default function List({ ventes }) {
     }
 
     const showDetailsModeModal = (e, vente) => {
-        console.log("Current vente ", vente)
         e.preventDefault();
-        setCurrentVente(vente);
+        setVente(vente);
         setShowDetails(true);
     }
 
@@ -41,97 +43,11 @@ export default function List({ ventes }) {
         setShowDetails(false);
     }
 
-    const { patch, delete: destroy } = useForm({})
-
-    const deleteVente = (e, vente) => {
-        e.preventDefault();
-        Swal.fire({
-            title: '<span style="color: #facc15;">⚠️ Êtes-vous sûr ?</span>', // yellow text
-            text: `La vente (${vente.reference}) sera supprimée de façon permanente !`,
-            showCancelButton: true,
-            confirmButtonColor: '#2a7348',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: '😇 Oui, supprimer !',
-            cancelButtonText: 'Annuler'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: '<span style="color: #facc15;">🫠 Suppression en cours...</span>', // yellow text
-                    text: 'Veuillez patienter pendant que nous traitons vos données.',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    },
-                });
-                destroy(route('vente.destroy', vente.id), {
-                    onSuccess: () => {
-                        Swal.close();
-                        Swal.fire({
-                            title: '<span style="color: #2a7348;">👌Suppression réussie </span>',
-                            text: `La vente a été supprimée avec succès.`,
-                            confirmButtonText: '😇 Fermer'
-                        });
-                    },
-                    onError: (e) => {
-                        Swal.close();
-                        Swal.fire({
-                            title: '<span style="color: #facc15;">🤦‍♂️ Suppression échouée </span>', // yellow text
-                            text: `${e.exception ?? 'Veuillez réessayer.'}`,
-                            confirmButtonText: '😇 Fermer'
-                        });
-                    },
-                })
-            }
-        });
-    }
-
-    const validateVente = (e, vente) => {
-        e.preventDefault();
-        Swal.fire({
-            title: '<span style="color: #facc15;">⚠️ Êtes-vous sûr ?</span>', // yellow text
-            text: `La vente (${vente.reference}) sera validée de façon permanente !`,
-            showCancelButton: true,
-            confirmButtonColor: '#2a7348',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: '😇 Oui, Valider !',
-            cancelButtonText: 'Annuler'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: '<span style="color: #facc15;">🫠 Validation en cours...</span>', // yellow text
-                    text: 'Veuillez patienter pendant que nous traitons vos données.',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    },
-                });
-                patch(route('vente.validate', vente.id), {
-                    onSuccess: () => {
-                        Swal.close();
-                        Swal.fire({
-                            title: '<span style="color: #2a7348;">Validation réussie </span>',
-                            text: `La vente (${vente.reference}) a été validée avec succès.`,
-                            confirmButtonText: '😇 Fermer'
-                        });
-                    },
-                    onError: (e) => {
-                        Swal.close();
-                        Swal.fire({
-                            title: '<span style="color: #facc15;">🤦‍♂️ Validation échouée </span>', // yellow text
-                            text: `${e.exception ?? 'Veuillez réessayer.'}`,
-                            confirmButtonText: '😇 Fermer'
-                        });
-                    },
-                })
-            }
-        });
-    }
-
     return (
         <AuthenticatedLayout
             header={
                 <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                    <CIcon className='text-success' icon={cilList} /> Gestion des ventes
+                    <CIcon className='text-success' icon={cilList} /> Gestion des ventes du partenaire <span className="badge bg-light border rounded text-success">{partenaire?.raison_sociale}</span> | <span className="badge bg-light border rounded text-success">{total_amount}</span>
                 </h2>
             }
         >
@@ -141,18 +57,15 @@ export default function List({ ventes }) {
 
                 <div className="col-md-10 bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
                     <div className="mx-auto _max-w-7xl space-y-6 sm:px-6 lg:px-8 " style={{ overflowX: 'auto' }} >
-                        {checkPermission('vente.create') ?
-                            (<div className="text-center  items-center gap-4">
-                                <Link className="btn w-50 bg-success bg-hover text-white" href={route("vente.create")}> <CIcon className='' icon={cibAddthis} /> Ajouter</Link>
-                            </div>) : null
-                        }
+                        <div className="text-center  items-center gap-4">
+                            <Link className="btn w-50 bg-success bg-hover text-white" href={route("partenaire.index")}> <CIcon className='' icon={cilList} /> Liste des partenaires</Link>
+                        </div>
+
                         <table className="table table-striped" id='myTable' style={{ width: '100%' }}>
                             <thead>
                                 <tr>
                                     <th scope="col">N°</th>
-                                    <th scope="col">Action</th>
                                     <th scope="col">Reference</th>
-                                    <th scope="col">Partenaire</th>
                                     <th scope="col">Camions</th>
                                     <th scope="col">Mode paiements</th>
                                     <th scope="col">Prix</th>
@@ -170,59 +83,10 @@ export default function List({ ventes }) {
                             </thead>
                             <tbody>
                                 {
-                                    ventes.data.map((vente, index) => (
+                                    partenaire?.ventes.map((vente, index) => (
                                         <tr key={vente.id}>
                                             <th scope="row">{index + 1}</th>
-                                            <td>
-                                                {!vente.validated_at ?
-                                                    (
-                                                        <div className="dropstart">
-                                                            <button className="dropdown-toggle inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none dark:bg-gray-800 dark:text-gray-400 dark:hover:text-gray-300" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                <CIcon icon={cilMenu} /> Gérer
-                                                            </button>
-
-                                                            <ul className="dropdown-menu p-2 border rounded shadow">
-                                                                <li>
-                                                                    {checkPermission('vente.edit') && (
-                                                                        <Link
-                                                                            className="btn text-warning"
-                                                                            href={route('vente.edit', vente.id)} // ✅ navigation via Inertia
-                                                                        >
-                                                                            <CIcon icon={cilPencil} /> Modifier
-                                                                        </Link>
-                                                                    )}
-                                                                </li>
-
-                                                                <li>
-                                                                    {checkPermission('vente.validate') && (
-                                                                        <button
-                                                                            type="button"
-                                                                            className="btn text-success"
-                                                                            onClick={(e) => validateVente(e, vente)} // ✅ action Inertia
-                                                                        >
-                                                                            <CIcon icon={cilCheckCircle} /> Valider
-                                                                        </button>
-                                                                    )}
-                                                                </li>
-
-                                                                <li>
-                                                                    {checkPermission('vente.delete') && (
-                                                                        <button
-                                                                            type="button"
-                                                                            className="btn text-danger"
-                                                                            onClick={(e) => deleteVente(e, vente)} // ✅ action Inertia
-                                                                        >
-                                                                            <CIcon icon={cilUserX} /> Supprimer
-                                                                        </button>
-                                                                    )}
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                    ) : '---'
-                                                }
-                                            </td>
                                             <td> <span className="badge bg-light border rounded text-dark"> {vente.reference} </span></td>
-                                            <td>{vente?.partenaire?.raison_sociale ?? '---'}</td>
                                             <td>
                                                 <button
                                                     className='btn btn-sm btn-light border shadow-sm rounded text-success'
@@ -276,7 +140,7 @@ export default function List({ ventes }) {
             <Modal show={showCamions} onClose={closeCamionModal}>
                 <form className="p-6">
                     <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                        <CIcon className='text-success' icon={cilTruck} /> Liste des camions de la vente <span className='badge bg-light rounded border shadow-sm text-success'>{currentVente?.reference ?? '---'}</span>
+                        <CIcon className='text-success' icon={cilTruck} /> Liste des camions de la vente <span className='badge bg-light rounded border shadow-sm text-success'>{vente?.reference ?? '---'}</span>
                     </h2>
 
                     <div className="p-2">
@@ -290,8 +154,8 @@ export default function List({ ventes }) {
                             </thead>
                             <tbody id="camion">
                                 {
-                                    currentVente?.camions.length > 0 ?
-                                        currentVente?.camions.map((data, index) => (
+                                    vente?.camions && vente?.camions.length > 0 ?
+                                        vente?.camions.map((data, index) => (
                                             <tr key={index}>
                                                 <td>{index + 1}</td>
                                                 <td>
@@ -329,7 +193,7 @@ export default function List({ ventes }) {
             <Modal show={showDetails} onClose={closeDetailModal}>
                 <form className="p-6">
                     <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                        <CIcon className='text-success' icon={cilList} /> Mode de paiement de la vente <span className='badge bg-light rounded border shadow-sm text-success'>{currentVente?.reference ?? '---'}</span>
+                        <CIcon className='text-success' icon={cilList} /> Mode de paiement de la vente <span className='badge bg-light rounded border shadow-sm text-success'>{vente?.reference ?? '---'}</span>
                     </h2>
 
                     <div className="p-2">
@@ -342,8 +206,8 @@ export default function List({ ventes }) {
                             </thead>
                             <tbody id="lignes">
                                 {
-                                    currentVente?.modes.length > 0 ?
-                                        currentVente?.modes.map((data, index) => (
+                                    vente?.modes && vente?.modes.length > 0 ?
+                                        vente?.modes.map((data, index) => (
                                             <tr key={index}>
                                                 <td>{index + 1}</td>
                                                 <td>
@@ -355,7 +219,7 @@ export default function List({ ventes }) {
                                                     />
                                                 </td>
                                             </tr>
-                                        )) : <tr className='text-center'><td colSpan={2}>Aucun détail disponible </td></tr>}
+                                        )) : <tr className='text-center'><td colSpan={2}>Aucun mode de paiement disponible </td></tr>}
                             </tbody>
                         </table>
                     </div>

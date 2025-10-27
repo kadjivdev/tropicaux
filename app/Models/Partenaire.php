@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Partenaire extends Model
@@ -17,6 +18,12 @@ class Partenaire extends Model
         'phone',
         'user_id',
     ];
+
+    /**Ventes */
+    function ventes(): HasMany
+    {
+        return $this->hasMany(Vente::class, 'partenaire_id');
+    }
 
     /**Createur */
     function createdBy(): BelongsTo

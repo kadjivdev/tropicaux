@@ -34,11 +34,11 @@ return new class extends Migration
             $table->date("validated_at")->nullable();
 
             $table->decimal('prix')->nullable();
-            $table->decimal('montant')->nullable();
+            $table->decimal('montant', 20, 2)->nullable();
             $table->decimal('poids')->nullable();
             $table->decimal('nbre_sac_rejete')->nullable();
             $table->decimal('prix_unitaire_sac_rejete')->nullable();
-            $table->decimal('montant_total')->nullable();
+            $table->decimal('montant_total', 20, 2)->nullable();
             $table->text('document')->nullable();
             $table->text('commentaire')->nullable();
             $table->softDeletes();

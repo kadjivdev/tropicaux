@@ -4,7 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 
 class Vente extends Model
 {
@@ -16,6 +18,7 @@ class Vente extends Model
         'prix',
 
         'montant',
+        'montant_total',
         'document',
         'poids',
         'nbre_sac_rejete',
@@ -44,6 +47,18 @@ class Vente extends Model
     function partenaire(): BelongsTo
     {
         return $this->belongsTo(Partenaire::class, 'partenaire_id');
+    }
+
+    /**Camions */
+    function camions(): HasMany
+    {
+        return $this->hasMany(VenteCamion::class, "vente_id");
+    }
+
+    /**Modes de paiement */
+    function modes(): HasMany
+    {
+        return $this->hasMany(VenteModePaiement::class, "vente_id");
     }
 
     /**HandleDocument */
@@ -85,6 +100,26 @@ class Vente extends Model
 
             // Handle document uploading
             $model->document = $model->handleDocumentUploading();
+
+            /**les montants totaux */
+            $montant = $model->poids * $model->prix;
+
+            $model->montant = $montant;
+            // montant total
+            $model->montant_total = $montant + ($model->nbre_sac_rejete * $model->prix_unitaire_sac_rejete);
+        });
+
+        static::updating(function ($model) {
+            /**les montants totaux */
+            $montant = $model->poids * $model->prix;
+
+            $model->montant = $montant;
+            // montant total
+            $model->montant_total = $montant + ($model->nbre_sac_rejete * $model->prix_unitaire_sac_rejete);
+
+            // Handle document uploading
+            Log::debug("Document de la vente",["doc"=>$model->handleDocumentUploading()]);
+            $model->document = $model->handleDocumentUploading() ?? $model->document;
         });
     }
 }
