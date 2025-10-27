@@ -1,17 +1,17 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, usePage } from '@inertiajs/react';
 import CIcon from '@coreui/icons-react';
-import {cilCloudDownload, cilList, cilTruck} from "@coreui/icons";
+import { cilCloudDownload, cilList, cilTruck } from "@coreui/icons";
 import { useState } from 'react';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import TextInput from '@/Components/TextInput';
 import { Textarea } from '@headlessui/react';
 
-export default function List({ partenaire,total_amount }) {
+export default function List({ partenaire, total_amount }) {
     const permissions = usePage().props.auth.permissions;
 
-    console.log("Le partenaire ",partenaire)
+    console.log("Le partenaire ", partenaire)
 
     const checkPermission = (name) => {
         return permissions.some(per => per.name == name);
@@ -26,7 +26,7 @@ export default function List({ partenaire,total_amount }) {
         setVente(vente);
         setShowCamions(true);
 
-        console.log("Current vente",vente.camions)
+        console.log("Current vente", vente.camions)
     }
 
     const closeCamionModal = () => {
@@ -43,6 +43,18 @@ export default function List({ partenaire,total_amount }) {
         setShowDetails(false);
     }
 
+    const getDate = (vente) => {
+        let dateFr = null
+        if (vente.validated_at) {
+            const date = new Date(vente.validated_at);
+            dateFr = date.toLocaleString('fr-FR', {
+                dateStyle: 'short',
+                timeStyle: 'short'
+            });
+        }
+
+        return dateFr;
+    }
     return (
         <AuthenticatedLayout
             header={
@@ -124,9 +136,9 @@ export default function List({ partenaire,total_amount }) {
                                                     <span className="text-muted">---</span>
                                                 )}
                                             </td>
-                                            <td> <span className="badge bg-light border rounded text-dark">{`${vente.createdBy?.firstname} - ${vente.createdBy?.lastname}`}</span> </td>
-                                            <td> <span className="badge bg-light border rounded text-dark">{`${vente.validated_at || '--'}`}</span> </td>
-                                            <td> <span className="badge bg-light border rounded text-dark">{`${vente.validatedBy?.firstname || ''} - ${vente.validatedBy?.lastname || ''}`}</span> </td>
+                                            <td> <span className="badge bg-light border rounded text-dark">{`${vente.created_by?.firstname} - ${vente.created_by?.lastname}`}</span> </td>
+                                            <td><span className="badge bg-light border rounded text-dark">{`${getDate(vente) || '--'}`}</span></td>
+                                            <td> <span className="badge bg-light border rounded text-dark">{`${vente.validated_by?.firstname || ''} - ${vente.validated_by?.lastname || ''}`}</span> </td>
                                         </tr>
                                     ))
                                 }

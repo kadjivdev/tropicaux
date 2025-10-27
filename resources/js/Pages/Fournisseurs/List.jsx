@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import CIcon from '@coreui/icons-react';
-import { cibAddthis, cibMyspace, cilMenu, cilPencil, cilUserX } from "@coreui/icons";
+import { cibAddthis, cibMyspace, cilList, cilMenu, cilPencil, cilUserX } from "@coreui/icons";
 import Swal from 'sweetalert2';
 
 export default function List({ fournisseurs }) {
@@ -11,7 +11,7 @@ export default function List({ fournisseurs }) {
         return permissions.some(per => per.name == name);
     }
 
-    const {delete:destroy} = useForm({})
+    const { delete: destroy } = useForm({})
 
     const deleteFournisseur = (e, fournisseur) => {
         e.preventDefault();
@@ -83,6 +83,7 @@ export default function List({ fournisseurs }) {
                                 <tr>
                                     <th scope="col">N°</th>
                                     <th scope="col">Raison sociale</th>
+                                    <th scope='col'>Financements</th>
                                     <th scope="col">Phone</th>
                                     <th scope="col">Email</th>
                                     <th scope="col">Adresse</th>
@@ -96,10 +97,19 @@ export default function List({ fournisseurs }) {
                                         <tr key={fournisseur.id}>
                                             <th scope="row">{index + 1}</th>
                                             <td>{fournisseur.raison_sociale || '---'}</td>
+                                            <td className='text-center'>
+                                                <Link
+                                                    href={route("fournisseur.financements", fournisseur.id)}
+                                                    className='btn btn-sm btn-light border shadow-sm rounded text-success'
+                                                >
+                                                    <CIcon icon={cilList} />
+                                                </Link>
+                                            </td>
                                             <td>{fournisseur.phone || '---'}</td>
                                             <td>{fournisseur.email || '---'}</td>
                                             <td>{fournisseur.adresse || '---'}</td>
                                             <td><span className="badge bg-light border text-dark"> {`${fournisseur.createdBy?.firstname} - ${fournisseur.createdBy?.lastname}`}</span></td>
+                                            
                                             <td>
                                                 <div className="dropstart">
                                                     <button className="dropdown-toggle inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none dark:bg-gray-800 dark:text-gray-400 dark:hover:text-gray-300" type="button" data-bs-toggle="dropdown" aria-expanded="false">

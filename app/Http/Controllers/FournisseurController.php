@@ -23,6 +23,20 @@ class FournisseurController extends Controller
     }
 
     /**
+     * liste les financements
+     */
+    function financements(Fournisseur $fournisseur)
+    {
+        $fournisseur->load("financements.gestionnaire", "financements.createdBy", "financements.validatedBy");
+        $total_amount = $fournisseur->financements->whereNotNull("validated_by")->sum("montant");
+
+        return inertia("Fournisseurs/Financements", [
+            'total_amount' => number_format($total_amount,2,","," "),
+            'fournisseur' => $fournisseur,
+        ]);
+    }
+
+    /**
      * Formulaire de création
      */
     function create()

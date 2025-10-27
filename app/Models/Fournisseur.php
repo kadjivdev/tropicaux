@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Fournisseur extends Model
@@ -17,6 +18,18 @@ class Fournisseur extends Model
         'email',
         'user_id',
     ];
+
+    /**Chargments */
+    function chargements(): HasMany
+    {
+        return $this->hasMany(Chargement::class, 'fournisseur_id');
+    }
+
+    /**Financements */
+    function financements(): HasMany
+    {
+        return $this->hasMany(Financement::class, 'fournisseur_id');
+    }
 
     /**Createur */
     function createdBy(): BelongsTo

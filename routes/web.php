@@ -66,6 +66,7 @@ Route::middleware('auth')->group(function () {
 
     // Fournisseur
     Route::resource("fournisseur", FournisseurController::class);
+    Route::get("fournisseur/{fournisseur}/financements", [FournisseurController::class, "financements"])->name("fournisseur.financements");
 
     // Chargements
     Route::resource("chargement", ChargementController::class);

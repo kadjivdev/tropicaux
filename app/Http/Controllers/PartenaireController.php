@@ -26,10 +26,12 @@ class PartenaireController extends Controller
     function ventes(Partenaire $partenaire)
     {
         $total_amount = $partenaire->ventes->whereNotNull("validated_at")->sum("montant_total");
-       
+        $partenaire->load("ventes.camions.camion","ventes.modes.mode","ventes.createdBy","ventes.validatedBy");
+
+        // return $partenaire;
         return inertia("Partenaires/Ventes", [
             "total_amount" => number_format($total_amount, 2, ",", " "),
-            'partenaire' => $partenaire->load("ventes.camions.camion","ventes.modes.mode","ventes.createdBy","ventes.validatedBy"),
+            'partenaire' => $partenaire,
         ]);
     }
 

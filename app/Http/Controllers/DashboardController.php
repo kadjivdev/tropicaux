@@ -27,11 +27,11 @@ class DashboardController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request)
+    public function __invoke()
     {
-        $financementsAmount = Financement::get()->sum("montant");
-        $fondSuperviseursAmount = FondSuperviseur::get()->sum("montant");
-        $depensesSuperviseursAmount = DepenseSuperviseur::get()->sum("montant");
+        $financementsAmount = Financement::whereNotNull("validated_at")->sum("montant");
+        $fondSuperviseursAmount = FondSuperviseur::whereNotNull("validated_at")->sum("montant");
+        $depensesSuperviseursAmount = DepenseSuperviseur::whereNotNull("validated_at")->sum("montant");
 
         $chargements = Chargement::all();
         $ventes = Vente::all();
@@ -40,7 +40,7 @@ class DashboardController extends Controller
             "financementsAmount" => number_format($financementsAmount,2,","," "),
             "fondSuperviseursAmount" => number_format($fondSuperviseursAmount,2,","," "),
             "depensesSuperviseursAmount" => number_format($depensesSuperviseursAmount,2,","," "),
-            "ventesAmount" => number_format($ventes->sum("montant_total"),2,","," "),
+            "ventesAmount" => number_format($ventes->whereNotNull("validated_at")->sum("montant_total"),2,","," "),
             "chargements" => ChargementResource::collection($chargements),
             "ventes" => VenteResource::collection($ventes),
         ]);
