@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('paiement_modes', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('campagne_id')
+                ->nullable()
+                ->constrained('campagnes')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
             $table->string('libelle');
             $table->text('description')->nullable();
             $table->foreignId("user_id")

@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('chauffeurs', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('campagne_id')
+                ->nullable()
+                ->constrained('campagnes')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
             $table->string('raison_sociale');
             $table->string('phone')->nullable();
             $table->text('adresse')->nullable();

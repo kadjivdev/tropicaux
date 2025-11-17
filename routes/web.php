@@ -3,6 +3,8 @@
 use App\Http\Controllers\ApprenantController;
 use App\Http\Controllers\BulletinController;
 use App\Http\Controllers\CamionController;
+use App\Http\Controllers\CampagneController;
+use App\Http\Controllers\CampagneSession;
 use App\Http\Controllers\ChargementController;
 use App\Http\Controllers\ChauffeurController;
 use App\Http\Controllers\ClasseController;
@@ -54,80 +56,94 @@ Route::redirect('/', '/login');
 
 Route::get('/dashboard', DashboardController::class)->middleware(['auth', 'verified'])->name('dashboard');
 
+// Route::middleware(['auth', 'campagne.session'])->group(function () {
+
+//     Route::resource("camion", CamionController::class);
+
+// });
+
+
 Route::middleware('auth')->group(function () {
 
-    /**
-     * LES GESTIONS
-     */
+    // Campagnes
+    Route::resource("campagne", CampagneController::class);
+    // Initiation d'une campagne dans un session
+    Route::get("/campagne-session/{campagne}", [CampagneSession::class, "campagneSession"])->name("campagneSession");
 
-    // Financements
-    Route::resource("financement", FinancementController::class);
-    Route::patch("/financement/{financement}/validate", [FinancementController::class, "validatedFinancement"])->name("financement.validate");
+    Route::middleware("campagne.session")->group(function () {
+        /**
+         * LES GESTIONS
+         */
 
-    // Fournisseur
-    Route::resource("fournisseur", FournisseurController::class);
-    Route::get("fournisseur/{fournisseur}/financements", [FournisseurController::class, "financements"])->name("fournisseur.financements");
+        // Financements
+        Route::resource("financement", FinancementController::class);
+        Route::patch("/financement/{financement}/validate", [FinancementController::class, "validatedFinancement"])->name("financement.validate");
 
-    // Chargements
-    Route::resource("chargement", ChargementController::class);
-    Route::patch("/chargement/{chargement}/validate", [ChargementController::class, "validatedChargement"])->name("chargement.validate");
+        // Fournisseur
+        Route::resource("fournisseur", FournisseurController::class);
+        Route::get("fournisseur/{fournisseur}/financements", [FournisseurController::class, "financements"])->name("fournisseur.financements");
 
-    // Fonds aux superviseur
-    Route::resource("fond-superviseur", FondSuperviseurController::class);
-    Route::patch("/fond-superviseur/{fond}/validate", [FondSuperviseurController::class, "validatedFond"])->name("fond-superviseur.validate");
+        // Chargements
+        Route::resource("chargement", ChargementController::class);
+        Route::patch("/chargement/{chargement}/validate", [ChargementController::class, "validatedChargement"])->name("chargement.validate");
 
-    // Dépenses superviseur
-    Route::resource("depense-superviseur", DepenseSuperviseurController::class);
-    Route::patch("/depense-superviseur/{depense}/validate", [FondSuperviseurController::class, "validatedFond"]);
+        // Fonds aux superviseur
+        Route::resource("fond-superviseur", FondSuperviseurController::class);
+        Route::patch("/fond-superviseur/{fond}/validate", [FondSuperviseurController::class, "validatedFond"])->name("fond-superviseur.validate");
 
-    // Partenanires
-    Route::resource("partenaire", PartenaireController::class);
-    Route::get("partenaire/{partenaire}/ventes", [PartenaireController::class, "ventes"])->name("partenaire.ventes");
+        // Dépenses superviseur
+        Route::resource("depense-superviseur", DepenseSuperviseurController::class);
+        Route::patch("/depense-superviseur/{depense}/validate", [DepenseSuperviseurController::class, "validatedDepense"])->name("depense-superviseur.validate");
 
-    // Ventes
-    Route::resource("vente", VenteController::class);
-    Route::patch("/vente/{vente}/validate", [VenteController::class, "validatedVente"])->name("vente.validate");
+        // Partenanires
+        Route::resource("partenaire", PartenaireController::class);
+        Route::get("partenaire/{partenaire}/ventes", [PartenaireController::class, "ventes"])->name("partenaire.ventes");
 
-    // Profils utilisateurs
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+        // Ventes
+        Route::resource("vente", VenteController::class);
+        Route::patch("/vente/{vente}/validate", [VenteController::class, "validatedVente"])->name("vente.validate");
 
-    /***
-     * LES PARAMETRAGES
-     */
+        // Profils utilisateurs
+        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Users
-    Route::resource("user", UserController::class);
+        /***
+         * LES PARAMETRAGES
+         */
 
-    // Roles
-    Route::resource("role", RoleController::class)->except("update");
-    Route::get("role/{id}/permissions", [RoleController::class, 'getPermissions'])->name("role.permissions");
-    Route::get("role/{id}/users", [RoleController::class, 'getUsers'])->name("role.users");
-    Route::post("role/affect", [RoleController::class, 'affectRole'])->name("affect.role");
-    Route::patch("role/{id}/update-permissions", [RoleController::class, 'updatePermissions'])->name("role.update.permissions");
-    Route::patch("role/{id}/update-users", [RoleController::class, 'updateUsers'])->name("role.update.users");
+        // Users
+        Route::resource("user", UserController::class);
 
-    // Mode de paiement
-    Route::resource("mode-paiement", PaiementModeController::class);
+        // Roles
+        Route::resource("role", RoleController::class)->except("update");
+        Route::get("role/{id}/permissions", [RoleController::class, 'getPermissions'])->name("role.permissions");
+        Route::get("role/{id}/users", [RoleController::class, 'getUsers'])->name("role.users");
+        Route::post("role/affect", [RoleController::class, 'affectRole'])->name("affect.role");
+        Route::patch("role/{id}/update-permissions", [RoleController::class, 'updatePermissions'])->name("role.update.permissions");
+        Route::patch("role/{id}/update-users", [RoleController::class, 'updateUsers'])->name("role.update.users");
 
-    // Produits
-    Route::resource("produit", ProduitController::class);
+        // Mode de paiement
+        Route::resource("mode-paiement", PaiementModeController::class);
 
-    // Camions
-    Route::resource("camion", CamionController::class);
+        // Produits
+        Route::resource("produit", ProduitController::class);
 
-    // Chauffeurs
-    Route::resource("chauffeur", ChauffeurController::class);
+        // Camions
+        Route::resource("camion", CamionController::class);
 
-    // Superviseurs
-    Route::resource("superviseur", SuperviseurController::class);
+        // Chauffeurs
+        Route::resource("chauffeur", ChauffeurController::class);
 
-    // Magasins
-    Route::resource("magasin", MagasinController::class);
+        // Superviseurs
+        Route::resource("superviseur", SuperviseurController::class);
 
-    // Convoyeurs
-    Route::resource("convoyeur", ConvoyeurController::class);
+        // Magasins
+        Route::resource("magasin", MagasinController::class);
+
+        // Convoyeurs
+        Route::resource("convoyeur", ConvoyeurController::class);
+    });
 });
 
 require __DIR__ . '/auth.php';

@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Resources\DepenseResource;
 use App\Models\Chargement;
 use App\Models\DepenseSuperviseur;
-use App\Models\FondSuperviseur;
 use App\Models\Superviseur;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 
 class DepenseSuperviseurController extends Controller
 {
@@ -20,7 +20,9 @@ class DepenseSuperviseurController extends Controller
 
     function index()
     {
-        $depenses = DepenseSuperviseur::all();
+        $sessionId = Session::get("campagne")?->id;
+
+        $depenses = DepenseSuperviseur::where("campagne_id", $sessionId)->get();
         return inertia("Depenses/List", [
             "depenses" => DepenseResource::collection($depenses)
         ]);
@@ -138,18 +140,18 @@ class DepenseSuperviseurController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
             Log::debug("Erreure lors de la modification de la depense", ["error" => $e->errors()]);
-            return back()->withErrors(["error"=>"Erreure lors de la modification de la depense : ".$e->errors()]);
+            return back()->withErrors(["error" => "Erreure lors de la modification de la depense : " . $e->errors()]);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::debug("Erreure lors de la modification de la depense", ["error" => $e->getMessage()]);
-            return back()->withErrors(["error" => "Erreure lors de la modification de la depense : ".$e->getMessage()]);
+            return back()->withErrors(["error" => "Erreure lors de la modification de la depense : " . $e->getMessage()]);
         }
     }
 
     /**
      * Validation
      */
-    function validatedDepense(FondSuperviseur $depense)
+    function validatedDepense(DepenseSuperviseur $depense)
     {
         try {
             DB::beginTransaction();
@@ -188,7 +190,7 @@ class DepenseSuperviseurController extends Controller
             if (!$depense) {
                 throw new \Exception("Cete depense n'existe pas");
             }
-            
+
             $depense->delete();
 
             DB::commit();
@@ -196,7 +198,7 @@ class DepenseSuperviseurController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
             Log::debug("Erreure lors de la suppression de la depense", ["error" => $e->errors()]);
-            return back()->withErrors(["error"=>$e->errors()]);
+            return back()->withErrors(["error" => $e->errors()]);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::debug("Erreure lors de la suppression de la depense", ["error" => $e->getMessage()]);

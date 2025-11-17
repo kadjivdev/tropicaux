@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Session;
 
 class Partenaire extends Model
 {
@@ -17,6 +18,7 @@ class Partenaire extends Model
         'email',
         'phone',
         'user_id',
+        "campagne_id"
     ];
 
     /**Ventes */
@@ -35,6 +37,8 @@ class Partenaire extends Model
     protected static function booted()
     {
         static::creating(function ($model) {
+            $model->campagne_id = Session::get("campagne")?->id;
+
             if (auth()->check()) {
                 $model->user_id = auth()->id();
             }

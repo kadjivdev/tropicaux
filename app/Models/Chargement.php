@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Session;
 
 class Chargement extends Model
 {
@@ -22,7 +23,8 @@ class Chargement extends Model
         'observation',
         'user_id',
         'validated_by',
-        'validated_at'
+        'validated_at',
+        "campagne_id"
     ];
 
     /**Casts */
@@ -88,6 +90,8 @@ class Chargement extends Model
     protected static function booted()
     {
         static::creating(function ($chargement) {
+            
+            $chargement->campagne_id = Session::get("campagne")?->id;
             
             $chargement->reference = "CHARGE-" . time() . "-MENT";
             if (auth()->check()) {

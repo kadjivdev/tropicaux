@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 
 class FondSuperviseurController extends Controller
 {
@@ -19,7 +20,9 @@ class FondSuperviseurController extends Controller
 
     function index()
     {
-        $fonds = FondSuperviseur::all();
+        $sessionId = Session::get("campagne")?->id;
+
+        $fonds = FondSuperviseur::where("campagne_id", $sessionId)->get();
         return inertia("Fonds/List", [
             "fonds" => FondResource::collection($fonds)
         ]);
@@ -137,11 +140,11 @@ class FondSuperviseurController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
             Log::debug("Erreure lors de la modification du fond", ["error" => $e->errors()]);
-            return back()->withErrors(["error"=>"Erreure lors de la modification du fond : ".$e->errors()]);
+            return back()->withErrors(["error" => "Erreure lors de la modification du fond : " . $e->errors()]);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::debug("Erreure lors de la modification du fond", ["error" => $e->getMessage()]);
-            return back()->withErrors(["error" => "Erreure lors de la modification du fond : ".$e->getMessage()]);
+            return back()->withErrors(["error" => "Erreure lors de la modification du fond : " . $e->getMessage()]);
         }
     }
 
@@ -187,7 +190,7 @@ class FondSuperviseurController extends Controller
             if (!$fond) {
                 throw new \Exception("Ce fond n'existe pas");
             }
-            
+
             $fond->delete();
 
             DB::commit();
@@ -195,7 +198,7 @@ class FondSuperviseurController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
             Log::debug("Erreure lors de la suppression du fonds", ["error" => $e->errors()]);
-            return back()->withErrors(["error"=>$e->errors()]);
+            return back()->withErrors(["error" => $e->errors()]);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::debug("Erreure lors de la suppression du fonds", ["error" => $e->getMessage()]);

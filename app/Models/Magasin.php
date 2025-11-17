@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Session;
 
 class Magasin extends Model
 {
@@ -14,6 +15,7 @@ class Magasin extends Model
         'libelle',
         'description',
         'user_id',
+        'campagne_id'
     ];
 
     /**Createur */
@@ -25,9 +27,11 @@ class Magasin extends Model
     /**Boot */
     protected static function booted()
     {
-        static::creating(function ($produit) {
+        static::creating(function ($model) {
+            $model->campagne_id = Session::get("campagne")?->id;
+
             if (auth()->check()) {
-                $produit->user_id = auth()->id();
+                $model->user_id = auth()->id();
             }
         });
     }

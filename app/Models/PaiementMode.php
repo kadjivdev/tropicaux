@@ -5,17 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Session;
 
 class PaiementMode extends Model
 {
     use SoftDeletes;
-    
+
     // protected $table = 'paiement_mode';
 
     protected $fillable = [
         'libelle',
         'description',
         'user_id',
+        'campagne_id'
     ];
 
     /**Createur */
@@ -27,9 +29,11 @@ class PaiementMode extends Model
     /**Boot */
     protected static function booted()
     {
-        static::creating(function ($produit) {
+        static::creating(function ($model) {
+            $model->campagne_id = Session::get("campagne")?->id;
+
             if (auth()->check()) {
-                $produit->user_id = auth()->id();
+                $model->user_id = auth()->id();
             }
         });
     }

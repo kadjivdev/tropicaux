@@ -20,6 +20,8 @@ use App\Models\Vente;
 use BcMath\Number;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -29,18 +31,22 @@ class DashboardController extends Controller
      */
     public function __invoke()
     {
-        $financementsAmount = Financement::whereNotNull("validated_at")->sum("montant");
-        $fondSuperviseursAmount = FondSuperviseur::whereNotNull("validated_at")->sum("montant");
-        $depensesSuperviseursAmount = DepenseSuperviseur::whereNotNull("validated_at")->sum("montant");
+        
+        $sessionId = Session::get("campagne")?->id;
+        Log::debug("La session concernée :", ["session" => Session::get("campagne")?->id]);
 
-        $chargements = Chargement::all();
-        $ventes = Vente::all();
+        $financementsAmount = Financement::where("campagne_id", $sessionId)->whereNotNull("validated_at")->sum("montant");
+        $fondSuperviseursAmount = FondSuperviseur::where("campagne_id", $sessionId)->whereNotNull("validated_at")->sum("montant");
+        $depensesSuperviseursAmount = DepenseSuperviseur::where("campagne_id", $sessionId)->whereNotNull("validated_at")->sum("montant");
+
+        $chargements = Chargement::where("campagne_id", $sessionId)->get();
+        $ventes = Vente::where("campagne_id", $sessionId)->get();
 
         return Inertia::render('Dashboard', [
-            "financementsAmount" => number_format($financementsAmount,2,","," "),
-            "fondSuperviseursAmount" => number_format($fondSuperviseursAmount,2,","," "),
-            "depensesSuperviseursAmount" => number_format($depensesSuperviseursAmount,2,","," "),
-            "ventesAmount" => number_format($ventes->whereNotNull("validated_at")->sum("montant_total"),2,","," "),
+            "financementsAmount" => number_format($financementsAmount, 2, ",", " "),
+            "fondSuperviseursAmount" => number_format($fondSuperviseursAmount, 2, ",", " "),
+            "depensesSuperviseursAmount" => number_format($depensesSuperviseursAmount, 2, ",", " "),
+            "ventesAmount" => number_format($ventes->whereNotNull("validated_at")->sum("montant_total"), 2, ",", " "),
             "chargements" => ChargementResource::collection($chargements),
             "ventes" => VenteResource::collection($ventes),
         ]);

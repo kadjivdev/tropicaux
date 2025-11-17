@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('depense_superviseurs', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('campagne_id')
+                ->nullable()
+                ->constrained('campagnes')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
             $table->text("reference")->nullable();
             $table->foreignId("chargement_id")
                 ->nullable()
@@ -35,7 +40,7 @@ return new class extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
             $table->date("validated_at")->nullable();
-            $table->decimal("montant",20,2)->nullable();
+            $table->decimal("montant", 20, 2)->nullable();
             $table->text("document")->nullable();
             $table->text("commentaire")->nullable();
             $table->softDeletes();

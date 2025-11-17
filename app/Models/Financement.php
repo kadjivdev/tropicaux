@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 
 class Financement extends Model
 {
@@ -19,7 +21,8 @@ class Financement extends Model
         'document',
         'user_id',
         'validated_by',
-        'validated_at'
+        'validated_at',
+        "campagne_id"
     ];
 
     /**Cast */
@@ -73,6 +76,8 @@ class Financement extends Model
     protected static function booted()
     {
         static::creating(function ($financement) {
+            $financement->campagne_id = Session::get("campagne")?->id;
+
             if (auth()->check()) {
                 $financement->user_id = auth()->id();
             }

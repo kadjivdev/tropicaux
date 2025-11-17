@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 class CamionController extends Controller
 {
+   
     /**
      * lister les camions
      */

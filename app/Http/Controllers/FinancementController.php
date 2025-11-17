@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 
 class FinancementController extends Controller
 {
@@ -19,7 +20,9 @@ class FinancementController extends Controller
 
     function index()
     {
-        $financements = Financement::all();
+        $sessionId = Session::get("campagne")?->id;
+
+        $financements = Financement::where("campagne_id", $sessionId)->get();
         return inertia("Financements/List", [
             "financements" => FinancementResource::collection($financements)
         ]);

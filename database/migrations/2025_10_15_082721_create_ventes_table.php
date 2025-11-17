@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('ventes', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('campagne_id')
+                ->nullable()
+                ->constrained('campagnes')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
             $table->text("reference")->nullable();
             $table->foreignId("partenaire_id")
                 ->nullable()

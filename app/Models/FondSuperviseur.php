@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 
 class FondSuperviseur extends Model
 {
@@ -24,6 +25,7 @@ class FondSuperviseur extends Model
         'validated_at',
 
         'user_id',
+        'campagne_id'
     ];
 
     /*Casts*/
@@ -78,6 +80,8 @@ class FondSuperviseur extends Model
     protected static function booted()
     {
         static::creating(function ($model) {
+            $model->campagne_id = Session::get("campagne")?->id;
+
             if (auth()->check()) {
                 $model->user_id = auth()->id();
             }

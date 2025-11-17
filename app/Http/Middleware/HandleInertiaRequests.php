@@ -2,9 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\School;
-use App\Models\Trimestre;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -35,6 +34,7 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
+                'campagne' => Session::get("campagne"),
                 'receivedNotificationsNbr' => $request->user() ? $request->user()->notificationsReceived->count() : 0,
                 'base_url' => env("APP_URL"),
                 'permissions' => $request->user()?->getAllPermissions(),

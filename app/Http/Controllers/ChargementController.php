@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
 
 class ChargementController extends Controller
@@ -25,7 +26,9 @@ class ChargementController extends Controller
 
     function index()
     {
-        $chargements = Chargement::all();
+        $sessionId = Session::get("campagne")?->id;
+
+        $chargements = Chargement::where("campagne_id", $sessionId)->get();
         return inertia("Chargements/List", [
             "chargements" => ChargementResource::collection($chargements)
         ]);

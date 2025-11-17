@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Session;
 
 class Fournisseur extends Model
 {
@@ -17,6 +18,7 @@ class Fournisseur extends Model
         'adresse',
         'email',
         'user_id',
+        "campagne_id"
     ];
 
     /**Chargments */
@@ -41,6 +43,8 @@ class Fournisseur extends Model
     protected static function booted()
     {
         static::creating(function ($model) {
+            $model->campagne_id = Session::get("campagne")?->id;
+
             if (auth()->check()) {
                 $model->user_id = auth()->id();
             }

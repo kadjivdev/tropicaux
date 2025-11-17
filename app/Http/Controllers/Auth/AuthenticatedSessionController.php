@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -38,7 +39,7 @@ class AuthenticatedSessionController extends Controller
             $request->session()->regenerate();
 
             DB::commit();
-            return redirect()->intended(route('dashboard', absolute: false));
+            return redirect()->route("campagne.index");// intended(route('dashboard', absolute: false));
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
             Log::debug("Erreure de Validation: ", ["error" => $e->errors()]);
@@ -61,6 +62,9 @@ class AuthenticatedSessionController extends Controller
             Auth::guard('web')->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
+
+            // Suppression de la session campagne
+            Session::put("campagne",null);
 
             return redirect('/login');
             DB::commit();

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Session;
 
 class DepenseSuperviseur extends Model
 {
@@ -23,6 +24,7 @@ class DepenseSuperviseur extends Model
         'validated_at',
 
         'user_id',
+        'campagne_id'
     ];
 
     /*Casts*/
@@ -74,6 +76,8 @@ class DepenseSuperviseur extends Model
     protected static function booted()
     {
         static::creating(function ($model) {
+            $model->campagne_id = Session::get("campagne")?->id;
+
             if (auth()->check()) {
                 $model->user_id = auth()->id();
             }

@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('chargement_details', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('campagne_id')
+                ->nullable()
+                ->constrained('campagnes')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
             $table->foreignId("chargement_id")
                 ->nullable()
                 ->constrained("chargements")

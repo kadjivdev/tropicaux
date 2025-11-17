@@ -1,10 +1,10 @@
 import Dropdown from '@/Components/Dropdown';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import CIcon from '@coreui/icons-react';
-import { useForm, usePage } from '@inertiajs/react';
+import { Link, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import Swal from 'sweetalert2';
-import { cilAccountLogout, cilUserX, cilBellExclamation } from '@coreui/icons'
+import { cilAccountLogout, cilUserX, cilBellExclamation, cilList } from '@coreui/icons'
 
 import { useEffect } from 'react';
 // import DataTable from 'datatables.net-dt';
@@ -40,7 +40,7 @@ pdfMake.vfs = pdfFonts.vfs; // ✅ not pdfFonts.pdfMake.vfs
 import 'datatables.net-responsive';
 import SidebarMenu from '@/Components/SidebarMenu';
 
-export default function AuthenticatedLayout({ header, children }) {
+export default function AuthenticatedLayout({ header, children, menu = true }) {
     const [visible, setVisible] = useState(true)
 
     useEffect(() => {
@@ -121,8 +121,9 @@ export default function AuthenticatedLayout({ header, children }) {
     }, []);
 
     const user = usePage().props.auth.user;
+    const campagne = usePage().props.auth.campagne;
 
-    const receivedNotificationsNbr = usePage().props.auth.receivedNotificationsNbr;
+    console.log("La campagne en question :", campagne)
 
     const { post } = useForm();
 
@@ -206,6 +207,22 @@ export default function AuthenticatedLayout({ header, children }) {
                         </div>
 
                         <div className="hidden sm:ms-6 sm:flex sm:items-center">
+                            {
+                                campagne &&
+                                (
+                                    <>
+                                        <div className="mx-2">
+                                            <Link href={route('campagne.index')} className="btn w-100 bg-success bg-hover text-white">
+                                                <CIcon icon={cilList} className="text-white" />  Changer de Campagnes
+                                            </Link> 
+                                        </div>
+
+                                        <div className="mx-2">
+                                            <strong>Campagne Concernée :  <span className="badge bg-light text-success border rounded shadow">{campagne?.libelle}</span></strong>
+                                        </div> |
+                                    </>)
+                            }
+
                             <div className="relative ms-3">
                                 <Dropdown>
                                     <Dropdown.Trigger>
@@ -346,7 +363,8 @@ export default function AuthenticatedLayout({ header, children }) {
             <div className="row">
                 <SidebarMenu
                     visible={visible}
-                    setVisible={setVisible} />
+                    setVisible={setVisible}
+                    showMenu={menu} />
 
                 <div className="col-sm-12" style={{ overflowX: "scroll!important" }}>
                     <div className={`h-[600px] overflow-y-auto`}>
