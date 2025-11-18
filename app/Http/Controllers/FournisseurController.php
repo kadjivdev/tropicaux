@@ -7,6 +7,7 @@ use App\Models\Fournisseur;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 
 class FournisseurController extends Controller
 {
@@ -27,11 +28,19 @@ class FournisseurController extends Controller
      */
     function financements(Fournisseur $fournisseur)
     {
-        $fournisseur->load("financements.gestionnaire", "financements.createdBy", "financements.validatedBy");
+        $sessionId = Session::get("campagne")?->id;
+
+        $fournisseur->load([
+            "financements" => fn($query) => $query->where("campagne_id", $sessionId),
+            "financements.gestionnaire",
+            "financements.createdBy",
+            "financements.validatedBy"
+        ]);
+
         $total_amount = $fournisseur->financements->whereNotNull("validated_by")->sum("montant");
 
         return inertia("Fournisseurs/Financements", [
-            'total_amount' => number_format($total_amount,2,","," "),
+            'total_amount' => number_format($total_amount, 2, ",", " "),
             'fournisseur' => $fournisseur,
         ]);
     }

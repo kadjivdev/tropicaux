@@ -33,7 +33,10 @@ class FondSuperviseurController extends Controller
      */
     function create()
     {
-        $chargements = Chargement::all();
+        $sessionId = Session::get("campagne")?->id;
+        $chargements = Chargement::where("campagne_id", $sessionId)
+            ->whereNotNull("validated_by")
+            ->get();
         $superviseurs = Superviseur::all();
 
         return inertia("Fonds/Create", [
@@ -93,7 +96,10 @@ class FondSuperviseurController extends Controller
     function edit($id)
     {
         $fond = FondSuperviseur::find($id);
-        $chargements = Chargement::all();
+        $sessionId = Session::get("campagne")?->id;
+        $chargements = Chargement::where("campagne_id", $sessionId)
+            ->whereNotNull("validated_by")
+            ->get();
         $superviseurs = Superviseur::all();
 
         return inertia("Fonds/Update", [
@@ -106,7 +112,7 @@ class FondSuperviseurController extends Controller
     /**
      * Update
      */
-    function update(Request $request, FondSuperviseur $fond)
+    function update(Request $request, FondSuperviseur $fond_superviseur)
     {
         Log::info("Les datas", ["data" => $request->all()]);
 
@@ -133,7 +139,7 @@ class FondSuperviseurController extends Controller
 
             DB::beginTransaction();
 
-            $fond->update($validated);
+            $fond_superviseur->update($validated);
 
             DB::commit();
             return redirect()->route("fond-superviseur.index");

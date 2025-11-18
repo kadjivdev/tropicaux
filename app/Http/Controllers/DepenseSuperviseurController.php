@@ -33,7 +33,11 @@ class DepenseSuperviseurController extends Controller
      */
     function create()
     {
-        $chargements = Chargement::all();
+        $sessionId = Session::get("campagne")?->id;
+        $chargements = Chargement::where("campagne_id", $sessionId)
+            ->whereNotNull("validated_by")
+            ->get();
+
         $superviseurs = Superviseur::all();
 
         return inertia("Depenses/Create", [
@@ -93,7 +97,12 @@ class DepenseSuperviseurController extends Controller
     function edit($id)
     {
         $depense = DepenseSuperviseur::find($id);
-        $chargements = Chargement::all();
+        
+        $sessionId = Session::get("campagne")?->id;
+        $chargements = Chargement::where("campagne_id", $sessionId)
+            ->whereNotNull("validated_by")
+            ->get();
+            
         $superviseurs = Superviseur::all();
 
         return inertia("Depenses/Update", [
@@ -106,9 +115,9 @@ class DepenseSuperviseurController extends Controller
     /**
      * Update
      */
-    function update(Request $request, DepenseSuperviseur $depense)
+    function update(Request $request, DepenseSuperviseur $depense_superviseur)
     {
-        Log::info("Les datas", ["data" => $request->all()]);
+        Log::info("Les datas update depense", ["data" => $request->all()]);
 
         try {
             $validated = $request->validate([
@@ -133,7 +142,7 @@ class DepenseSuperviseurController extends Controller
 
             DB::beginTransaction();
 
-            $depense->update($validated);
+            $depense_superviseur->update($validated);
 
             DB::commit();
             return redirect()->route("depense-superviseur.index");

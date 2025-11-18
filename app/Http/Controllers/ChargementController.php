@@ -7,6 +7,7 @@ use App\Models\Camion;
 use App\Models\Chargement;
 use App\Models\Chauffeur;
 use App\Models\Convoyeur;
+use App\Models\FondSuperviseur;
 use App\Models\Fournisseur;
 use App\Models\Magasin;
 use App\Models\Produit;
@@ -27,12 +28,13 @@ class ChargementController extends Controller
     function index()
     {
         $sessionId = Session::get("campagne")?->id;
-
         $chargements = Chargement::where("campagne_id", $sessionId)->get();
+        
         return inertia("Chargements/List", [
             "chargements" => ChargementResource::collection($chargements)
         ]);
     }
+
 
     /**
      * Formulaire de création
@@ -258,6 +260,52 @@ class ChargementController extends Controller
             Log::debug("Erreure lors de la validation du chargements", ["error" => $e->getMessage()]);
             return back()->withErrors(["error" => $e->getMessage()]);
         }
+    }
+
+    /**
+     * liste les fonds superviseurs
+     */
+    function fonds(Chargement $chargement)
+    {
+        $sessionId = Session::get("campagne")?->id;
+
+        $chargement->load([
+            "fonds" => fn($query) => $query->where("campagne_id", $sessionId),
+            "fonds.createdBy",
+            "fonds.superviseur",
+            "fonds.validatedBy",
+        ]);
+
+        Log::debug("Le Chargement cponcerné :", ["data" => $chargement]);
+
+        $total_amount = $chargement->fonds()->whereNotNull("validated_by")->sum("montant");
+
+        return inertia("Chargements/Fonds", [
+            'total_amount' => number_format($total_amount, 2, ",", " "),
+            'chargement' => $chargement,
+        ]);
+    }
+
+    /**
+     * liste les depenses superviseurs
+     */
+    function depenses(Chargement $chargement)
+    {
+        $sessionId = Session::get("campagne")?->id;
+
+        $chargement->load([
+            "depenses" => fn($query) => $query->where("campagne_id", $sessionId),
+            "depenses.createdBy",
+            "depenses.superviseur",
+            "depenses.validatedBy"
+        ]);
+
+        $total_amount = $chargement->depenses()->whereNotNull("validated_by")->sum("montant");
+
+        return inertia("Chargements/Depenses", [
+            'total_amount' => number_format($total_amount, 2, ",", " "),
+            'chargement' => $chargement,
+        ]);
     }
 
     /**

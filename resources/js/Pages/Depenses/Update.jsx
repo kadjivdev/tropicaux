@@ -23,19 +23,17 @@ export default function Update({ depense, chargements, superviseurs }) {
         errors,
         patch,
         processing,
-        // progress
     } = useForm({
-        chargement_id: fond.chargement_id || '',
-        superviseur_id: fond.superviseur_id || '',
-        montant: fond.montant || 0,
-        // document: "",
-        commentaire: fond.commentaire || ''
+        chargement_id: depense.chargement_id || '',
+        superviseur_id: depense.superviseur_id || '',
+        montant: depense.montant || 0,
+        commentaire: depense.commentaire || ''
     });
 
     const submit = (e) => {
         e.preventDefault();
 
-        patch(route('fond-superviseur.update', { "fond_superviseur": fond.id }), {
+        patch(route('depense-superviseur.update', { "depense_superviseur": depense.id }), {
             onStart: () => {
                 Swal.fire({
                     title: '<span style="color: #facc15;">🫠 Opération en cours...</span>', // yellow text
@@ -70,7 +68,7 @@ export default function Update({ depense, chargements, superviseurs }) {
         <AuthenticatedLayout
             header={
                 <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                    <CIcon className='text-success' icon={cilPencil} /> Modifier le fond <span className="badge bg-light border rounded text-success">{fond.reference}</span>
+                    <CIcon className='text-success' icon={cilPencil} /> Modifier le fond <span className="badge bg-light border rounded text-success">{depense.reference}</span>
                 </h2>
             }
         >
@@ -81,9 +79,9 @@ export default function Update({ depense, chargements, superviseurs }) {
                     <div className="mx-auto _max-w-7xl space-y-6 sm:px-6 lg:px-8 ">
 
                         <div className="bg-light p-3 rounded border mb-5">
-                            {checkPermission('fond.superviseur.view') ?
+                            {checkPermission('depense.superviseur.view') ?
                                 (<div className=" text-center  items-center gap-4">
-                                    <Link className="btn btn-sm bg-success bg-hover text-white" href={route("fond-superviseur.index")}> <CIcon icon={cilList} /> Liste des fonds aux superviseurs</Link>
+                                    <Link className="btn btn-sm bg-success bg-hover text-white" href={route("depense-superviseur.index")}> <CIcon icon={cilList} /> Liste des fonds aux superviseurs</Link>
                                 </div>) : null
                             }
 

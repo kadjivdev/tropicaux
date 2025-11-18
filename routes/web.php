@@ -86,6 +86,8 @@ Route::middleware('auth')->group(function () {
         // Chargements
         Route::resource("chargement", ChargementController::class);
         Route::patch("/chargement/{chargement}/validate", [ChargementController::class, "validatedChargement"])->name("chargement.validate");
+        Route::get("chargement/{chargement}/fonds", [ChargementController::class, "fonds"])->name("chargement.fonds");
+        Route::get("chargement/{chargement}/depenses", [ChargementController::class, "depenses"])->name("chargement.depenses");
 
         // Fonds aux superviseur
         Route::resource("fond-superviseur", FondSuperviseurController::class);

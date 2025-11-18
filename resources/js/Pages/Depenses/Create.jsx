@@ -178,7 +178,7 @@ export default function Create({ chargements, superviseurs }) {
                                                 id="commentaire"
                                                 className="mt-1 block w-full"
                                                 value={data.commentaire}
-                                                placeholder="Ex: Fond attribué su superviseur Emmannuel"
+                                                placeholder="Ex: Dépense effrectué sur le chargement"
                                                 onChange={(e) => setData('commentaire', e.target.value)}
                                                 autoComplete="commentaire"
                                             />

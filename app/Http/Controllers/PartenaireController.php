@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\PartenaireResource;
 use App\Models\Partenaire;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +17,7 @@ class PartenaireController extends Controller
     {
         $partenaires = Partenaire::all();
         return inertia("Partenaires/List", [
-            'partenaires' => $partenaires,
+            'partenaires' => PartenaireResource::collection($partenaires),
         ]);
     }
 

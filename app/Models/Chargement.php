@@ -80,6 +80,18 @@ class Chargement extends Model
         return $this->hasMany(ChargementDetail::class, "chargement_id");
     }
 
+    /**Fonds superviseur */
+    function fonds(): HasMany
+    {
+        return $this->hasMany(FondSuperviseur::class, "chargement_id");
+    }
+
+    /**Depenses superviseur */
+    function depenses(): HasMany
+    {
+        return $this->hasMany(DepenseSuperviseur::class, "chargement_id");
+    }
+
     /**Camions */
     function camions(): HasMany
     {

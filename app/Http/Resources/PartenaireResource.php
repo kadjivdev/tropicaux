@@ -21,7 +21,8 @@ class PartenaireResource extends JsonResource
             "adresse" => $this->adresse,
             "email" => $this->email,
             "phone" => $this->phone,
-            "createdBy" => UserResource::collection($this->createdBy),
+            "total_ventes" => number_format($this->ventes()->whereNotNull("validated_by")->sum("montant_total"),2,","," "),
+            "createdBy" => $this->createdBy,
         ];
     }
 }

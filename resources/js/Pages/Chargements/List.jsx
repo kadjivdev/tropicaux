@@ -153,6 +153,8 @@ export default function List({ chargements }) {
                                     <th scope="col">Reference</th>
                                     <th scope="col">Camions</th>
                                     <th scope="col">Détails</th>
+                                    <th scope="col">Fonds Superviseurs</th>
+                                    <th scope="col">Dépenses Superviseurs</th>
                                     <th scope="col">Produit</th>
                                     <th scope="col">Chauffeur</th>
                                     <th scope="col">Superviseur</th>
@@ -195,7 +197,7 @@ export default function List({ chargements }) {
                                                                         <button
                                                                             type="button"
                                                                             className="btn text-success"
-                                                                            onClick={(e) => validateChargement(e,chargement)} // ✅ action Inertia
+                                                                            onClick={(e) => validateChargement(e, chargement)} // ✅ action Inertia
                                                                         >
                                                                             <CIcon icon={cilCheckCircle} /> Valider
                                                                         </button>
@@ -207,7 +209,7 @@ export default function List({ chargements }) {
                                                                         <button
                                                                             type="button"
                                                                             className="btn text-danger"
-                                                                            onClick={(e) => deleteChargement(e,chargement)} // ✅ action Inertia
+                                                                            onClick={(e) => deleteChargement(e, chargement)} // ✅ action Inertia
                                                                         >
                                                                             <CIcon icon={cilUserX} /> Supprimer
                                                                         </button>
@@ -238,6 +240,22 @@ export default function List({ chargements }) {
                                                 >
                                                     <CIcon icon={cilList} />
                                                 </button>
+                                            </td>
+                                            <td className='text-center'>
+                                                <Link
+                                                    href={route("chargement.fonds", chargement.id)}
+                                                    className='btn btn-sm btn-light border shadow-sm rounded text-success'
+                                                >
+                                                   <CIcon icon={cilList} /> <strong> {chargement.total_fonds} FCFA</strong>
+                                                </Link>
+                                            </td>
+                                            <td className='text-center'>
+                                                <Link
+                                                    href={route("chargement.depenses", chargement.id)}
+                                                    className='btn btn-sm btn-light border shadow-sm rounded text-success'
+                                                >
+                                                    <CIcon icon={cilList} /> <strong> {chargement.total_depenses} FCFA</strong>
+                                                </Link>
                                             </td>
                                             <td>{chargement?.produit?.libelle ?? '---'}</td>
                                             <td>{`${chargement?.chauffeur?.raison_sociale}`}</td>
@@ -294,6 +312,7 @@ export default function List({ chargements }) {
                                                         type="text"
                                                         className="mt-1 block w-full form-control"
                                                         value={data.commentaire}
+                                                        rows={1}
                                                         disabled={true}
                                                     />
                                                 </td>

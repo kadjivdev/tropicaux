@@ -24,7 +24,6 @@ class Vente extends Model
         'poids',
         'nbre_sac_rejete',
         'prix_unitaire_sac_rejete',
-        'montant_total',
         'commentaire',
 
         'validated_by',

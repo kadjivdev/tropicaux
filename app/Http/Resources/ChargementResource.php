@@ -25,6 +25,8 @@ class ChargementResource extends JsonResource
             "magasin" => $this->magasin,
             "camions" => $this->camions->load("camion"),
             "details" => $this->details->load("fournisseur"),
+            "total_fonds" => number_format($this->fonds->whereNotNull("validated_by")->sum("montant"),2,","," "),
+            "total_depenses" => number_format($this->depenses->whereNotNull("validated_by")->sum("montant"),2,","," "),
             "adresse" => $this->adresse,
             "observation" => $this->observation,
             "createdBy" => $this->createdBy,

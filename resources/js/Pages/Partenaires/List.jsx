@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 export default function List({ partenaires }) {
     const permissions = usePage().props.auth.permissions;
 
+    console.log("Les partenanires : ",partenaires)
     const checkPermission = (name) => {
         return permissions.some(per => per.name == name);
     }
@@ -88,7 +89,8 @@ export default function List({ partenaires }) {
                             </thead>
                             <tbody>
                                 {
-                                    partenaires.map((partenaire, index) => (
+                                    partenaires.data.length>0 &&
+                                    partenaires.data?.map((partenaire, index) => (
                                         <tr key={partenaire.id}>
                                             <th scope="row">{index + 1}</th>
                                             <td>
@@ -96,7 +98,7 @@ export default function List({ partenaires }) {
                                                 href={route("partenaire.ventes",partenaire.id)}
                                                     className='btn btn-sm btn-light border shadow-sm rounded text-success'
                                                 >
-                                                    <CIcon icon={cilList} />
+                                                    <CIcon icon={cilList} /> <strong> {partenaire.total_ventes} FCFA</strong>
                                                 </Link>
                                             </td>
                                             <td>{partenaire.raison_sociale ?? '---'}</td>

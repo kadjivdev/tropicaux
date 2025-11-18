@@ -309,6 +309,7 @@ export default function List({ ventes }) {
                                                         className="mt-1 block w-full form-control"
                                                         value={data.commentaire}
                                                         disabled={true}
+                                                        rows={1}
                                                     />
                                                 </td>
                                             </tr>

@@ -56,7 +56,6 @@ export default function List({ fournisseurs }) {
         });
     }
 
-
     return (
         <AuthenticatedLayout
             header={
