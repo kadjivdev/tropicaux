@@ -54,14 +54,12 @@ Route::get("/{roleId}/affect-permissions", function ($roleId) {
 
 Route::redirect('/', '/login');
 
-Route::get('/dashboard', DashboardController::class)->middleware(['auth', 'verified'])->name('dashboard');
 
 // Route::middleware(['auth', 'campagne.session'])->group(function () {
 
 //     Route::resource("camion", CamionController::class);
 
 // });
-
 
 Route::middleware('auth')->group(function () {
 
@@ -71,6 +69,8 @@ Route::middleware('auth')->group(function () {
     Route::get("/campagne-session/{campagne}", [CampagneSession::class, "campagneSession"])->name("campagneSession");
 
     Route::middleware("campagne.session")->group(function () {
+        Route::get('/dashboard', DashboardController::class)->middleware(['verified'])->name('dashboard');
+
         /**
          * LES GESTIONS
          */
