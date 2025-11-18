@@ -69,7 +69,7 @@ export default function Create({ }) {
         if (e.target.value.length > 20) {
             Swal.fire({
                 icon: "info",
-                text: "Le nombre de caractère ne doit pas dépasser 50!"
+                text: "Le nombre de caractère ne doit pas dépasser 20!"
             })
             e.target.value =null
         }
