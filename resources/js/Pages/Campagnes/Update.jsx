@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
 import Select from 'react-select'
 import { Textarea } from '@headlessui/react';
 
-export default function Create({ campagne}) {
+export default function Create({ campagne }) {
     const permissions = usePage().props.auth.permissions;
 
     const checkPermission = (name) => {
@@ -31,7 +31,7 @@ export default function Create({ campagne}) {
     const submit = (e) => {
         e.preventDefault();
 
-        patch(route('campagne.update',campagne.id), {
+        patch(route('campagne.update', campagne.id), {
             onStart: () => {
                 Swal.fire({
                     title: '<span style="color: #facc15;">🫠 Opération en cours...</span>', // yellow text
@@ -61,6 +61,20 @@ export default function Create({ campagne}) {
             },
         });
     };
+
+    const handleName = (e) => {
+        e.preventDefault();
+
+        if (e.target.value.length > 20) {
+            Swal.fire({
+                icon: "info",
+                text: "Le nombre de caractère ne doit pas dépasser 50!"
+            })
+            e.target.value = null
+        }
+
+        setData("libelle", e.target.value)
+    }
 
     return (
         <AuthenticatedLayout
@@ -95,7 +109,7 @@ export default function Create({ campagne}) {
                                                 className="mt-1 block w-full"
                                                 value={data.libelle}
                                                 placeholder="Ex: Campagne du mois de Novembre..."
-                                                onChange={(e) => setData('libelle', e.target.value)}
+                                                onChange={(e) => handleName(e)}
                                                 autoComplete="libelle"
                                                 min={1}
                                                 required

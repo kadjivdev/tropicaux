@@ -62,6 +62,21 @@ export default function Create({ }) {
         });
     };
 
+    // 
+    const handleName = (e) => {
+        e.preventDefault();
+
+        if (e.target.value.length > 20) {
+            Swal.fire({
+                icon: "info",
+                text: "Le nombre de caractère ne doit pas dépasser 50!"
+            })
+            e.target.value =null
+        }
+
+        setData("libelle",e.target.value)
+    }
+
     return (
         <AuthenticatedLayout
             menu={false}
@@ -95,7 +110,7 @@ export default function Create({ }) {
                                                 className="mt-1 block w-full"
                                                 value={data.libelle}
                                                 placeholder="Ex: Campagne du mois de Novembre..."
-                                                onChange={(e) => setData('libelle', e.target.value)}
+                                                onChange={(e) => handleName(e)}
                                                 autoComplete="libelle"
                                                 min={1}
                                                 required
