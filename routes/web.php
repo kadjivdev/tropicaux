@@ -25,6 +25,7 @@ use App\Http\Controllers\MoyenneInterrogationController;
 use App\Http\Controllers\PaiementModeController;
 use App\Http\Controllers\PartenaireController;
 use App\Http\Controllers\PayementController;
+use App\Http\Controllers\PreFinancementController;
 use App\Http\Controllers\ProduitController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
@@ -54,13 +55,6 @@ Route::get("/{roleId}/affect-permissions", function ($roleId) {
 
 Route::redirect('/', '/login');
 
-
-// Route::middleware(['auth', 'campagne.session'])->group(function () {
-
-//     Route::resource("camion", CamionController::class);
-
-// });
-
 Route::middleware('auth')->group(function () {
 
     // Campagnes
@@ -74,6 +68,11 @@ Route::middleware('auth')->group(function () {
         /**
          * LES GESTIONS
          */
+        // Pré Financements
+        Route::resource("prefinancement", PreFinancementController::class);
+        Route::patch("/prefinancement/{prefinancement}/validate", [PreFinancementController::class, "validatedPreFinancement"])->name("prefinancement.validate");
+        Route::post("/prefinancement/{prefinancement}/transfert-reste", [PreFinancementController::class, "transfertReste"])->name("prefinancement.transfert-reste");
+
 
         // Financements
         Route::resource("financement", FinancementController::class);

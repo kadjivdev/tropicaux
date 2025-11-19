@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\FinancementResource;
+use App\Http\Resources\PreFinancementResource;
 use App\Models\Financement;
 use App\Models\Fournisseur;
+use App\Models\PreFinancement;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,13 +37,18 @@ class FinancementController extends Controller
     function create()
     {
         $fournisseurs = Fournisseur::all();
-        $gestionnaires = User::whereHas("roles", function ($role) {
-            $role->where("name", "Gestionnaire de fonds");
-        })->get();
+
+        $sessionId = Session::get("campagne")?->id;
+        $prefinancements = PreFinancement::where("campagne_id", $sessionId)
+            ->whereNotNull("validated_by")
+            ->get()
+            ->filter(function ($query) {
+                return $query->montant - $query->financements->sum("montant") > 0;
+            });
 
         return inertia("Financements/Create", [
             "fournisseurs" => $fournisseurs,
-            "gestionnaires" => $gestionnaires
+            "prefinancements" => PreFinancementResource::collection($prefinancements),
         ]);
     }
 
@@ -52,7 +59,7 @@ class FinancementController extends Controller
     {
         $validated = $request->validate([
             "fournisseur_id" => ["required", "integer"],
-            "gestionnaire_id" => ["required", "integer"],
+            "prefinancement_id" => ["required", "integer", "exists:pre_financements,id"],
             "montant" => ["required", "numeric"],
             "date_financement" => ["required", "date"],
             "document" => ["nullable", "file", "mimes:pdf,png,jpg,jpeg"],
@@ -60,8 +67,8 @@ class FinancementController extends Controller
             "fournisseur_id.required" => "Le fournisseur est requis.",
             "fournisseur_id.integer" => "Le fournisseur doit être un entier.",
 
-            "gestionnaire_id.required" => "Le gestionnaire est requis.",
-            "gestionnaire_id.integer" => "Le gestionnaire doit être un entier.",
+            "prefinancement_id.required" => "Le pré financement est requis.",
+            "prefinancement_id.integer" => "Le pré financement doit être un entier.",
 
             "montant.required" => "Le montant est requis.",
             "montant.numeric" => "Le montant doit être un nombre.",
@@ -77,7 +84,7 @@ class FinancementController extends Controller
             $financement = Financement::create($validated);
 
             DB::commit();
-            Log::info("Nouveau fournisseur créé avec succès", ["financement_id" => $financement->id, "created_by" => auth()->user()->id]);
+            Log::info("Nouveau financement créé avec succès", ["financement_id" => $financement->id, "created_by" => auth()->user()->id]);
             return redirect()->route("financement.index");
         } catch (\Illuminate\Validation\ValidationException $e) {
             Log::debug("Erreure lors de la création du financement", ["error" => $e->getMessage()]);
@@ -96,14 +103,20 @@ class FinancementController extends Controller
     function edit(Financement $financement)
     {
         $fournisseurs = Fournisseur::all();
-        $gestionnaires = User::whereHas("roles", function ($role) {
-            $role->where("name", "Gestionnaire de fonds");
-        })->get();
+
+        $sessionId = Session::get("campagne")?->id;
+
+        $prefinancements = PreFinancement::where("campagne_id", $sessionId)
+            ->whereNotNull("validated_by")
+            ->get()
+            ->filter(function ($query) {
+                return $query->montant - $query->financements->sum("montant") > 0;
+            });
 
         return inertia("Financements/Update", [
             'financement' => $financement,
             "fournisseurs" => $fournisseurs,
-            "gestionnaires" => $gestionnaires
+            "prefinancements" => PreFinancementResource::collection($prefinancements)
         ]);
     }
 
@@ -117,7 +130,7 @@ class FinancementController extends Controller
         try {
             $validated = $request->validate([
                 "fournisseur_id" => ["required", "integer"],
-                "gestionnaire_id" => ["required", "integer"],
+                "prefinancement_id" => ["required", "integer", "exists:pre_financements,id"],
                 "montant" => ["required", "numeric"],
                 "date_financement" => ["required", "date"],
                 "document" => ["nullable", "file", "mimes:pdf,png,jpg,jpeg"],
@@ -125,8 +138,8 @@ class FinancementController extends Controller
                 "fournisseur_id.required" => "Le fournisseur est requis.",
                 "fournisseur_id.integer" => "Le fournisseur doit être un entier.",
 
-                "gestionnaire_id.required" => "Le gestionnaire est requis.",
-                "gestionnaire_id.integer" => "Le gestionnaire doit être un entier.",
+                "prefinancement_id.required" => "Le pré financement est requis.",
+                "prefinancement_id.integer" => "Le pré financement doit être un entier.",
 
                 "montant.required" => "Le montant est requis.",
                 "montant.numeric" => "Le montant doit être un nombre.",

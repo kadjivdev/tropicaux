@@ -15,7 +15,7 @@ class Financement extends Model
     protected $fillable = [
         "reference",
         'fournisseur_id',
-        'gestionnaire_id',
+        'prefinancement_id',
         'montant',
         'date_financement',
         'document',
@@ -38,10 +38,10 @@ class Financement extends Model
         return $this->belongsTo(Fournisseur::class, 'fournisseur_id');
     }
 
-    /**Gestionnaire */
-    function gestionnaire(): BelongsTo
+    /**Pre Financement */
+    function preFinancement(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'gestionnaire_id');
+        return $this->belongsTo(PreFinancement::class, 'prefinancement_id');
     }
 
     /**Handle document */

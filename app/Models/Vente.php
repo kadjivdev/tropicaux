@@ -16,6 +16,7 @@ class Vente extends Model
     protected $fillable = [
         "reference",
         'partenaire_id',
+        'chargement_id',
         'prix',
 
         'montant',
@@ -48,6 +49,12 @@ class Vente extends Model
     function partenaire(): BelongsTo
     {
         return $this->belongsTo(Partenaire::class, 'partenaire_id');
+    }
+
+    /**Chargement */
+    function chargement(): BelongsTo
+    {
+        return $this->belongsTo(chargement::class, 'chargement_id');
     }
 
     /**Camions */

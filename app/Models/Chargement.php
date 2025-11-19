@@ -62,6 +62,12 @@ class Chargement extends Model
         return $this->belongsTo(Magasin::class, 'magasin_id');
     }
 
+    /**Ventes */
+    function ventes(): HasMany
+    {
+        return $this->hasMany(Vente::class, 'chargement_id');
+    }
+
     /**Createur */
     function createdBy(): BelongsTo
     {
@@ -102,9 +108,9 @@ class Chargement extends Model
     protected static function booted()
     {
         static::creating(function ($chargement) {
-            
+
             $chargement->campagne_id = Session::get("campagne")?->id;
-            
+
             $chargement->reference = "CHARGE-" . time() . "-MENT";
             if (auth()->check()) {
                 $chargement->user_id = auth()->id();

@@ -87,6 +87,32 @@ export default function SidebarMenu(props) {
                                 </CNavGroup> : null
                             }
 
+                            {/* Prefinancements */}
+                            {checkPermission('prefinancement.view') || checkPermission('prefinancement.create') ?
+                                <CNavGroup
+                                    toggler={
+                                        <>
+                                            <CIcon customClassName="nav-icon text-success" icon={cibAlipay} /> Les Pré-Financements
+                                        </>
+                                    }
+                                >
+                                    {checkPermission('prefinancement.view') ?
+                                        (<Link href={route('prefinancement.index')} className="nav-link">
+                                            <span className="nav-icon">
+                                                <span className="nav-icon-bullet text-danger"></span>
+                                            </span>
+                                            Liste des pré-financements
+                                        </Link>) : null}
+
+                                    {checkPermission('prefinancement.create') ? (<Link href={route('prefinancement.create')} className="nav-link">
+                                        <span className="nav-icon">
+                                            <span className="nav-icon-bullet"></span>
+                                        </span>
+                                        Ajouter un pré-financement
+                                    </Link>) : null}
+                                </CNavGroup> : null
+                            }
+
                             {/* Financement */}
                             {checkPermission('financement.view') || checkPermission('financement.create') ?
                                 <CNavGroup

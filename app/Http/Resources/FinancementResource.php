@@ -20,13 +20,14 @@ class FinancementResource extends JsonResource
             "id" => $this->id,
             "reference" => $this->reference,
             "fournisseur" => $this->fournisseur,
-            "gestionnaire" => $this->gestionnaire,
+            "prefinancement" => $this->preFinancement,
             "montant" => number_format($this->montant, 2, ",", " "),
             "date_financement" => Carbon::parse($this->date_financement)->locale('fr')->isoFormat("D MMMM YYYY"),
             "document" => $this->document,
+            "preFinancement" => $this->preFinancement,
             "validatedBy" => $this->validatedBy,
             "createdBy" => $this->createdBy,
-            "validated_at" => $this->validated_at ? Carbon::parse($this->validated_at)->locale('fr')->isoFormat("D MMMM YYYY"):null
+            "validated_at" => $this->validated_at ? Carbon::parse($this->validated_at)->locale('fr')->isoFormat("D MMMM YYYY") : null
         ];
     }
 }

@@ -11,7 +11,7 @@ import Select from 'react-select'
 import { Textarea } from '@headlessui/react';
 import { useEffect, useState } from 'react';
 
-export default function Create({ partenaires, modes, camions }) {
+export default function Create({ partenaires, modes, camions, chargements }) {
     const permissions = usePage().props.auth.permissions;
     const [i, setI] = useState(1);
     const [iCamion, setIcamion] = useState(1);
@@ -32,6 +32,7 @@ export default function Create({ partenaires, modes, camions }) {
         // progress
     } = useForm({
         partenaire_id: "",
+        chargement_id: "",
         prix: "",
         // montant: "",
         document: "",
@@ -253,6 +254,35 @@ export default function Create({ partenaires, modes, camions }) {
                                                 min={1}
                                             />
                                             <InputError className="mt-2" message={errors.prix_unitaire_sac_rejete} />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Le chargement */}
+                                <div className="row">
+                                    <div className="col-12">
+                                        <div className="mb-3">
+                                            <InputLabel htmlFor="chargement_id" value="Le Chargement concerné" >  <span className="text-danger">*</span> </InputLabel>
+                                            <Select
+                                                placeholder="Rechercher un chargement ..."
+                                                name="chargement_id"
+                                                id="chargement_id"
+                                                required
+                                                className="form-control mt-1 block w-full"
+                                                options={chargements.map((chargement) => ({
+                                                    value: chargement.id,
+                                                    label: `${chargement.reference}`,
+                                                }))}
+                                                value={chargements
+                                                    .map((chargement) => ({
+                                                        value: chargement.id,
+                                                        label: `${chargement.reference}`,
+                                                    }))
+                                                    .find((option) => option.value === data.chargement_id)} // set selected option
+                                                onChange={(option) => setData('chargement_id', option.value)} // update state with id
+                                            />
+
+                                            <InputError className="mt-2" message={errors.chargement_id} />
                                         </div>
                                     </div>
                                 </div>

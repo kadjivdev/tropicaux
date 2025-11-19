@@ -11,7 +11,7 @@ import Select from 'react-select'
 import { Textarea } from '@headlessui/react';
 import { useEffect, useState } from 'react';
 
-export default function Create({ vente, partenaires, modes, camions }) {
+export default function Create({ vente, partenaires, modes, camions, chargements }) {
     const permissions = usePage().props.auth.permissions;
     const [i, setI] = useState(1);
     const [iCamion, setIcamion] = useState(1);
@@ -32,6 +32,7 @@ export default function Create({ vente, partenaires, modes, camions }) {
         // progress
     } = useForm({
         partenaire_id: vente.partenaire_id || "",
+        chargement_id: vente.chargement_id || "",
         prix: vente.prix || "",
         montant: vente.montant || "",
         document: vente.partenaire_id || "",
@@ -62,7 +63,7 @@ export default function Create({ vente, partenaires, modes, camions }) {
     }, [ligneCamions])
 
 
-    const removeCamionLine = (e,id) => {
+    const removeCamionLine = (e, id) => {
         e.preventDefault();
         let updatedLines = ligneCamions.filter(function (ligne) {
             return ligne.id != id
@@ -258,6 +259,35 @@ export default function Create({ vente, partenaires, modes, camions }) {
                                     </div>
                                 </div>
 
+                                {/* Le chargement */}
+                                <div className="row">
+                                    <div className="col-12">
+                                        <div className="mb-3">
+                                            <InputLabel htmlFor="chargement_id" value="Le Chargement concerné" >  <span className="text-danger">*</span> </InputLabel>
+                                            <Select
+                                                placeholder="Rechercher un chargement ..."
+                                                name="chargement_id"
+                                                id="chargement_id"
+                                                required
+                                                className="form-control mt-1 block w-full"
+                                                options={chargements.map((chargement) => ({
+                                                    value: chargement.id,
+                                                    label: `${chargement.reference}`,
+                                                }))}
+                                                value={chargements
+                                                    .map((chargement) => ({
+                                                        value: chargement.id,
+                                                        label: `${chargement.reference}`,
+                                                    }))
+                                                    .find((option) => option.value === data.chargement_id)} // set selected option
+                                                onChange={(option) => setData('chargement_id', option.value)} // update state with id
+                                            />
+
+                                            <InputError className="mt-2" message={errors.chargement_id} />
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <br />
                                 {/* Camions */}
                                 <div className="d-flex" style={{ justifyContent: 'space-between' }}>
@@ -323,7 +353,7 @@ export default function Create({ vente, partenaires, modes, camions }) {
 
                                                         <td className='items-center'>
                                                             <button className="btn btn-sm btn-danger shadow-sm rounded"
-                                                                onClick={(e) => removeCamionLine(e,data.id)}> <CIcon icon={cilCut} /> </button>
+                                                                onClick={(e) => removeCamionLine(e, data.id)}> <CIcon icon={cilCut} /> </button>
                                                         </td>
                                                     </tr>
                                                 )) : <tr className='text-center'><td colSpan={4}>Aucun camion disponible <InputError className="mt-2" message={errors.camions} /></td></tr>}

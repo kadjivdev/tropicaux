@@ -19,6 +19,11 @@ return new class extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
             $table->text("reference")->nullable();
+            $table->foreignId("chargement_id")
+                ->nullable()
+                ->constrained("chargements")
+                ->onUpdate("CASCADE")
+                ->onDelete("SET NULL");
             $table->foreignId("partenaire_id")
                 ->nullable()
                 ->constrained("partenaires")

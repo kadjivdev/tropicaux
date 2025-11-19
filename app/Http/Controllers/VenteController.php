@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\VenteResource;
 use App\Models\Camion;
+use App\Models\Chargement;
 use App\Models\PaiementMode;
 use App\Models\Partenaire;
 use App\Models\Vente;
@@ -38,10 +39,16 @@ class VenteController extends Controller
         $modes = PaiementMode::all();
         $camions = Camion::all();
 
+        $sessionId = Session::get("campagne")?->id;
+        $chargements = Chargement::where("campagne_id", $sessionId)
+            ->whenreNotNull("validated_by")
+            ->get();
+
         return inertia("Ventes/Create", [
             "partenaires" => $partenaires,
             "modes" => $modes,
-            "camions" => $camions
+            "camions" => $camions,
+            "chargements" => $chargements,
         ]);
     }
 
@@ -54,6 +61,7 @@ class VenteController extends Controller
 
         $validated = $request->validate([
             "partenaire_id" => ["required", "integer"],
+            "chargement_id" => ["required", "integer"],
             "prix" => ["required", "numeric"],
             // "montant" => ["required", "numeric"],
             "document" => ["nullable", "file", "mimes:pdf,png,jpg,jpeg"],
@@ -69,6 +77,9 @@ class VenteController extends Controller
         ], [
             "partenaire_id.required" => "Le partenaire est requis.",
             "partenaire_id.integer" => "Le partenaire doit être un entier.",
+
+            "chargement_id.required" => "Le chargement est requis.",
+            "chargement_id.integer" => "Le chargement doit être un entier.",
 
             "prix.required" => "Le prix est requis.",
             "prix.numeric" => "Le prix doit être un nombre.",
@@ -131,11 +142,17 @@ class VenteController extends Controller
         $modes = PaiementMode::all();
         $camions = Camion::all();
 
+        $sessionId = Session::get("campagne")?->id;
+        $chargements = Chargement::where("campagne_id", $sessionId)
+            ->whenreNotNull("validated_by")
+            ->get();
+
         return inertia("Ventes/Update", [
             'vente' => $vente->load("camions", "modes"),
             "partenaires" => $partenaires,
             "modes" => $modes,
-            "camions" => $camions
+            "camions" => $camions,
+            "chargements" => $chargements,
         ]);
     }
 

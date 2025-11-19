@@ -8,13 +8,16 @@ import CIcon from '@coreui/icons-react';
 import { cilSend, cilList, cibAddthis } from "@coreui/icons";
 import Swal from 'sweetalert2';
 import Select from 'react-select'
+import { useState } from 'react';
 
-export default function Create({ fournisseurs, gestionnaires }) {
+export default function Create({ fournisseurs, prefinancements }) {
     const permissions = usePage().props.auth.permissions;
 
     const checkPermission = (name) => {
         return permissions.some(per => per.name == name);
     }
+
+    const [maxAmount, setMaxAmount] = useState(null)
 
     const {
         data,
@@ -27,11 +30,40 @@ export default function Create({ fournisseurs, gestionnaires }) {
         progress
     } = useForm({
         fournisseur_id: "",
-        gestionnaire_id: "",
+        prefinancement_id: "",
         montant: "",
         date_financement: "",
         document: "",
     });
+
+    // Fields handling
+    const changePreFinancement = (option) => {
+        setData('prefinancement_id', option.value)
+
+        const selectedPreFinancement = prefinancements.data.find((s) => s.id === option.value);
+        console.log("Prefinancement sélectionnée :", selectedPreFinancement);
+
+        setMaxAmount(selectedPreFinancement.reste)
+        setData("montant",selectedPreFinancement.reste)
+    }
+
+    // Change Amount
+    const changeAmount = (e) => {
+        e.preventDefault()
+        console.log("Le montant saisi :", e.target.value)
+
+        if (e.target.value > maxAmount) {
+            Swal.fire({
+                icon: "info",
+                text: `Le montant restant de ce pré-financement est : ${maxAmount} FCFA`
+            })
+            e.target.value = null
+            return
+        }
+
+
+        setData("montant", e.target.value)
+    }
 
     const submit = (e) => {
         e.preventDefault();
@@ -92,6 +124,48 @@ export default function Create({ fournisseurs, gestionnaires }) {
                                 <div className="row">
                                     <div className="col-md-6">
                                         <div className="mb-3">
+                                            <InputLabel htmlFor="prefinancement_id" value="Pré Financement" >  <span className="text-danger">*</span> </InputLabel>
+                                            <Select
+                                                placeholder="Rechercher un pré financement ..."
+                                                name="prefinancement_id"
+                                                id="prefinancement_id"
+                                                required
+                                                className="form-control mt-1 block w-full"
+                                                options={prefinancements.data.map((prefinancement) => ({
+                                                    value: prefinancement.id,
+                                                    label: `${prefinancement.reference}`,
+                                                }))}
+                                                value={prefinancements.data
+                                                    .map((prefinancement) => ({
+                                                        value: prefinancement.id,
+                                                        label: `${prefinancement.reference}`,
+                                                    }))
+                                                    .find((option) => option.value === data.prefinancement_id)} // set selected option
+                                                onChange={(option) => changePreFinancement(option)} // update state with id
+                                            />
+
+                                            <InputError className="mt-2" message={errors.prefinancement_id} />
+                                        </div>
+
+                                        <div className='mb-3'>
+                                            <InputLabel htmlFor="montant" value="Le montant" >  <span className="text-danger">*</span> </InputLabel>
+                                            <TextInput
+                                                type="number"
+                                                id="montant"
+                                                className="mt-1 block w-full"
+                                                value={data.montant}
+                                                placeholder="Ex: 234567"
+                                                onChange={(e) => changeAmount(e)}
+                                                autoComplete="montant"
+                                                min={1}
+                                                max={maxAmount}
+                                                required
+                                            />
+                                            <InputError className="mt-2" message={errors.montant} />
+                                        </div>
+                                    </div>
+                                    <div className="col-md-6">
+                                        <div className="mb-3">
                                             <InputLabel htmlFor="fournisseur_id" value="Fournisseur" >  <span className="text-danger">*</span> </InputLabel>
                                             <Select
                                                 placeholder="Rechercher un fournisseur ..."
@@ -113,46 +187,6 @@ export default function Create({ fournisseurs, gestionnaires }) {
                                             />
 
                                             <InputError className="mt-2" message={errors.fournisseur_id} />
-                                        </div>
-                                        <div className='mb-3'>
-                                            <InputLabel htmlFor="montant" value="Le montant" >  <span className="text-danger">*</span> </InputLabel>
-                                            <TextInput
-                                                type="number"
-                                                id="montant"
-                                                className="mt-1 block w-full"
-                                                value={data.montant}
-                                                placeholder="Ex: 234567"
-                                                onChange={(e) => setData('montant', e.target.value)}
-                                                autoComplete="montant"
-                                                min={1}
-                                                required
-                                            />
-                                            <InputError className="mt-2" message={errors.montant} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <div className="mb-3">
-                                            <InputLabel htmlFor="gestionnaire_id" value="Gestionnaire" >  <span className="text-danger">*</span> </InputLabel>
-                                            <Select
-                                                placeholder="Rechercher un gestionnaire ..."
-                                                name="gestionnaire_id"
-                                                id="gestionnaire_id"
-                                                required
-                                                className="form-control mt-1 block w-full"
-                                                options={gestionnaires.map((gestionnaire) => ({
-                                                    value: gestionnaire.id,
-                                                    label: `${gestionnaire.firstname} - ${gestionnaire.lastname}`,
-                                                }))}
-                                                value={gestionnaires
-                                                    .map((gestionnaire) => ({
-                                                        value: gestionnaire.id,
-                                                        label: `${gestionnaire.firstname} - ${gestionnaire.lastname}`,
-                                                    }))
-                                                    .find((option) => option.value === data.gestionnaire_id)} // set selected option
-                                                onChange={(option) => setData('gestionnaire_id', option.value)} // update state with id
-                                            />
-
-                                            <InputError className="mt-2" message={errors.gestionnaire_id} />
                                         </div>
 
                                         <div className='mb-3'>
@@ -177,7 +211,7 @@ export default function Create({ fournisseurs, gestionnaires }) {
                                                 id="document"
                                                 type="file"
                                                 className="mt-1 block w-full"
-                                                onChange={(e) => setData('document',e.target.files[0])}
+                                                onChange={(e) => setData('document', e.target.files[0])}
                                                 autoComplete="document"
                                             />
 

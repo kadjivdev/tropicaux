@@ -5,16 +5,19 @@ import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import InputError from '@/Components/InputError';
 import CIcon from '@coreui/icons-react';
-import { cilSend, cilList, cibAddthis, cilPencil } from "@coreui/icons";
+import { cilSend, cilList, cibAddthis } from "@coreui/icons";
 import Swal from 'sweetalert2';
 import Select from 'react-select'
+import { useState } from 'react';
 
-export default function Update({ financement,fournisseurs,gestionnaires }) {
+export default function Create({ fournisseurs,financement, prefinancements }) {
     const permissions = usePage().props.auth.permissions;
 
     const checkPermission = (name) => {
         return permissions.some(per => per.name == name);
     }
+
+    const [maxAmount, setMaxAmount] = useState(null)
 
     const {
         data,
@@ -24,12 +27,41 @@ export default function Update({ financement,fournisseurs,gestionnaires }) {
         processing,
         progress
     } = useForm({
-        fournisseur_id: financement.fournisseur_id,
-        gestionnaire_id: financement.gestionnaire_id,
-        montant: financement.montant,
-        date_financement: new Date(financement.date_financement),
-        // document: financement.document,
+        fournisseur_id: financement.fournisseur_id || "",
+        prefinancement_id: financement.prefinancement_id || "",
+        montant: financement.montant || "",
+        date_financement: financement.date_financement || "",
+        // document: "",
     });
+
+    // Fields handling
+    const changePreFinancement = (option) => {
+        setData('prefinancement_id', option.value)
+
+        const selectedPreFinancement = prefinancements.data.find((s) => s.id === option.value);
+        console.log("Prefinancement sélectionnée :", selectedPreFinancement);
+
+        setMaxAmount(selectedPreFinancement.reste)
+        setData("montant",selectedPreFinancement.reste)
+    }
+
+    // Change Amount
+    const changeAmount = (e) => {
+        e.preventDefault()
+        console.log("Le montant saisi :", e.target.value)
+
+        if (e.target.value > maxAmount) {
+            Swal.fire({
+                icon: "info",
+                text: `Le montant restant de ce pré-financement est : ${maxAmount} FCFA`
+            })
+            e.target.value = null
+            return
+        }
+
+
+        setData("montant", e.target.value)
+    }
 
     const submit = (e) => {
         e.preventDefault();
@@ -69,11 +101,11 @@ export default function Update({ financement,fournisseurs,gestionnaires }) {
         <AuthenticatedLayout
             header={
                 <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                    <CIcon className='text-success' icon={cilPencil} /> Modifier un financement
+                    <CIcon className='text-success' icon={cibAddthis} /> Ajout des financements
                 </h2>
             }
         >
-            <Head title="Modifier un financement" />
+            <Head title="Ajouter un financement" />
 
             <div className="row py-12 justify-content-center">
                 <div className="col-md-10 bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
@@ -88,6 +120,48 @@ export default function Update({ financement,fournisseurs,gestionnaires }) {
 
                             <form onSubmit={submit} className="mt-6 space-y-6">
                                 <div className="row">
+                                    <div className="col-md-6">
+                                        <div className="mb-3">
+                                            <InputLabel htmlFor="prefinancement_id" value="Pré Financement" >  <span className="text-danger">*</span> </InputLabel>
+                                            <Select
+                                                placeholder="Rechercher un pré financement ..."
+                                                name="prefinancement_id"
+                                                id="prefinancement_id"
+                                                required
+                                                className="form-control mt-1 block w-full"
+                                                options={prefinancements.data.map((prefinancement) => ({
+                                                    value: prefinancement.id,
+                                                    label: `${prefinancement.reference}`,
+                                                }))}
+                                                value={prefinancements.data
+                                                    .map((prefinancement) => ({
+                                                        value: prefinancement.id,
+                                                        label: `${prefinancement.reference}`,
+                                                    }))
+                                                    .find((option) => option.value === data.prefinancement_id)} // set selected option
+                                                onChange={(option) => changePreFinancement(option)} // update state with id
+                                            />
+
+                                            <InputError className="mt-2" message={errors.prefinancement_id} />
+                                        </div>
+
+                                        <div className='mb-3'>
+                                            <InputLabel htmlFor="montant" value="Le montant" >  <span className="text-danger">*</span> </InputLabel>
+                                            <TextInput
+                                                type="number"
+                                                id="montant"
+                                                className="mt-1 block w-full"
+                                                value={data.montant}
+                                                placeholder="Ex: 234567"
+                                                onChange={(e) => changeAmount(e)}
+                                                autoComplete="montant"
+                                                min={1}
+                                                max={maxAmount}
+                                                required
+                                            />
+                                            <InputError className="mt-2" message={errors.montant} />
+                                        </div>
+                                    </div>
                                     <div className="col-md-6">
                                         <div className="mb-3">
                                             <InputLabel htmlFor="fournisseur_id" value="Fournisseur" >  <span className="text-danger">*</span> </InputLabel>
@@ -112,49 +186,9 @@ export default function Update({ financement,fournisseurs,gestionnaires }) {
 
                                             <InputError className="mt-2" message={errors.fournisseur_id} />
                                         </div>
-                                        <div className='mb-3'>
-                                            <InputLabel htmlFor="montant" value="Le montant" >  <span className="text-danger">*</span> </InputLabel>
-                                            <TextInput
-                                                type="number"
-                                                id="montant"
-                                                className="mt-1 block w-full"
-                                                value={data.montant}
-                                                placeholder="Ex: 234567"
-                                                onChange={(e) => setData('montant', e.target.value)}
-                                                autoComplete="montant"
-                                                min={1}
-                                                required
-                                            />
-                                            <InputError className="mt-2" message={errors.montant} />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <div className="mb-3">
-                                            <InputLabel htmlFor="gestionnaire_id" value="Gestionnaire" >  <span className="text-danger">*</span> </InputLabel>
-                                            <Select
-                                                placeholder="Rechercher un gestionnaire ..."
-                                                name="gestionnaire_id"
-                                                id="gestionnaire_id"
-                                                required
-                                                className="form-control mt-1 block w-full"
-                                                options={gestionnaires.map((gestionnaire) => ({
-                                                    value: gestionnaire.id,
-                                                    label: `${gestionnaire.firstname} - ${gestionnaire.lastname}`,
-                                                }))}
-                                                value={gestionnaires
-                                                    .map((gestionnaire) => ({
-                                                        value: gestionnaire.id,
-                                                        label: `${gestionnaire.firstname} - ${gestionnaire.lastname}`,
-                                                    }))
-                                                    .find((option) => option.value === data.gestionnaire_id)} // set selected option
-                                                onChange={(option) => setData('gestionnaire_id', option.value)} // update state with id
-                                            />
-
-                                            <InputError className="mt-2" message={errors.gestionnaire_id} />
-                                        </div>
 
                                         <div className='mb-3'>
-                                            <InputLabel htmlFor="date_financement" value="Date de financement" > </InputLabel>
+                                            <InputLabel htmlFor="date_financement" value="Date de financement" > <span className="text-danger">*</span> </InputLabel>
                                             <TextInput
                                                 id="date_financement"
                                                 type="date"
@@ -162,26 +196,26 @@ export default function Update({ financement,fournisseurs,gestionnaires }) {
                                                 value={data.date_financement}
                                                 onChange={(e) => setData('date_financement', e.target.value)}
                                                 autoComplete="date_financement"
-                                                // required
+                                                required
                                             />
                                             <InputError className="mt-2" message={errors.date_financement} />
                                         </div>
                                     </div>
 
-                                    {/* <div className="col-12">
+                                    <div className="col-12">
                                         <div className='mb-3'>
                                             <InputLabel htmlFor="document" value="Document(preuve)" > </InputLabel>
                                             <TextInput
                                                 id="document"
                                                 type="file"
                                                 className="mt-1 block w-full"
-                                                onChange={(e) => setData('document',e.target.files[0])}
+                                                onChange={(e) => setData('document', e.target.files[0])}
                                                 autoComplete="document"
                                             />
 
                                             <InputError className="mt-2" message={errors.document} />
                                         </div>
-                                    </div> */}
+                                    </div>
                                 </div>
 
                                 <div className="flex items-center gap-4">

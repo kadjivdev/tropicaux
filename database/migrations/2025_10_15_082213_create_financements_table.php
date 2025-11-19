@@ -24,9 +24,9 @@ return new class extends Migration
                 ->constrained("fournisseurs")
                 ->onUpdate("CASCADE")
                 ->onDelete("SET NULL");
-            $table->foreignId("gestionnaire_id")
+            $table->foreignId("prefinancement_id")
                 ->nullable()
-                ->constrained("users")
+                ->constrained("pre_financements")
                 ->onUpdate("CASCADE")
                 ->onDelete("SET NULL");
             $table->foreignId("user_id")

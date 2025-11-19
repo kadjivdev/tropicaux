@@ -122,8 +122,8 @@ export default function List({ financements }) {
                                     <th scope="col">N°</th>
                                     <th scope="col text-center">Action</th>
                                     <th scope="col">Reference</th>
+                                    <th scope="col">Pré-Financement</th>
                                     <th scope="col">Fournisseur</th>
-                                    <th scope="col">Gestionnaire</th>
                                     <th scope="col">Montant</th>
                                     <th scope="col">Date de financement</th>
                                     <th scope="col">Preuve</th>
@@ -185,9 +185,9 @@ export default function List({ financements }) {
 
                                             </td>
                                             <td><span className="badge bg-light rounded text-dark rounded shadow-sm"> {financement?.reference ?? '---'}</span> </td>
+                                            <td><span className="badge bg-light rounded text-success rounded shadow-sm">{`${financement?.prefinancement?.reference}`} </span> </td>
                                             <td>{financement?.fournisseur?.raison_sociale ?? '---'}</td>
-                                            <td>{`${financement?.gestionnaire?.lastname} - ${financement?.gestionnaire?.firstname}`}</td>
-                                            <td>{financement.montant}</td>
+                                            <td><span className="badge bg-light border rounded text-success">{financement.montant} </span></td>
                                             <td>{financement.date_financement}</td>
                                             <td>
                                                 {financement.document ? (

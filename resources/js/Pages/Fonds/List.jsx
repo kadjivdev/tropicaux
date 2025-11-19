@@ -185,7 +185,7 @@ export default function List({ fonds }) {
 
                                             </td>
                                             <td><span className="badge bg-light rounded text-dark rounded shadow-sm"> {fond.reference ?? '---'}</span> </td>
-                                            <td><span className="badge bg-light rounded text-dark rounded shadow-sm"> {fond.chargement?.reference ?? '---'}</span> </td>
+                                            <td><span className="badge bg-light rounded text-success rounded shadow-sm"> {fond.chargement?.reference ?? '---'}</span> </td>
                                             <td>{fond?.superviseur?.raison_sociale ?? '---'}</td>
                                             <td>{fond.montant}</td>
                                             <td>
