@@ -4,7 +4,7 @@ import CIcon from '@coreui/icons-react';
 import { cibAddthis, cilCheckCircle, cilCloudDownload, cilList, cilMenu, cilPencil, cilSend, cilTruck, cilUserX } from "@coreui/icons";
 import Swal from 'sweetalert2';
 import Modal from '@/Components/Modal';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import SecondaryButton from '@/Components/SecondaryButton';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
@@ -19,10 +19,56 @@ export default function List({ financements, gestionnaires }) {
         return permissions.some(per => per.name == name);
     }
 
+    const allFinancements = financements.data
+    const [_financements, setFinancements] = useState(financements.data)
+
+    const [totalMontant, setTotalMontant] = useState(0);
+    const [totalDispatch, setTotalDispatch] = useState(0);
+    const [totalRetour, setTotalRetour] = useState(0);
+    const [totalReste, setTotalReste] = useState(0);
+
+    // Function to clean and convert the formatted string to a valid number
+    const parseAmount = (amount) => {
+        if (typeof amount === 'string') {
+            // Remove spaces (thousands separator) and replace comma with dot for decimals
+            return parseFloat(amount.replace(/\s/g, '').replace(',', '.')) || 0;
+        }
+        return 0;
+    };
+
+    useEffect(() => {
+        const montant = _financements.reduce((acc, financement) => {
+            console.log("Le financement en cours :", financement);
+            return acc + parseAmount(financement.montant); // On ajoute 0 si "reste" est undefined ou null
+        }, 0);
+
+        const dispatch = _financements.reduce((acc, financement) => {
+            console.log("Le financement en cours :", financement);
+            return acc + parseAmount(financement.montant_dispatche); // On ajoute 0 si "reste" est undefined ou null
+        }, 0);
+
+
+        const retour = _financements.reduce((acc, financement) => {
+            console.log("Le financement en cours :", financement);
+            return acc + parseAmount(financement.back_amount); // On ajoute 0 si "reste" est undefined ou null
+        }, 0);
+
+        const reste = _financements.reduce((acc, financement) => {
+            console.log("Le financement en cours :", financement);
+            return acc + financement.reste; // On ajoute 0 si "reste" est undefined ou null
+        }, 0);
+
+        setTotalMontant(montant.toLocaleString('fr-FR', { minimumFractionDigits: 2 }));
+        setTotalDispatch(dispatch.toLocaleString('fr-FR', { minimumFractionDigits: 2 }));
+        setTotalRetour(retour.toLocaleString('fr-FR', { minimumFractionDigits: 2 }));
+        setTotalReste(reste.toLocaleString('fr-FR', { minimumFractionDigits: 2 }));
+
+    }, [_financements]); // On relance l'effet à chaque changement de _financements
+
     const [currentFinancement, setCurrentFinancement] = useState(null);
     const [showTransfert, setTransfert] = useState(false);
 
-    const { data, setData, errors, processing, patch,post, delete: destroy } = useForm({
+    const { data, setData, errors, processing, patch, post, delete: destroy } = useForm({
         reste: currentFinancement?.reste,
         gestionnaire_id: null
     })
@@ -171,6 +217,12 @@ export default function List({ financements, gestionnaires }) {
         });
     }
 
+    // Filtrage
+    const handleFiltre = (option) => {
+        let newFinances = allFinancements.filter((f) => f.gestionnaire?.id == option.value)
+        setFinancements(newFinances)
+    }
+
     return (
         <AuthenticatedLayout
             header={
@@ -190,6 +242,34 @@ export default function List({ financements, gestionnaires }) {
                                 <Link className="btn w-50 bg-success bg-hover text-white" href={route("prefinancement.create")}> <CIcon className='' icon={cibAddthis} /> Ajouter</Link>
                             </div>) : null
                         }
+
+                        {/* filtrage via gestionnaire */}
+                        <div className="row d-flex justify-content-center">
+                            <div className="col-6">
+                                <Select
+                                    placeholder="Rechercher un gestionnaire ..."
+                                    className="form-control mt-1 block w-full"
+                                    options={gestionnaires.map((gestionnaire) => ({
+                                        value: gestionnaire.id,
+                                        label: `${gestionnaire.firstname} - ${gestionnaire.lastname}`,
+                                    }))}
+                                    value={gestionnaires
+                                        .map((gestionnaire) => ({
+                                            value: gestionnaire.id,
+                                            label: `${gestionnaire.firstname} - ${gestionnaire.lastname}`,
+                                        }))
+                                        .find((option) => option.value === data.gestionnaire_id)} // set selected option
+                                    onChange={(option) => handleFiltre(option)} // update state with id
+                                />
+                            </div>
+                        </div>
+
+                        <div className="border">
+                            <strong className='border'>Total pré-financé: </strong>     <span className="badge mx-3 bg-dark text-light shadow border rounded">{totalMontant} FCFA</span> <br />
+                            <strong className='border'>Total dispatché: </strong>     <span className="badge mx-3 bg-dark text-light shadow border rounded">{totalDispatch} FCFA</span> <br />
+                            <strong className='border'>Total retourné: </strong>     <span className="badge mx-3 bg-dark text-light shadow border rounded">{totalRetour} FCFA</span> <br />
+                            <strong className='border'>Total reste: </strong>     <span className="badge mx-3 bg-dark text-light shadow border rounded">{totalReste} FCFA</span>
+                        </div>
                         <table className="table table-striped" id='myTable' style={{ width: '100%' }}>
                             <thead>
                                 <tr>
@@ -210,7 +290,7 @@ export default function List({ financements, gestionnaires }) {
                             </thead>
                             <tbody>
                                 {
-                                    financements.data.map((financement, index) => (
+                                    _financements.map((financement, index) => (
                                         <tr key={financement.id}>
                                             <th scope="row">{index + 1}</th>
                                             <td>
@@ -260,13 +340,21 @@ export default function List({ financements, gestionnaires }) {
                                                 }
 
                                             </td>
-                                            <td><span className="badge bg-light rounded text-dark rounded shadow-sm"> {financement?.reference ?? '---'}</span> </td>
+                                            <td>
+                                                <span className="badge bg-light rounded text-dark rounded shadow-sm"> {financement?.reference ?? '---'}</span>
+                                                <br />
+                                                {financement.prefinancement &&
+                                                    <small>
+                                                        Transféré du financement : <span className="badge bg-success rounded text-white rounded shadow-sm">{financement.prefinancement?.reference}</span>
+                                                    </small>
+                                                }
+                                            </td>
                                             <td>{`${financement?.gestionnaire?.lastname} - ${financement?.gestionnaire?.firstname}`}</td>
-                                            <td><span className="badge bg-light rounded text-dark rounded shadow-sm">{financement.montant} FCFA</span></td>
-                                            <td><strong className="badge bg-light rounded text-dark rounded shadow-sm">{financement.montant_dispatche} FCFA</strong></td>
-                                            <td><strong className="badge bg-light rounded text-danger rounded shadow-sm">{financement.back_amount} FCFA</strong></td>
+                                            <td><span className="badge bg-light rounded text-dark rounded shadow-sm">{financement.montant}</span></td>
+                                            <td><strong className="badge bg-light rounded text-dark rounded shadow-sm">{financement.montant_dispatche}</strong></td>
+                                            <td><strong className="badge bg-light rounded text-danger rounded shadow-sm">{financement.back_amount}</strong></td>
                                             <td className='text-center'>
-                                                <span className="badge bg-light rounded text-success rounded shadow-sm">{financement.reste} FCFA</span>
+                                                <span className="badge bg-light rounded text-success rounded shadow-sm">{financement.reste}</span>
                                                 {
                                                     financement.reste > 0 && <button className="btn btn-sm btn-light border rounded w-100 shadow text-center"
                                                         onClick={(e) => transfertReste(e, financement)}> <CIcon icon={cilSend} className='text-success' /> Transferer </button>

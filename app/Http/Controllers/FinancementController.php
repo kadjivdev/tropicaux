@@ -23,9 +23,12 @@ class FinancementController extends Controller
     {
         $sessionId = Session::get("campagne")?->id;
 
+        $prefinancements = PreFinancement::all();
         $financements = Financement::where("campagne_id", $sessionId)->get();
+        
         return inertia("Financements/List", [
-            "financements" => FinancementResource::collection($financements)
+            "financements" => FinancementResource::collection($financements),
+            "prefinancements" => PreFinancementResource::collection($prefinancements),
         ]);
     }
 
@@ -38,8 +41,7 @@ class FinancementController extends Controller
         $fournisseurs = Fournisseur::all();
 
         $sessionId = Session::get("campagne")?->id;
-        $prefinancements = PreFinancement::where("campagne_id", $sessionId)
-            ->whereNotNull("validated_by")
+        $prefinancements = PreFinancement::whereNotNull("validated_by")
             ->get()
             ->filter(function ($query) {
                 return $query->reste() > 0;
@@ -105,8 +107,7 @@ class FinancementController extends Controller
 
         $sessionId = Session::get("campagne")?->id;
 
-        $prefinancements = PreFinancement::where("campagne_id", $sessionId)
-            ->whereNotNull("validated_by")
+        $prefinancements = PreFinancement::whereNotNull("validated_by")
             ->get()
             ->filter(function ($query) {
                 return $query->montant - $query->financements->sum("montant") > 0;

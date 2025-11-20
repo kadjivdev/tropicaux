@@ -3,15 +3,17 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import CIcon from '@coreui/icons-react';
 import { cibAddthis, cilCheckCircle, cilCloudDownload, cilList, cilMenu, cilPencil, cilUserX } from "@coreui/icons";
 import Swal from 'sweetalert2';
+import { useEffect, useState } from 'react';
+import Select from 'react-select';
 
-export default function List({ financements }) {
+export default function List({ financements, prefinancements }) {
     const permissions = usePage().props.auth.permissions;
 
     const checkPermission = (name) => {
         return permissions.some(per => per.name == name);
     }
 
-    const { patch, delete: destroy } = useForm({})
+    const { patch, data, delete: destroy } = useForm({})
 
     const deleteFinancement = (e, financement) => {
         e.preventDefault();
@@ -97,6 +99,58 @@ export default function List({ financements }) {
         });
     }
 
+    const _prefinancements = prefinancements.data
+    const _allfinancements = financements.data
+    const [_financements, setFinancements] = useState(financements.data)
+
+    const [totalMontant, setTotalMontant] = useState(0);
+    const [totalRetour, setTotalRetour] = useState(0);
+    const [totalReste, setTotalReste] = useState(0);
+
+    // Function to clean and convert the formatted string to a valid number
+    const parseAmount = (amount) => {
+        if (typeof amount === 'string') {
+            // Remove spaces (thousands separator) and replace comma with dot for decimals
+            return parseFloat(amount.replace(/\s/g, '').replace(',', '.')) || 0;
+        }
+        return 0;
+    };
+
+    useEffect(() => {
+
+        const montant = _financements.reduce((acc, financement) => {
+            console.log("Le financement en cours :", financement);
+            return acc + parseAmount(financement.montant); // On ajoute 0 si "reste" est undefined ou null
+        }, 0);
+
+        const retour = _financements.reduce((acc, financement) => {
+            console.log("Le financement en cours :", financement);
+            return acc + parseAmount(financement.back_amount); // On ajoute 0 si "reste" est undefined ou null
+        }, 0);
+
+        const reste = _financements.reduce((acc, financement) => {
+            console.log("Le financement en cours :", financement);
+            return acc + parseAmount(financement.reste); // On ajoute 0 si "reste" est undefined ou null
+        }, 0);
+
+        setTotalMontant(montant.toLocaleString('fr-FR', { minimumFractionDigits: 2 }));
+        setTotalRetour(retour.toLocaleString('fr-FR', { minimumFractionDigits: 2 }));
+        setTotalReste(reste.toLocaleString('fr-FR', { minimumFractionDigits: 2 }));
+
+    }, [_financements]); // On relance l'effet à chaque changement de _financements
+
+    // Filtrage
+    const handleFiltre = (option) => {
+        console.log("Tous les financements :",_allfinancements)
+
+        console.log("Value conerned :",option.value)
+        let newFinances = _allfinancements.filter((f) => f.preFinancement?.id == option.value)
+
+        console.log("News les financements :",newFinances)
+
+        setFinancements(newFinances)
+    }
+
     return (
         <AuthenticatedLayout
             header={
@@ -116,6 +170,34 @@ export default function List({ financements }) {
                                 <Link className="btn w-50 bg-success bg-hover text-white" href={route("financement.create")}> <CIcon className='' icon={cibAddthis} /> Ajouter</Link>
                             </div>) : null
                         }
+
+                        {/* filtrage via gestionnaire */}
+                        <div className="row d-flex justify-content-center">
+                            <div className="col-6">
+                                <Select
+                                    placeholder="Rechercher un pré-financement ..."
+                                    className="form-control mt-1 block w-full"
+                                    options={_prefinancements.map((f) => ({
+                                        value: f.id,
+                                        label: `${f.reference}`,
+                                    }))}
+                                    value={_prefinancements
+                                        .map((f) => ({
+                                            value: f.id,
+                                            label: `${f.reference}`,
+                                        }))
+                                        .find((option) => option.value === data.id)} // set selected option
+                                    onChange={(option) => handleFiltre(option)} // update state with id
+                                />
+                            </div>
+                        </div>
+
+                        <div className="border">
+                            <strong className='border'>Total financé: </strong>     <span className="badge mx-3 bg-dark text-light shadow border rounded">{totalMontant} FCFA</span> <br />
+                            <strong className='border'>Total retourné: </strong>     <span className="badge mx-3 bg-dark text-light shadow border rounded">{totalRetour} FCFA</span> <br />
+                            <strong className='border'>Total reste: </strong>     <span className="badge mx-3 bg-dark text-light shadow border rounded">{totalReste} FCFA</span>
+                        </div>
+
                         <table className="table table-striped" id='myTable' style={{ width: '100%' }}>
                             <thead>
                                 <tr>
@@ -136,7 +218,7 @@ export default function List({ financements }) {
                             </thead>
                             <tbody>
                                 {
-                                    financements.data.map((financement, index) => (
+                                    _financements.map((financement, index) => (
                                         <tr key={financement.id}>
                                             <th scope="row">{index + 1}</th>
                                             <td>

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\FinancementResource;
+// use App\Http\Resources\FinancementResource;
 use App\Http\Resources\PreFinancementResource;
-use App\Models\Financement;
-use App\Models\Fournisseur;
+// use App\Models\Financement;
+// use App\Models\Fournisseur;
 use App\Models\PreFinancement;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -23,7 +23,7 @@ class PreFinancementController extends Controller
     function index()
     {
         $sessionId = Session::get("campagne")?->id;
-        $preFinancements = PreFinancement::where("campagne_id", $sessionId)->get();
+        $preFinancements = PreFinancement::get();
 
         $gestionnaires = User::whereHas("roles", function ($role) {
             $role->where("name", "Gestionnaire de fonds");
@@ -201,7 +201,6 @@ class PreFinancementController extends Controller
             if ($prefinancement->gestionnaire_id == $validated["gestionnaire_id"]) {
                 throw new \Exception("Le transfert ne peut plus se faire sur le compte de " . User::firstWhere("id", $validated["gestionnaire_id"])?->firstname);
             }
-
 
             $validated["montant"] = $validated["reste"];
             $validated["date_financement"] = now();

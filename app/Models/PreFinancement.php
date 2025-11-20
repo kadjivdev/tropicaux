@@ -38,7 +38,7 @@ class PreFinancement extends Model
     }
 
     function reste() {
-        return ($this->montant-($this->financements->sum("montant") + $this->reste_transfere)) + $this->backAmount();
+        return ($this->montant-($this->financements->whereNotNull("validated_by")->sum("montant") + $this->reste_transfere)) + $this->backAmount();
     }
 
     /**Cast */
