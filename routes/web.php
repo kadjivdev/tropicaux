@@ -13,6 +13,7 @@ use App\Http\Controllers\Dashboard;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepenseSuperviseurController;
 use App\Http\Controllers\DevoirController;
+use App\Http\Controllers\FinancementBackController;
 use App\Http\Controllers\FinancementController;
 use App\Http\Controllers\FondSuperviseurController;
 use App\Http\Controllers\FournisseurController;
@@ -77,6 +78,10 @@ Route::middleware('auth')->group(function () {
         // Financements
         Route::resource("financement", FinancementController::class);
         Route::patch("/financement/{financement}/validate", [FinancementController::class, "validatedFinancement"])->name("financement.validate");
+
+        // Retour des Financements
+        Route::resource("backfinancement", FinancementBackController::class);
+        Route::patch("/backfinancement/{backfinancement}/validate", [FinancementBackController::class, "validatedFinancementBack"])->name("backfinancement.validate");
 
         // Fournisseur
         Route::resource("fournisseur", FournisseurController::class);

@@ -21,6 +21,13 @@ class FinancementResource extends JsonResource
             "reference" => $this->reference,
             "fournisseur" => $this->fournisseur,
             "prefinancement" => $this->preFinancement,
+            "back_amount" => number_format($this->backFinancements
+                ->whereNotNull("validated_by")
+                ->sum("montant"), 2, ",", " "),
+            "montant_r" => $this->montant_r(),
+            "reste" => number_format($this->montant - $this->backFinancements
+                ->whereNotNull("validated_by")
+                ->sum("montant"), 2, ",", " "),
             "montant" => number_format($this->montant, 2, ",", " "),
             "date_financement" => Carbon::parse($this->date_financement)->locale('fr')->isoFormat("D MMMM YYYY"),
             "document" => $this->document,

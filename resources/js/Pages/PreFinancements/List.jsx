@@ -199,8 +199,9 @@ export default function List({ financements, gestionnaires }) {
                                     <th scope="col">Gestionnaire</th>
                                     <th scope="col">Montant</th>
                                     <th scope="col">Montant Dispatché</th>
+                                    <th scope="col">Retours</th>
                                     <th scope="col">Reste</th>
-                                    <th scope="col">Date de financement</th>
+                                    <th scope="col">Date de pré-financement</th>
                                     <th scope="col">Preuve</th>
                                     <th scope="col">Inséré par</th>
                                     <th scope="col">Validé le</th>
@@ -263,6 +264,7 @@ export default function List({ financements, gestionnaires }) {
                                             <td>{`${financement?.gestionnaire?.lastname} - ${financement?.gestionnaire?.firstname}`}</td>
                                             <td><span className="badge bg-light rounded text-dark rounded shadow-sm">{financement.montant} FCFA</span></td>
                                             <td><strong className="badge bg-light rounded text-dark rounded shadow-sm">{financement.montant_dispatche} FCFA</strong></td>
+                                            <td><strong className="badge bg-light rounded text-danger rounded shadow-sm">{financement.back_amount} FCFA</strong></td>
                                             <td className='text-center'>
                                                 <span className="badge bg-light rounded text-success rounded shadow-sm">{financement.reste} FCFA</span>
                                                 {

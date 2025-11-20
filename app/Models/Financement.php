@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
@@ -32,6 +33,13 @@ class Financement extends Model
         'validated_at' => 'date'
     ];
 
+    function montant_r()
+    {
+        return (float) $this->montant - $this->backFinancements
+            // ->whereNotNull("validated_by")
+            ->sum("montant");
+    }
+
     /**Fournisseur */
     function fournisseur(): BelongsTo
     {
@@ -42,6 +50,12 @@ class Financement extends Model
     function preFinancement(): BelongsTo
     {
         return $this->belongsTo(PreFinancement::class, 'prefinancement_id');
+    }
+
+    /**Retours de financements */
+    function backFinancements(): HasMany
+    {
+        return $this->hasMany(FinancementBack::class, 'financement_id');
     }
 
     /**Handle document */
@@ -81,7 +95,7 @@ class Financement extends Model
             if (auth()->check()) {
                 $financement->user_id = auth()->id();
             }
-            
+
             $financement->reference = "FINAN-" . time() . "-CE";
             /**insertion du document */
             $financement->document = $financement->handleDocumentUploading();

@@ -139,8 +139,34 @@ export default function SidebarMenu(props) {
                                 </CNavGroup> : null
                             }
 
-                            <CNavTitle>CAMPAGNE OFFICIELLE</CNavTitle>
+                            {/* Retour de Financement */}
+                            {checkPermission('backfinancement.view') || checkPermission('backfinancement.create') ?
+                                <CNavGroup
+                                    toggler={
+                                        <>
+                                            <CIcon customClassName="nav-icon text-success" icon={cibAlipay} /> Retour financements
+                                        </>
+                                    }
+                                >
+                                    {checkPermission('backfinancement.view') ?
+                                        (<Link href={route('backfinancement.index')} className="nav-link">
+                                            <span className="nav-icon">
+                                                <span className="nav-icon-bullet text-danger"></span>
+                                            </span>
+                                            Liste des retours
+                                        </Link>) : null}
 
+                                    {checkPermission('backfinancement.create') ? (<Link href={route('backfinancement.create')} className="nav-link">
+                                        <span className="nav-icon">
+                                            <span className="nav-icon-bullet"></span>
+                                        </span>
+                                        Ajouter un retour
+                                    </Link>) : null}
+                                </CNavGroup> : null
+                            }
+
+
+                            <CNavTitle>CAMPAGNE OFFICIELLE</CNavTitle>
                             {/* Chargements */}
                             {checkPermission('chargement.view') || checkPermission('chargement.create') ?
                                 <CNavGroup

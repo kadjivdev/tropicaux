@@ -7,7 +7,6 @@ use App\Http\Resources\PreFinancementResource;
 use App\Models\Financement;
 use App\Models\Fournisseur;
 use App\Models\PreFinancement;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -43,7 +42,7 @@ class FinancementController extends Controller
             ->whereNotNull("validated_by")
             ->get()
             ->filter(function ($query) {
-                return $query->montant - $query->financements->sum("montant") > 0;
+                return $query->reste() > 0;
             });
 
         return inertia("Financements/Create", [

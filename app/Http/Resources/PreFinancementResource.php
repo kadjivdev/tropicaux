@@ -16,14 +16,17 @@ class PreFinancementResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        
+
         return [
             "id" => $this->id,
             "reference" => $this->reference,
             "gestionnaire" => $this->gestionnaire,
             "prefinancement" => $this->prefinancement,
-            "reste" => $this->montant - ($this->financements->sum("montant") + $this->reste_transfere),
-            "montant_dispatche" => number_format($this->financements->sum("montant"), 2, ",", " "),
             "montant" => number_format($this->montant, 2, ",", " "),
+            "montant_dispatche" => number_format($this->financements->sum("montant"), 2, ",", " "),
+            "back_amount" => number_format($this->backAmount(),2,","," ",),
+            "reste" => $this->reste(),
             "date_financement" => Carbon::parse($this->date_financement)->locale('fr')->isoFormat("D MMMM YYYY"),
             "document" => $this->document,
             "validatedBy" => $this->validatedBy,

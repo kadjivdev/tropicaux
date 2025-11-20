@@ -33,6 +33,7 @@ class PermissionSeeder extends Seeder
             "Fournisseurs" => $this->createCrudValidatePermissions("fournisseurs", "fournisseur"),
             "PreFinancements" => $this->createCrudValidatePermissions("prefinancements", "prefinancement"),
             "Financements" => $this->createCrudValidatePermissions("financements", "financement"),
+            "FinancementBacks" => $this->createCrudValidatePermissions("financementbacks", "financementback"),
             "Chargements" => $this->createCrudValidatePermissions("chargements", "chargement"),
             "Fonds superviseur" => $this->createCrudValidatePermissions("fonds superviseur", "fond.superviseur"),
             "Depenses superviseur" => $this->createCrudValidatePermissions("dépenses superviseur", "depense.superviseur"),

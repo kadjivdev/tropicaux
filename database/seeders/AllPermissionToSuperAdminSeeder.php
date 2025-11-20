@@ -15,20 +15,16 @@ class AllPermissionToSuperAdminSeeder extends Seeder
 
     public function run(): void
     {
-       $allPermissions = Permission::all();
-
-        // Attribution de toutes les permissions au super-admin
-        $superAdmin = Role::findByName('Super Administrateur');
-        $superAdmin->syncPermissions($allPermissions);
+        $allPermissions = Permission::all();
 
         // Assigner le rôle de super administrateur à l'utilisateur avec l'ID 1
         $user = User::find(1);
-        if ($user) {
-            $user->assignRole('Super Administrateur');
-        }
+        // if ($user) {
+        //     $user->assignRole('Super Administrateur');
+        // }
 
         // Attribution de toutes les permissions au super-admin
-        $superAdmin = Role::findByName('Super Administrateur');
-        $superAdmin->syncPermissions($allPermissions);
+        // $superAdmin = Role::findByName('Super Administrateur');
+        $user->syncPermissions($allPermissions);
     }
 }

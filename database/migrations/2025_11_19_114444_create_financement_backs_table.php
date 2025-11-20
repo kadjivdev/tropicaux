@@ -13,6 +13,31 @@ return new class extends Migration
     {
         Schema::create('financement_backs', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('campagne_id')
+                ->nullable()
+                ->constrained('campagnes')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->text("reference")->nullable();
+            $table->foreignId("financement_id")
+                ->nullable()
+                ->constrained("financements")
+                ->onUpdate("CASCADE")
+                ->onDelete("SET NULL");
+            $table->foreignId("user_id")
+                ->nullable()
+                ->constrained("users")
+                ->onUpdate("CASCADE")
+                ->onDelete("SET NULL");
+            $table->foreignId('validated_by')
+                ->nullable()
+                ->constrained('users')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->date("validated_at")->nullable();
+            $table->decimal("montant", 20, 2)->default(0);
+            $table->text("document")->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

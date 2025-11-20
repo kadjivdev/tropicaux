@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Session;
 
@@ -27,6 +28,19 @@ class PreFinancement extends Model
         "campagne_id"
     ];
 
+    //Montant retournés
+    function backAmount()
+    {
+        return $this->financements->flatMap(function ($financement) {
+            return $financement->backFinancements->whereNotNull('validated_by');
+        })
+            ->sum('montant');
+    }
+
+    function reste() {
+        return ($this->montant-($this->financements->sum("montant") + $this->reste_transfere)) + $this->backAmount();
+    }
+
     /**Cast */
     protected $casts = [
         'date_financement' => 'date',
@@ -42,10 +56,10 @@ class PreFinancement extends Model
         return $this->belongsTo(User::class, 'gestionnaire_id');
     }
 
-    /**Prefinancement */
-    function prefinancement(): BelongsTo
+    /**Prefinancement generé par transfert  d'un autre prefinancement*/
+    function prefinancement(): HasOne
     {
-        return $this->belongsTo(User::class, 'prefinancement_id');
+        return $this->hasOne(PreFinancement::class, 'prefinancement_id');
     }
 
     /**Financements */
@@ -91,7 +105,7 @@ class PreFinancement extends Model
             if (auth()->check()) {
                 $financement->user_id = auth()->id();
             }
-            
+
             $financement->reference = "PREFINAN-" . time() . "-CE";
             /**insertion du document */
             $financement->document = $financement->handleDocumentUploading();

@@ -202,10 +202,6 @@ class PreFinancementController extends Controller
                 throw new \Exception("Le transfert ne peut plus se faire sur le compte de " . User::firstWhere("id", $validated["gestionnaire_id"])?->firstname);
             }
 
-            $prefinancement->update([
-                "reste_transfere" => $validated["reste"],
-                "prefinancement_id" => $prefinancement->id
-            ]);
 
             $validated["montant"] = $validated["reste"];
             $validated["date_financement"] = now();
@@ -213,7 +209,12 @@ class PreFinancementController extends Controller
             $validated["validated_by"] = Auth::id();
 
             //Generation d'un pré-financement au nouveau gestionnaire
-            PreFinancement::create($validated);
+            $newPrefinancement = PreFinancement::create($validated);
+
+            $prefinancement->update([
+                "reste_transfere" => $validated["reste"],
+                "prefinancement_id" => $newPrefinancement->id
+            ]);
 
             Log::info("Donnée validées", ["data" => $validated]);
 
