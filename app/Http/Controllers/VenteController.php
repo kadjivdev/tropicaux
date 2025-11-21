@@ -24,9 +24,14 @@ class VenteController extends Controller
     {
         $sessionId = Session::get("campagne")?->id;
         $ventes = Vente::where("campagne_id", $sessionId)->get();
+        $chargements = Chargement::with("camions")
+            ->where("campagne_id", $sessionId)
+            ->whereNotNull("validated_by")
+            ->get();
 
         return inertia("Ventes/List", [
-            "ventes" => VenteResource::collection($ventes)
+            "ventes" => VenteResource::collection($ventes),
+            "chargements"=>$chargements
         ]);
     }
 
@@ -40,8 +45,9 @@ class VenteController extends Controller
         $camions = Camion::all();
 
         $sessionId = Session::get("campagne")?->id;
-        $chargements = Chargement::where("campagne_id", $sessionId)
-            ->whenreNotNull("validated_by")
+        $chargements = Chargement::with("camions")
+            ->where("campagne_id", $sessionId)
+            ->whereNotNull("validated_by")
             ->get();
 
         return inertia("Ventes/Create", [
@@ -144,7 +150,7 @@ class VenteController extends Controller
 
         $sessionId = Session::get("campagne")?->id;
         $chargements = Chargement::where("campagne_id", $sessionId)
-            ->whenreNotNull("validated_by")
+            ->whereNotNull("validated_by")
             ->get();
 
         return inertia("Ventes/Update", [

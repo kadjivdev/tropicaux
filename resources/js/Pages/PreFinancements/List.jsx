@@ -270,6 +270,7 @@ export default function List({ financements, gestionnaires }) {
                             <strong className='border'>Total retourné: </strong>     <span className="badge mx-3 bg-dark text-light shadow border rounded">{totalRetour} FCFA</span> <br />
                             <strong className='border'>Total reste: </strong>     <span className="badge mx-3 bg-dark text-light shadow border rounded">{totalReste} FCFA</span>
                         </div>
+                        
                         <table className="table table-striped" id='myTable' style={{ width: '100%' }}>
                             <thead>
                                 <tr>

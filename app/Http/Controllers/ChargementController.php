@@ -7,7 +7,6 @@ use App\Models\Camion;
 use App\Models\Chargement;
 use App\Models\Chauffeur;
 use App\Models\Convoyeur;
-use App\Models\FondSuperviseur;
 use App\Models\Fournisseur;
 use App\Models\Magasin;
 use App\Models\Produit;

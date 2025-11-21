@@ -3,20 +3,24 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import CIcon from '@coreui/icons-react';
 import { cibAddthis, cilCheckCircle, cilCloudDownload, cilList, cilMenu, cilPencil, cilTruck, cilUserX } from "@coreui/icons";
 import Swal from 'sweetalert2';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import TextInput from '@/Components/TextInput';
 import { Textarea } from '@headlessui/react';
+import Select from 'react-select';
 
-export default function List({ ventes }) {
+export default function List({ ventes, chargements }) {
     const permissions = usePage().props.auth.permissions;
 
     const checkPermission = (name) => {
         return permissions.some(per => per.name == name);
     }
 
+    const allVentes = ventes.data;
+    const [_ventes, setVentes] = useState(ventes.data);
     const [currentVente, setCurrentVente] = useState(null);
+
     const [showCamions, setShowCamions] = useState(false);
     const [showDetails, setShowDetails] = useState(false);
 
@@ -41,7 +45,19 @@ export default function List({ ventes }) {
         setShowDetails(false);
     }
 
-    const { patch, delete: destroy } = useForm({})
+    const {data, patch, delete: destroy } = useForm({})
+
+
+    const [totalMontant, setTotalMontant] = useState(0);
+
+    useEffect(() => {
+        const montant = _ventes.reduce((acc, vente) => {
+            console.log("La vente en cours :", vente);
+            return acc + parseAmount(vente.montant); // On ajoute 0 si "reste" est undefined ou null
+        }, 0);
+
+        setTotalMontant(montant.toLocaleString('fr-FR', { minimumFractionDigits: 2 }));
+    })
 
     const deleteVente = (e, vente) => {
         e.preventDefault();
@@ -127,6 +143,21 @@ export default function List({ ventes }) {
         });
     }
 
+    // Function to clean and convert the formatted string to a valid number
+    const parseAmount = (amount) => {
+        if (typeof amount === 'string') {
+            // Remove spaces (thousands separator) and replace comma with dot for decimals
+            return parseFloat(amount.replace(/\s/g, '').replace(',', '.')) || 0;
+        }
+        return 0;
+    };
+
+    // Filtrage
+    const handleFiltre = (option) => {
+        let newVentes = allVentes.filter((v) => v.chargement?.id == option.value)
+        setVentes(newVentes)
+    }
+
     return (
         <AuthenticatedLayout
             header={
@@ -146,12 +177,39 @@ export default function List({ ventes }) {
                                 <Link className="btn w-50 bg-success bg-hover text-white" href={route("vente.create")}> <CIcon className='' icon={cibAddthis} /> Ajouter</Link>
                             </div>) : null
                         }
+
+                        {/* filtrage via gestionnaire */}
+                        <div className="row d-flex justify-content-center">
+                            <div className="col-6">
+                                <Select
+                                    placeholder="Rechercher un Chargement ..."
+                                    className="form-control mt-1 block w-full"
+                                    options={chargements.map((c) => ({
+                                        value: c.id,
+                                        label: `${c.reference}`,
+                                    }))}
+                                    value={chargements
+                                        .map((c) => ({
+                                            value: c.id,
+                                            label: `${c.reference}`,
+                                        }))
+                                        .find((option) => option.value === data.id)} // set selected option
+                                    onChange={(option) => handleFiltre(option)} // update state with id
+                                />
+                            </div>
+                        </div>
+
+                        <div className="border">
+                            <strong className='border'>Total ventes: </strong>     <span className="badge mx-3 bg-dark text-light shadow border rounded">{totalMontant} FCFA</span> <br />
+                        </div>
+
                         <table className="table table-striped" id='myTable' style={{ width: '100%' }}>
                             <thead>
                                 <tr>
                                     <th scope="col">N°</th>
                                     <th scope="col">Action</th>
                                     <th scope="col">Reference</th>
+                                    <th scope="col">Chargement</th>
                                     <th scope="col">Partenaire</th>
                                     <th scope="col">Camions</th>
                                     <th scope="col">Mode paiements</th>
@@ -170,7 +228,7 @@ export default function List({ ventes }) {
                             </thead>
                             <tbody>
                                 {
-                                    ventes.data.map((vente, index) => (
+                                    _ventes.map((vente, index) => (
                                         <tr key={vente.id}>
                                             <th scope="row">{index + 1}</th>
                                             <td>
@@ -222,6 +280,7 @@ export default function List({ ventes }) {
                                                 }
                                             </td>
                                             <td> <span className="badge bg-light border rounded text-dark"> {vente.reference} </span></td>
+                                            <td> <span className="badge bg-light border rounded text-success"> {vente.chargement?.reference} </span></td>
                                             <td>{vente?.partenaire?.raison_sociale ?? '---'}</td>
                                             <td>
                                                 <button

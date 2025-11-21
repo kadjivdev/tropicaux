@@ -19,6 +19,7 @@ class VenteResource extends JsonResource
             "id" => $this->id,
             "reference" => $this->reference,
             "partenaire" => $this->partenaire,
+            "chargement" => $this->chargement,
             "prix" => $this->prix,
             "montant" => $this->montant,
             "document" => $this->document,

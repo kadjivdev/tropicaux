@@ -16,6 +16,7 @@ export default function Create({ partenaires, modes, camions, chargements }) {
     const [i, setI] = useState(1);
     const [iCamion, setIcamion] = useState(1);
 
+    const allChargements = chargements
     const [lignes, setLignes] = useState([]);
     const [ligneCamions, setCamionLignes] = useState([]);
 
@@ -29,7 +30,6 @@ export default function Create({ partenaires, modes, camions, chargements }) {
         errors,
         post,
         processing,
-        // progress
     } = useForm({
         partenaire_id: "",
         chargement_id: "",
@@ -60,6 +60,7 @@ export default function Create({ partenaires, modes, camions, chargements }) {
 
     useEffect(() => {
         setData("camions", ligneCamions);
+        console.log("Lignes camions à partir du useEffect :", ligneCamions)
     }, [ligneCamions])
 
     const removeCamionLine = (id) => {
@@ -130,6 +131,14 @@ export default function Create({ partenaires, modes, camions, chargements }) {
             },
         });
     };
+
+    // Filtrage
+    const handleChargementSelection = (option) => {
+        setData('chargement_id', option.value)
+        let chargementSelected = allChargements.find((c) => c.id == option.value)
+
+        setCamionLignes(chargementSelected.camions);
+    }
 
     return (
         <AuthenticatedLayout
@@ -279,7 +288,7 @@ export default function Create({ partenaires, modes, camions, chargements }) {
                                                         label: `${chargement.reference}`,
                                                     }))
                                                     .find((option) => option.value === data.chargement_id)} // set selected option
-                                                onChange={(option) => setData('chargement_id', option.value)} // update state with id
+                                                onChange={(option) => handleChargementSelection(option)} // update state with id
                                             />
 
                                             <InputError className="mt-2" message={errors.chargement_id} />

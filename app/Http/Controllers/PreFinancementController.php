@@ -154,6 +154,7 @@ class PreFinancementController extends Controller
      */
     function validatedPreFinancement(PreFinancement $prefinancement)
     {
+
         try {
             DB::beginTransaction();
 

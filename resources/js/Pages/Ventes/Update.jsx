@@ -16,6 +16,7 @@ export default function Create({ vente, partenaires, modes, camions, chargements
     const [i, setI] = useState(1);
     const [iCamion, setIcamion] = useState(1);
 
+    const allChargements = chargements
     const [lignes, setLignes] = useState(vente.modes);
     const [ligneCamions, setCamionLignes] = useState(vente.camions);
 
@@ -132,6 +133,14 @@ export default function Create({ vente, partenaires, modes, camions, chargements
             },
         });
     };
+
+    // Filtrage
+    const handleChargementSelection = (option) => {
+        setData('chargement_id', option.value)
+        let chargementSelected = allChargements.find((c) => c.id == option.value)
+
+        setCamionLignes(chargementSelected.camions);
+    }
 
     return (
         <AuthenticatedLayout
@@ -280,7 +289,7 @@ export default function Create({ vente, partenaires, modes, camions, chargements
                                                         label: `${chargement.reference}`,
                                                     }))
                                                     .find((option) => option.value === data.chargement_id)} // set selected option
-                                                onChange={(option) => setData('chargement_id', option.value)} // update state with id
+                                                onChange={(option) => handleChargementSelection(option)} // update state with id
                                             />
 
                                             <InputError className="mt-2" message={errors.chargement_id} />
