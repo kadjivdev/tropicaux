@@ -126,8 +126,8 @@ Route::middleware('auth')->group(function () {
         Route::get("role/{id}/permissions", [RoleController::class, 'getPermissions'])->name("role.permissions");
         Route::get("role/{id}/users", [RoleController::class, 'getUsers'])->name("role.users");
         Route::post("role/affect", [RoleController::class, 'affectRole'])->name("affect.role");
-        Route::patch("role/{id}/update-permissions", [RoleController::class, 'updatePermissions'])->name("role.update.permissions");
-        Route::patch("role/{id}/update-users", [RoleController::class, 'updateUsers'])->name("role.update.users");
+        Route::post("role/{id}/update-permissions", [RoleController::class, 'updatePermissions'])->name("role.update.permissions");
+        Route::post("role/{id}/update-users", [RoleController::class, 'updateUsers'])->name("role.update.users");
 
         // Mode de paiement
         Route::resource("mode-paiement", PaiementModeController::class);

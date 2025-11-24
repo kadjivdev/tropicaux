@@ -48,7 +48,7 @@ export default function List({ role }) {
     const submit = (e) => {
         e.preventDefault();
 
-        patch(route('role.update.users', role.id), {
+        post(route('role.update.users', role.id), {
             onStart: () => {
                 Swal.fire({
                     title: '<span style="color: #facc15;">🫠 Opération en cours...</span>', // yellow text
