@@ -30,9 +30,7 @@ class RoleController extends Controller
         ]);
     }
 
-    /**
-     * Getting all permissions
-     */
+    
     public function getPermissions(Request $request, $id)
     {
         $role = Role::with(["permissions"])->find($id);
