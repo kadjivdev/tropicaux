@@ -300,8 +300,7 @@ export default function Create({ partenaires, modes, camions, chargements }) {
                                 {/* Camions */}
                                 <div className="d-flex" style={{ justifyContent: 'space-between' }}>
                                     <span className="text-success"><CIcon icon={cilTruck} /> Détail des camions</span>
-                                    <button className="btn btn-success bg-hover"
-                                        onClick={(e) => addCamionLine(e)}> <CIcon className='' icon={cilTruck} /> Ajouter un camion</button>
+                                    
                                 </div>
 
                                 <table className="table">

@@ -47,7 +47,7 @@ class VenteController extends Controller
         $sessionId = Session::get("campagne")?->id;
         $chargements = Chargement::with("camions")
             ->where("campagne_id", $sessionId)
-            ->whereNotNull("validated_by")
+            // ->whereNotNull("validated_by")
             ->get();
 
         return inertia("Ventes/Create", [
