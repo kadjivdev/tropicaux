@@ -24,7 +24,7 @@ class AddSomePermission extends Seeder
     public function run(): void
     {
         $permissions_groups = [
-            "FinancementBacks" => $this->createCrudValidatePermissions("financementbacks", "backfinancement"),
+            "Campagnes" => $this->createCrudValidatePermissions("campagnes", "campagne"),
         ];
 
         foreach ($permissions_groups as $group => $permissions) {

@@ -110,7 +110,7 @@ export default function List({ campagnes }) {
 
                 <div className="col-md-10 bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
                     <div className="mx-auto _max-w-7xl space-y-6 sm:px-6 lg:px-8 " style={{ overflowX: 'auto' }} >
-                        {checkPermission('financement.create') ?
+                        {checkPermission('campagne.create') ?
                             (<div className="text-center  items-center gap-4">
                                 <Link className="btn w-50 bg-success bg-hover text-white" href={route("campagne.create")}> <CIcon className='' icon={cibAddthis} /> Ajouter</Link>
                             </div>) : null

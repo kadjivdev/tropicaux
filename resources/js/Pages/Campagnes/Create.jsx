@@ -93,7 +93,7 @@ export default function Create({ }) {
                     <div className="mx-auto _max-w-7xl space-y-6 sm:px-6 lg:px-8 ">
 
                         <div className="bg-light p-3 rounded border mb-5">
-                            {checkPermission('financement.view') ?
+                            {checkPermission('campagne.view') ?
                                 (<div className=" text-center  items-center gap-4">
                                     <Link className="btn btn-sm bg-success bg-hover text-white" href={route("campagne.index")}> <CIcon icon={cilList} /> Liste des campagnes</Link>
                                 </div>) : null
