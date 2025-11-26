@@ -24,14 +24,13 @@ class AddSomePermission extends Seeder
     public function run(): void
     {
         $permissions_groups = [
-            "Campagnes" => $this->createCrudValidatePermissions("campagnes", "campagne"),
+            ["Transferer un pré-financement" => "prefinancement.transfert"]
         ];
 
-        foreach ($permissions_groups as $group => $permissions) {
-            foreach ($permissions as $description => $permission) {
-                Permission::firstOrCreate(
-                    ['name' => $permission, 'guard_name' => 'web'],
-                    ['name' => $permission, 'group_name' => $group, 'description' => $description]
+        foreach ($permissions_groups as $permission) {
+            foreach ($permission as $description => $name) {
+                Permission::create(
+                    ['name' => $name, 'group_name' => 'pré-financement', 'description' => $description]
                 );
             }
         }

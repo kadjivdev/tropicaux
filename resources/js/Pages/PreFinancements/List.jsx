@@ -270,7 +270,7 @@ export default function List({ financements, gestionnaires }) {
                             <strong className='border'>Total retourné: </strong>     <span className="badge mx-3 bg-dark text-light shadow border rounded">{totalRetour} FCFA</span> <br />
                             <strong className='border'>Total reste: </strong>     <span className="badge mx-3 bg-dark text-light shadow border rounded">{totalReste} FCFA</span>
                         </div>
-                        
+
                         <table className="table table-striped" id='myTable' style={{ width: '100%' }}>
                             <thead>
                                 <tr>
@@ -356,8 +356,9 @@ export default function List({ financements, gestionnaires }) {
                                             <td><strong className="badge bg-light rounded text-danger rounded shadow-sm">{financement.back_amount}</strong></td>
                                             <td className='text-center'>
                                                 <span className="badge bg-light rounded text-success rounded shadow-sm">{financement.reste}</span>
+
                                                 {
-                                                    financement.reste > 0 && <button className="btn btn-sm btn-light border rounded w-100 shadow text-center"
+                                                    checkPermission("prefinancement.transfert") && financement.reste > 0 && <button className="btn btn-sm btn-light border rounded w-100 shadow text-center"
                                                         onClick={(e) => transfertReste(e, financement)}> <CIcon icon={cilSend} className='text-success' /> Transferer </button>
                                                 }
                                             </td>

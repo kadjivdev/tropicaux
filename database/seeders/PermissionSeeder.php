@@ -24,6 +24,7 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         $permissions_groups = [
+            "Campagnes" => $this->createCrudValidatePermissions("campagnes", "campagne"),
             'Produits' => $this->createCrudValidatePermissions('produits', 'produit'),
             "Camions" => $this->createCrudValidatePermissions("camions", "camion"),
             "Chauffeurs" => $this->createCrudValidatePermissions("chauffeurs", "chauffeur"),
@@ -31,7 +32,11 @@ class PermissionSeeder extends Seeder
             "Convoyeurs" => $this->createCrudValidatePermissions("convoyeurs", "convoyeur"),
             "Magasins" => $this->createCrudValidatePermissions("magasins", "magasin"),
             "Fournisseurs" => $this->createCrudValidatePermissions("fournisseurs", "fournisseur"),
-            "PreFinancements" => $this->createCrudValidatePermissions("prefinancements", "prefinancement"),
+            "PreFinancements" => array_merge(
+                $this->createCrudValidatePermissions("prefinancements", "prefinancement"),
+                ["Transferer un pré-financement" => "prefinancement.transfert"]
+            ),
+
             "Financements" => $this->createCrudValidatePermissions("financements", "financement"),
             "FinancementBacks" => $this->createCrudValidatePermissions("financementbacks", "backfinancement"),
 
