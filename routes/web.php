@@ -17,6 +17,7 @@ use App\Http\Controllers\FinancementBackController;
 use App\Http\Controllers\FinancementController;
 use App\Http\Controllers\FondSuperviseurController;
 use App\Http\Controllers\FournisseurController;
+use App\Http\Controllers\GestionnaireFondController;
 use App\Http\Controllers\InscriptionController;
 use App\Http\Controllers\InterrogationController;
 use App\Http\Controllers\MagasinController;
@@ -143,6 +144,9 @@ Route::middleware('auth')->group(function () {
 
         // Superviseurs
         Route::resource("superviseur", SuperviseurController::class);
+
+        // Gestionnaires de fonds
+        Route::resource("gestionnaire", GestionnaireFondController::class);
 
         // Magasins
         Route::resource("magasin", MagasinController::class);

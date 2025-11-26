@@ -53,7 +53,7 @@ class PreFinancement extends Model
     /**Gestionnaire */
     function gestionnaire(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'gestionnaire_id');
+        return $this->belongsTo(GestionnaireFond::class, 'gestionnaire_id');
     }
 
     /**Prefinancement generé par transfert  d'un autre prefinancement*/

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 // use App\Http\Resources\FinancementResource;
 use App\Http\Resources\PreFinancementResource;
+use App\Models\GestionnaireFond;
 // use App\Models\Financement;
 // use App\Models\Fournisseur;
 use App\Models\PreFinancement;
@@ -25,9 +26,11 @@ class PreFinancementController extends Controller
         $sessionId = Session::get("campagne")?->id;
         $preFinancements = PreFinancement::get();
 
-        $gestionnaires = User::whereHas("roles", function ($role) {
-            $role->where("name", "Gestionnaire de fonds");
-        })->get();
+        // $gestionnaires = User::whereHas("roles", function ($role) {
+        //     $role->where("name", "Gestionnaire de fonds");
+        // })->get();
+
+        $gestionnaires = GestionnaireFond::all(["id","raison_sociale"]);
 
         return inertia("PreFinancements/List", [
             "financements" => PreFinancementResource::collection($preFinancements),
@@ -41,9 +44,11 @@ class PreFinancementController extends Controller
 
     function create()
     {
-        $gestionnaires = User::whereHas("roles", function ($role) {
-            $role->where("name", "Gestionnaire de fonds");
-        })->get();
+        // $gestionnaires = User::whereHas("roles", function ($role) {
+        //     $role->where("name", "Gestionnaire de fonds");
+        // })->get();
+
+        $gestionnaires = GestionnaireFond::all(["id","raison_sociale"]);
 
         return inertia("PreFinancements/Create", [
             "gestionnaires" => $gestionnaires
@@ -96,9 +101,11 @@ class PreFinancementController extends Controller
      */
     function edit(PreFinancement $prefinancement)
     {
-        $gestionnaires = User::whereHas("roles", function ($role) {
-            $role->where("name", "Gestionnaire de fonds");
-        })->get();
+        // $gestionnaires = User::whereHas("roles", function ($role) {
+        //     $role->where("name", "Gestionnaire de fonds");
+        // })->get();
+
+        $gestionnaires = GestionnaireFond::all(["id","raison_sociale"]);
 
         return inertia("PreFinancements/Update", [
             "financement" => $prefinancement,

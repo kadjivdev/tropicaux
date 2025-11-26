@@ -251,12 +251,12 @@ export default function List({ financements, gestionnaires }) {
                                     className="form-control mt-1 block w-full"
                                     options={gestionnaires.map((gestionnaire) => ({
                                         value: gestionnaire.id,
-                                        label: `${gestionnaire.firstname} - ${gestionnaire.lastname}`,
+                                        label: `${gestionnaire.raison_sociale}`,
                                     }))}
                                     value={gestionnaires
                                         .map((gestionnaire) => ({
                                             value: gestionnaire.id,
-                                            label: `${gestionnaire.firstname} - ${gestionnaire.lastname}`,
+                                            label: `${gestionnaire.raison_sociale}`,
                                         }))
                                         .find((option) => option.value === data.gestionnaire_id)} // set selected option
                                     onChange={(option) => handleFiltre(option)} // update state with id
@@ -350,13 +350,12 @@ export default function List({ financements, gestionnaires }) {
                                                     </small>
                                                 }
                                             </td>
-                                            <td>{`${financement?.gestionnaire?.lastname} - ${financement?.gestionnaire?.firstname}`}</td>
+                                            <td>{financement?.gestionnaire?.raison_sociale}`</td>
                                             <td><span className="badge bg-light rounded text-dark rounded shadow-sm">{financement.montant}</span></td>
                                             <td><strong className="badge bg-light rounded text-dark rounded shadow-sm">{financement.montant_dispatche}</strong></td>
                                             <td><strong className="badge bg-light rounded text-danger rounded shadow-sm">{financement.back_amount}</strong></td>
                                             <td className='text-center'>
                                                 <span className="badge bg-light rounded text-success rounded shadow-sm">{financement.reste}</span>
-
                                                 {
                                                     checkPermission("prefinancement.transfert") && financement.reste > 0 && <button className="btn btn-sm btn-light border rounded w-100 shadow text-center"
                                                         onClick={(e) => transfertReste(e, financement)}> <CIcon icon={cilSend} className='text-success' /> Transferer </button>

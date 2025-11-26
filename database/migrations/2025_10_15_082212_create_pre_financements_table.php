@@ -21,7 +21,7 @@ return new class extends Migration
             $table->text("reference")->nullable();
             $table->foreignId("gestionnaire_id")
                 ->nullable()
-                ->constrained("users")
+                ->constrained("gestionnaire_fonds")
                 ->onUpdate("CASCADE")
                 ->onDelete("SET NULL");
             $table->foreignId("user_id")

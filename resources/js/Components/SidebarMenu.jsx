@@ -87,6 +87,32 @@ export default function SidebarMenu(props) {
                                 </CNavGroup> : null
                             }
 
+                            {/* Gestionnaires des fonds */}
+                            {checkPermission('gestionnaire.view') || checkPermission('gestionnaire.create') ?
+                                <CNavGroup
+                                    toggler={
+                                        <>
+                                            <CIcon customClassName="nav-icon text-success" icon={cibAlipay} />Gestionnaires de fonds
+                                        </>
+                                    }
+                                >
+                                    {checkPermission('gestionnaire.view') ?
+                                        (<Link href={route('gestionnaire.index')} className="nav-link">
+                                            <span className="nav-icon">
+                                                <span className="nav-icon-bullet text-danger"></span>
+                                            </span>
+                                            Liste des gestionnaires de fonds
+                                        </Link>) : null}
+
+                                    {checkPermission('gestionnaire.create') ? (<Link href={route('gestionnaire.create')} className="nav-link">
+                                        <span className="nav-icon">
+                                            <span className="nav-icon-bullet"></span>
+                                        </span>
+                                        Ajouter un gestionnaire
+                                    </Link>) : null}
+                                </CNavGroup> : null
+                            }
+
                             {/* Prefinancements */}
                             {checkPermission('prefinancement.view') || checkPermission('prefinancement.create') ?
                                 <CNavGroup

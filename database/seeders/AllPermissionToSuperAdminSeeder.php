@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
@@ -23,7 +24,7 @@ class AllPermissionToSuperAdminSeeder extends Seeder
         // }
 
         // Attribution de toutes les permissions au super-admin
-        // $superAdmin = Role::findByName('Super Administrateur');
-        $user->syncPermissions($allPermissions);
+        $superAdmin = Role::findByName('Super Administrateur');
+        $superAdmin->syncPermissions($allPermissions);
     }
 }

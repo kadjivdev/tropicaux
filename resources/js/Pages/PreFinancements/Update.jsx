@@ -114,12 +114,12 @@ export default function Update({ financement,gestionnaires }) {
                                                 className="form-control mt-1 block w-full"
                                                 options={gestionnaires.map((gestionnaire) => ({
                                                     value: gestionnaire.id,
-                                                    label: `${gestionnaire.firstname} - ${gestionnaire.lastname}`,
+                                                    label: `${gestionnaire.raison_sociale}`,
                                                 }))}
                                                 value={gestionnaires
                                                     .map((gestionnaire) => ({
                                                         value: gestionnaire.id,
-                                                        label: `${gestionnaire.firstname} - ${gestionnaire.lastname}`,
+                                                        label: `${gestionnaire.raison_sociale}`,
                                                     }))
                                                     .find((option) => option.value === data.gestionnaire_id)} // set selected option
                                                 onChange={(option) => setData('gestionnaire_id', option.value)} // update state with id
