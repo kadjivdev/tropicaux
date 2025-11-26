@@ -24,7 +24,7 @@ class AllPermissionToSuperAdminSeeder extends Seeder
         // }
 
         // Attribution de toutes les permissions au super-admin
-        $superAdmin = Role::findByName('Super Administrateur');
-        $superAdmin->syncPermissions($allPermissions);
+        // $superAdmin = Role::findByName('Super Administrateur');
+        $user->syncPermissions($allPermissions);
     }
 }
