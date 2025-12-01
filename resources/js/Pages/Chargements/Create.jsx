@@ -203,12 +203,12 @@ export default function Create({ produits, convoyeurs, superviseurs, magasins, c
                                             <InputError className="mt-2" message={errors.chauffeur_id} />
                                         </div>
                                         <div className="mb-3">
-                                            <InputLabel htmlFor="magasin_id" value="Magasin" >  <span className="text-danger">*</span> </InputLabel>
+                                            <InputLabel htmlFor="magasin_id" value="Magasin" > </InputLabel>
                                             <Select
                                                 placeholder="Rechercher un magasin ..."
                                                 name="magasin_id"
                                                 id="magasin_id"
-                                                required
+                                                // required
                                                 className="form-control mt-1 block w-full"
                                                 options={magasins.map((magasin) => ({
                                                     value: magasin.id,

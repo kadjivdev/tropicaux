@@ -71,7 +71,7 @@ class ChargementController extends Controller
             "chauffeur_id" => ["required", "integer"],
             "superviseur_id" => ["required", "integer"],
             "convoyeur_id" => ["nullable", "integer"],
-            "magasin_id" => ["required", "integer"],
+            // "magasin_id" => ["required", "integer"],
             "adresse" => ["required"],
             "observation" => ["nullable"],
 
@@ -90,7 +90,7 @@ class ChargementController extends Controller
             // "convoyeur_id.required" => "Le convoyeur est requis.",
             "convoyeur_id.integer" => "Le convoyeur doit être un entier.",
 
-            "magasin_id.required" => "Le magasin est requis.",
+            // "magasin_id.required" => "Le magasin est requis.",
             "magasin_id.integer" => "Le magasin doit être un entier.",
 
             "adresse.required" => "L’adresse est requise.",
