@@ -41,7 +41,7 @@ class Chargement extends Model
     /**Chauffeur */
     function chauffeur(): BelongsTo
     {
-        return $this->belongsTo(Fournisseur::class, 'chauffeur_id');
+        return $this->belongsTo(Chauffeur::class, 'chauffeur_id');
     }
 
     /**Superviseur */
