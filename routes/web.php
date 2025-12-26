@@ -1,57 +1,41 @@
 <?php
 
-use App\Http\Controllers\ApprenantController;
-use App\Http\Controllers\BulletinController;
 use App\Http\Controllers\CamionController;
 use App\Http\Controllers\CampagneController;
 use App\Http\Controllers\CampagneSession;
 use App\Http\Controllers\ChargementController;
 use App\Http\Controllers\ChauffeurController;
-use App\Http\Controllers\ClasseController;
 use App\Http\Controllers\ConvoyeurController;
-use App\Http\Controllers\Dashboard;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepenseSuperviseurController;
-use App\Http\Controllers\DevoirController;
 use App\Http\Controllers\FinancementBackController;
 use App\Http\Controllers\FinancementController;
 use App\Http\Controllers\FondSuperviseurController;
 use App\Http\Controllers\FournisseurController;
 use App\Http\Controllers\GestionnaireFondController;
-use App\Http\Controllers\InscriptionController;
-use App\Http\Controllers\InterrogationController;
 use App\Http\Controllers\MagasinController;
-use App\Http\Controllers\MatiereController;
-use App\Http\Controllers\MoyenneDevoirController;
-use App\Http\Controllers\MoyenneInterrogationController;
 use App\Http\Controllers\PaiementModeController;
 use App\Http\Controllers\PartenaireController;
-use App\Http\Controllers\PayementController;
 use App\Http\Controllers\PreFinancementController;
 use App\Http\Controllers\ProduitController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
-use App\Http\Controllers\SchoolController;
-use App\Http\Controllers\SerieController;
 use App\Http\Controllers\SuperviseurController;
-use App\Http\Controllers\TrimestreController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VenteController;
-use App\Models\Permission;
-use App\Models\Role;
-use Illuminate\Foundation\Application;
+use App\Models\PreFinancement;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
-Route::get("/{roleId}/affect-permissions", function ($roleId) {
+Route::get("/debug", function () {
 
-    $role = Role::findOrFail($roleId);
+    $preFinancement = PreFinancement::firstWhere("reference", "PREFINAN-1766738520-CE");
 
-    if (!$role) {
-        return "Ce role n'existe pas";
+    if ($preFinancement) {
+        return $preFinancement;
+        //  $preFinancement->update([
+        //      "montant" => ,
+        //  ]);
     }
-    $permissions = Permission::all();
-    $role->syncPermissions($permissions->pluck("name"));
     return "Permissions affectées avec succès";
 });
 
