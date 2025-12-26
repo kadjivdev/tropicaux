@@ -31,12 +31,11 @@ Route::get("/debug", function () {
     $preFinancement = PreFinancement::firstWhere("reference", "PREFINAN-1766738520-CE");
 
     if ($preFinancement) {
-        return $preFinancement;
-        //  $preFinancement->update([
-        //      "montant" => ,
-        //  ]);
+        $preFinancement->update([
+            "montant" => 6258000,
+        ]);
     }
-    return "Permissions affectées avec succès";
+    return "regulation éffectuée avec succès";
 });
 
 Route::redirect('/', '/login');
