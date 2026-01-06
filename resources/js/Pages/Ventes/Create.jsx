@@ -220,7 +220,7 @@ export default function Create({ partenaires, modes, camions, chargements }) {
                                     </div>
                                     <div className="col-md-6">
                                         <div className='mb-3'>
-                                            <InputLabel htmlFor="poids" value="Le poids" > <span className="text-danger">*</span></InputLabel>
+                                            <InputLabel htmlFor="poids" value="Le poids" > </InputLabel>
                                             <TextInput
                                                 type="number"
                                                 id="poids"
@@ -231,8 +231,8 @@ export default function Create({ partenaires, modes, camions, chargements }) {
                                                     setData('poids', e.target.value)
                                                 }}
                                                 autoComplete="poids"
-                                                required
-                                                min={1}
+                                                // required
+                                                min={0}
                                             />
                                             <InputError className="mt-2" message={errors.poids} />
                                         </div>
@@ -246,7 +246,7 @@ export default function Create({ partenaires, modes, camions, chargements }) {
                                                 placeholder="Ex: 3.0"
                                                 onChange={(e) => setData('nbre_sac_rejete', e.target.value)}
                                                 autoComplete="nbre_sac_rejete"
-                                                min={1}
+                                                min={0}
                                             />
                                             <InputError className="mt-2" message={errors.nbre_sac_rejete} />
                                         </div>
@@ -260,7 +260,7 @@ export default function Create({ partenaires, modes, camions, chargements }) {
                                                 placeholder="Ex: 3.0"
                                                 onChange={(e) => setData('prix_unitaire_sac_rejete', e.target.value)}
                                                 autoComplete="prix_unitaire_sac_rejete"
-                                                min={1}
+                                                min={0}
                                             />
                                             <InputError className="mt-2" message={errors.prix_unitaire_sac_rejete} />
                                         </div>
