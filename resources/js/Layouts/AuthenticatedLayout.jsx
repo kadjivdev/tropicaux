@@ -4,7 +4,7 @@ import CIcon from '@coreui/icons-react';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import Swal from 'sweetalert2';
-import { cilAccountLogout, cilUserX, cilBellExclamation, cilList } from '@coreui/icons'
+import { cilAccountLogout, cilUserX, cilList } from '@coreui/icons'
 
 import { useEffect } from 'react';
 // import DataTable from 'datatables.net-dt';

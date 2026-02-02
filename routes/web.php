@@ -8,6 +8,7 @@ use App\Http\Controllers\ChauffeurController;
 use App\Http\Controllers\ConvoyeurController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepenseSuperviseurController;
+use App\Http\Controllers\DepenseVenteController;
 use App\Http\Controllers\FinancementBackController;
 use App\Http\Controllers\FinancementController;
 use App\Http\Controllers\FondSuperviseurController;
@@ -92,6 +93,11 @@ Route::middleware('auth')->group(function () {
         // Ventes
         Route::resource("vente", VenteController::class);
         Route::patch("/vente/{vente}/validate", [VenteController::class, "validatedVente"])->name("vente.validate");
+
+        // Dépenses ventes
+        Route::resource("depense-vente", DepenseVenteController::class);
+        Route::patch("/depense-vente/{depense}/validate", [DepenseVenteController::class, "validatedDepense"])->name("depense-vente.validate");
+
 
         // Profils utilisateurs
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -35,7 +35,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
                 'campagne' => Session::get("campagne"),
-                'receivedNotificationsNbr' => $request->user() ? $request->user()->notificationsReceived->count() : 0,
+                'receivedNotificationsNbr' =>  $request->user()?->notificationsReceived?->count() ?? 0,
                 'base_url' => env("APP_URL"),
                 'permissions' => $request->user()?->getAllPermissions(),
             ],

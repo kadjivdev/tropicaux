@@ -218,6 +218,7 @@ export default function List({ ventes, chargements }) {
                                     <th scope="col">Nbre Sac rejete</th>
                                     <th scope="col">Prix unit Sac rejete</th>
                                     <th scope='col'>Montant</th>
+                                    <th scope='col'>Dépense</th>
                                     <th scope='col'>Montant Total</th>
                                     <th scope='col'>Commentaire</th>
                                     <th scope='col'>Preuve</th>
@@ -304,7 +305,8 @@ export default function List({ ventes, chargements }) {
                                             <td> <span className="badge bg-light border rounded text-dark"> {vente.nbre_sac_rejete || '00'} </span></td>
                                             <td> <span className="badge bg-light border rounded text-dark"> {vente.prix_unitaire_sac_rejete || '00'} </span></td>
                                             <td> <span className="badge bg-light border rounded text-dark"> {vente.montant || '00'} </span></td>
-                                            <td> <span className="badge bg-light border rounded text-dark"> {vente.montant_total || '00'} </span></td>
+                                            <td> <span className="badge bg-light border rounded text-danger"> {vente.depense_total || '00'} </span></td>
+                                            <td> <span className="badge bg-light border rounded text-success"> {vente.montant_total || '00'} </span></td>
                                             <td><textarea rows={1} className='form-control' disabled={true} placeholder={vente.commentaire || '--'}></textarea></td>
                                             <td>
                                                 {vente.document ? (

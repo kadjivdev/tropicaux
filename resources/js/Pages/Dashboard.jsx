@@ -138,6 +138,7 @@ export default function Dashboard({ financementsAmount, fondSuperviseursAmount, 
                                                     <th className="border-b border-slate-300 p-2 text-left bg-slate-50"> Produit </th>
                                                     <th className="border-b border-slate-300 p-2 text-left bg-slate-50"> Chauffeur </th>
                                                     <th className="border-b border-slate-300 p-2 text-left bg-slate-50"> Superviseur</th>
+                                                    <th className="border-b border-slate-300 p-2 text-left bg-slate-50"> Inseré le</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -148,6 +149,7 @@ export default function Dashboard({ financementsAmount, fondSuperviseursAmount, 
                                                             <td className="border-b border-slate-300 p-2"> <span className="badge bg-light text-dark border rounded">{chargement.produit?.libelle}</span></td>
                                                             <td className="border-b border-slate-300 p-2"> <span className="badge bg-light text-dark border rounded">{chargement.chauffeur?.raison_sociale}</span> </td>
                                                             <td className="border-b border-slate-300 p-2"> <span className="badge bg-light text-dark border rounded">{chargement.superviseur?.raison_sociale}</span> </td>
+                                                            <td className="border-b border-slate-300 p-2"> <span className="badge bg-light text-dark border rounded">{chargement.created_at}</span> </td>
                                                         </tr>
                                                     ))
                                                 }
@@ -164,6 +166,7 @@ export default function Dashboard({ financementsAmount, fondSuperviseursAmount, 
                                                     <th className="border-b border-slate-300 p-2 text-left bg-slate-50"> Prix </th>
                                                     <th className="border-b border-slate-300 p-2 text-left bg-slate-50"> Poids </th>
                                                     <th className="border-b border-slate-300 p-2 text-left bg-slate-50"> Montant total </th>
+                                                    <th className="border-b border-slate-300 p-2 text-left bg-slate-50"> Inseré le</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -174,6 +177,7 @@ export default function Dashboard({ financementsAmount, fondSuperviseursAmount, 
                                                             <td className="border-b border-slate-300 p-2"> <span className="badge bg-light text-dark border rounded">{vente.prix}</span></td>
                                                             <td className="border-b border-slate-300 p-2"> <span className="badge bg-light text-dark border rounded">{vente.poids}</span> </td>
                                                             <td className="border-b border-slate-300 p-2"> <span className="badge bg-light text-dark border rounded">{vente.montant_total}</span> </td>
+                                                            <td className="border-b border-slate-300 p-2"> <span className="badge bg-light text-dark border rounded">{vente.created_at}</span> </td>
                                                         </tr>
                                                     ))
                                                 }

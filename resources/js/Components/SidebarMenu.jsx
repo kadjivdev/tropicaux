@@ -326,6 +326,31 @@ export default function SidebarMenu(props) {
                                 </CNavGroup> : null
                             }
 
+                            {/* Dépenses ventes */}
+                            {checkPermission('vente.view') || checkPermission('vente.create') ?
+                                <CNavGroup
+                                    toggler={
+                                        <>
+                                            <CIcon customClassName="nav-icon text-success text-bold" icon={cibCashapp} /> Dépense ventes
+                                        </>
+                                    }
+                                >
+                                    {checkPermission('vente.view') ?
+                                        (<Link href={route('depense-vente.index')} className="nav-link">
+                                            <span className="nav-icon">
+                                                <span className="nav-icon-bullet text-danger"></span>
+                                            </span>
+                                            Liste des dépenses
+                                        </Link>) : null}
+
+                                    {checkPermission('vente.create') ? (<Link href={route('depense-vente.create')} className="nav-link">
+                                        <span className="nav-icon">
+                                            <span className="nav-icon-bullet"></span>
+                                        </span>
+                                        Ajouter une dépense 
+                                    </Link>) : null}
+                                </CNavGroup> : null
+                            }
 
                             <CNavTitle>Paramètrage</CNavTitle>
 

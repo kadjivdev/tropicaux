@@ -44,7 +44,6 @@ export default function Create({ partenaires, modes, camions, chargements }) {
         camions: ligneCamions,
     });
 
-
     // Gestion des camions
     const addCamionLine = (e) => {
         e.preventDefault()

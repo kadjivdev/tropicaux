@@ -15,20 +15,22 @@ class VenteResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $depenses = $this->depenses->whereNotNull("validated_at")->sum("montant");
         return [
             "id" => $this->id,
             "reference" => $this->reference,
             "partenaire" => $this->partenaire,
             "chargement" => $this->chargement,
             "prix" => $this->prix,
-            "montant" => $this->montant,
+            "montant" => number_format($this->montant, 2, "."),
             "document" => $this->document,
             "camions" => $this->camions->load("camion"),
             "modes" => $this->modes->load("mode"),
             "poids" => $this->poids,
             "nbre_sac_rejete" => $this->nbre_sac_rejete,
             "prix_unitaire_sac_rejete" => $this->prix_unitaire_sac_rejete,
-            "montant_total" => $this->montant_total,
+            "depense_total" => number_format($depenses, 2, "."), //depenses validées
+            "montant_total" => number_format($this->montant_total - $depenses, 2, "."),
             "commentaire" => $this->commentaire,
             "createdBy" => $this->createdBy,
             "validatedBy" => $this->validatedBy,

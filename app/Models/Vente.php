@@ -57,6 +57,12 @@ class Vente extends Model
         return $this->belongsTo(chargement::class, 'chargement_id');
     }
 
+    /**Dépenses */
+    function depenses(): HasMany
+    {
+        return $this->hasMany(DepenseVente::class, 'vente_id');
+    }
+
     /**Camions */
     function camions(): HasMany
     {
@@ -128,7 +134,7 @@ class Vente extends Model
             $model->montant_total = $montant + ($model->nbre_sac_rejete * $model->prix_unitaire_sac_rejete);
 
             // Handle document uploading
-            Log::debug("Document de la vente",["doc"=>$model->handleDocumentUploading()]);
+            Log::debug("Document de la vente", ["doc" => $model->handleDocumentUploading()]);
             $model->document = $model->handleDocumentUploading() ?? $model->document;
         });
     }
