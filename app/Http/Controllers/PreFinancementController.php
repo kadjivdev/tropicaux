@@ -24,7 +24,7 @@ class PreFinancementController extends Controller
     function index()
     {
         $sessionId = Session::get("campagne")?->id;
-        $preFinancements = PreFinancement::get();
+        $preFinancements = PreFinancement::where("campagne_id", $sessionId)->get();
 
         // $gestionnaires = User::whereHas("roles", function ($role) {
         //     $role->where("name", "Gestionnaire de fonds");
