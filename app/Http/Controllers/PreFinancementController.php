@@ -32,6 +32,8 @@ class PreFinancementController extends Controller
 
         $gestionnaires = GestionnaireFond::all(["id","raison_sociale"]);
 
+        // dd($gestionnaires);
+
         return inertia("PreFinancements/List", [
             "financements" => PreFinancementResource::collection($preFinancements),
             "gestionnaires" => $gestionnaires
