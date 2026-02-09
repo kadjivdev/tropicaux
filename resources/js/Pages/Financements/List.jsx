@@ -1,19 +1,25 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import CIcon from '@coreui/icons-react';
-import { cibAddthis, cilCheckCircle, cilCloudDownload, cilList, cilMenu, cilPencil, cilUserX } from "@coreui/icons";
+import { cibAddthis, cilCheckCircle, cilCloudDownload, cilList, cilMenu, cilPencil, cilSend, cilTruck, cilUserX } from "@coreui/icons";
 import Swal from 'sweetalert2';
 import { useEffect, useState } from 'react';
 import Select from 'react-select';
+import Modal from '@/Components/Modal';
+import InputLabel from '@/Components/InputLabel';
+import TextInput from '@/Components/TextInput';
+import InputError from '@/Components/InputError';
+import PrimaryButton from '@/Components/PrimaryButton';
+import SecondaryButton from '@/Components/SecondaryButton';
 
-export default function List({ financements, prefinancements }) {
+export default function List({ financements, prefinancements, fournisseurs }) {
     const permissions = usePage().props.auth.permissions;
 
     const checkPermission = (name) => {
         return permissions.some(per => per.name == name);
     }
 
-    const { patch, data, delete: destroy } = useForm({})
+    const { patch, delete: destroy } = useForm({})
 
     const deleteFinancement = (e, financement) => {
         e.preventDefault();
@@ -119,17 +125,14 @@ export default function List({ financements, prefinancements }) {
     useEffect(() => {
 
         const montant = _financements.reduce((acc, financement) => {
-            console.log("Le financement en cours :", financement);
             return acc + parseAmount(financement.montant); // On ajoute 0 si "reste" est undefined ou null
         }, 0);
 
         const retour = _financements.reduce((acc, financement) => {
-            console.log("Le financement en cours :", financement);
             return acc + parseAmount(financement.back_amount); // On ajoute 0 si "reste" est undefined ou null
         }, 0);
 
         const reste = _financements.reduce((acc, financement) => {
-            console.log("Le financement en cours :", financement);
             return acc + parseAmount(financement.reste); // On ajoute 0 si "reste" est undefined ou null
         }, 0);
 
@@ -139,14 +142,79 @@ export default function List({ financements, prefinancements }) {
 
     }, [_financements]); // On relance l'effet à chaque changement de _financements
 
+    const [currentFinancement, setCurrentFinancement] = useState(null);
+    const [showTransfert, setTransfert] = useState(false);
+
+    // transfert du reste des pré-financements
+    const { data, setData, errors, processing, post } = useForm({
+        reste: currentFinancement?.reste,
+        fournisseur_id: null
+    })
+    const closeTransfertModal = () => {
+        setTransfert(false);
+    }
+
+    const transfertReste = (e, financement) => {
+        e.preventDefault();
+
+        setCurrentFinancement(financement);
+        setData("reste", financement.reste)
+        setTransfert(true);
+    }
+
+    const submitTransfert = (e) => {
+        e.preventDefault();
+
+        Swal.fire({
+            title: '<span style="color: #facc15;">⚠️ Êtes-vous sûr ?</span>', // yellow text
+            text: `Le reste (${currentFinancement?.back_amount} FCFA) du financement (${currentFinancement?.reference}) sera transféré de façon permanente !`,
+            showCancelButton: true,
+            confirmButtonColor: '#2a7348',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: '😇 Oui, valider !',
+            cancelButtonText: 'Annuler'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: '<span style="color: #facc15;">🫠 Validation en cours...</span>', // yellow text
+                    text: 'Veuillez patienter pendant que nous traitons vos données.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    },
+                });
+                post(route('financement.transfert-reste', currentFinancement?.id), {
+                    onSuccess: () => {
+                        Swal.close();
+                        Swal.fire({
+                            title: '<span style="color: #2a7348;">Transfert réussi </span>',
+                            text: `Le reste (${currentFinancement?.back_amount} FCFA) du financement (${currentFinancement?.reference}) a été transferé avec succès.`,
+                            confirmButtonText: '😇 Fermer'
+                        });
+
+                        setTransfert(false);
+                    },
+                    onError: (e) => {
+                        Swal.close();
+                        Swal.fire({
+                            title: '<span style="color: #facc15;">🤦‍♂️ Transfert échoué </span>', // yellow text
+                            text: `${e.exception ?? 'Veuillez réessayer.'}`,
+                            confirmButtonText: '😇 Fermer'
+                        });
+                    },
+                })
+            }
+        });
+    }
+
     // Filtrage
     const handleFiltre = (option) => {
-        console.log("Tous les financements :",_allfinancements)
+        console.log("Tous les financements :", _allfinancements)
 
-        console.log("Value conerned :",option.value)
+        console.log("Value conerned :", option.value)
         let newFinances = _allfinancements.filter((f) => f.preFinancement?.id == option.value)
 
-        console.log("News les financements :",newFinances)
+        console.log("News les financements :", newFinances)
 
         setFinancements(newFinances)
     }
@@ -268,11 +336,20 @@ export default function List({ financements, prefinancements }) {
                                                 }
 
                                             </td>
-                                            <td><span className="badge bg-light rounded text-dark rounded shadow-sm"> {financement?.reference ?? '---'}</span> </td>
+                                            <td>
+                                                <span className="badge bg-light rounded text-dark rounded shadow-sm"> {financement?.reference ?? '---'}</span>  <br />
+                                                {financement.financement && <span className="badge bg-light rounded text-info rounded shadow-sm"> (Transfert de : {financement.financement.reference})</span>}
+                                            </td>
                                             <td><span className="badge bg-light rounded text-success rounded shadow-sm">{`${financement?.prefinancement?.reference}`} </span> </td>
                                             <td>{financement?.fournisseur?.raison_sociale ?? '---'}</td>
                                             <td><span className="badge bg-light border rounded text-dark">{financement.montant} FCFA</span></td>
-                                            <td><span className="badge bg-light border rounded text-danger">{financement.back_amount} FCFA</span></td>
+                                            <td>
+                                                <span className="badge bg-light border rounded text-danger">{financement.back_amount} FCFA</span>
+                                                {
+                                                    checkPermission("prefinancement.transfert") && financement._back_amount > 0 && <button className="btn btn-sm btn-light border rounded w-100 shadow text-center"
+                                                        onClick={(e) => transfertReste(e, financement)}> <CIcon icon={cilSend} className='text-success' /> Transferer </button>
+                                                }
+                                            </td>
                                             <td><span className="badge bg-light border rounded text-dark">{financement.reste} FCFA</span></td>
                                             <td>{financement.date_financement}</td>
                                             <td>
@@ -299,6 +376,75 @@ export default function List({ financements, prefinancements }) {
                     </div>
                 </div>
             </div>
+
+            {/* Model de transfert de reste */}
+            <Modal show={showTransfert} onClose={closeTransfertModal}>
+                <div className="p-6">
+                    <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                        <CIcon className='text-success' icon={cilTruck} /> Transfert du retour du financement <span className='badge bg-light rounded border shadow-sm text-success'>{currentFinancement?.reference ?? '---'}</span>
+                    </h2>
+
+                    <form onSubmit={submitTransfert} className="mt-6 space-y-6">
+                        <div className="row d-flex justify-content-center">
+
+                            <div className="col-md-6">
+                                <div className="mb-3">
+                                    <Select
+                                        placeholder="Rechercher un fournisseur ..."
+                                        name="fournisseur_id"
+                                        id="fournisseur_id"
+                                        required
+                                        className="form-control mt-1 block w-full"
+                                        options={fournisseurs.map((fournisseur) => ({
+                                            value: fournisseur.id,
+                                            label: `${fournisseur.raison_sociale}`,
+                                        }))}
+                                        value={fournisseurs
+                                            .map((fournisseur) => ({
+                                                value: fournisseur.id,
+                                                label: `${fournisseur.raison_sociale}`,
+                                            }))
+                                            .find((option) => option.value === data.fournisseur_id)} // set selected option
+                                        onChange={(option) => setData('fournisseur_id', option.value)} // update state with id
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="col-md-6">
+                                <div className='mb-3'>
+                                    <InputLabel htmlFor="reste" value="Montant à transferer" > <span className="text-danger">*</span> </InputLabel>
+                                    <TextInput
+                                        id="reste"
+                                        name="reste"
+                                        type="number"
+                                        className="mt-1 block w-full"
+                                        // value={currentFinancement?._back_amount}
+                                        // autoComplete="reste"
+                                        max={currentFinancement?._back_amount}
+                                        onChange={(e) => setData('reste', e.target.value)}
+                                        min={0}
+                                        required
+                                    />
+                                    <InputError className="mt-2" message={errors.reste} />
+                                    <div className="mt-2">
+                                        <span className="text-muted">Le montant à transferer ne peut excéder <strong>{currentFinancement?.back_amount} FCFA</strong> (le montant retourné du financement).</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                            <PrimaryButton disabled={processing}> <CIcon icon={cilSend} /> {processing ? 'Enregistrement ...' : 'Enregistrer'} </PrimaryButton>
+                        </div>
+                    </form>
+
+                    <div className="mt-6 flex justify-end">
+                        <SecondaryButton className='text-success' onClick={closeTransfertModal}>
+                            Fermer
+                        </SecondaryButton>
+                    </div>
+                </div>
+            </Modal>
         </AuthenticatedLayout>
     );
 }

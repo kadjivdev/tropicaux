@@ -23,7 +23,9 @@ class Financement extends Model
         'user_id',
         'validated_by',
         'validated_at',
-        "campagne_id"
+        "campagne_id",
+        "reste_transfere",
+        "financement_id"
     ];
 
     /**Cast */
@@ -52,10 +54,37 @@ class Financement extends Model
         return $this->belongsTo(PreFinancement::class, 'prefinancement_id');
     }
 
+    /**Financement generé par transfert  d'un autre prefinancement*/
+    function financements(): HasMany
+    {
+        return $this->hasMany(Financement::class, 'financement_id');
+    }
+
+    /**Financement generé par transfert  d'un autre prefinancement*/
+    function financement(): BelongsTo
+    {
+        return $this->belongsTo(Financement::class, 'financement_id');
+    }
+
     /**Retours de financements */
     function backFinancements(): HasMany
     {
         return $this->hasMany(FinancementBack::class, 'financement_id');
+    }
+
+    /** Back amout */
+    function backAmount()
+    {
+        return
+            // retours
+            $this->backFinancements
+            ->whereNotNull("validated_by")
+            ->sum("montant")
+            -
+            // transfères
+            $this->financements
+            ->whereNotNull("validated_by")
+            ->sum("montant");
     }
 
     /**Handle document */

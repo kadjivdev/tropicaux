@@ -25,10 +25,12 @@ class FinancementController extends Controller
 
         $prefinancements = PreFinancement::all();
         $financements = Financement::where("campagne_id", $sessionId)->get();
-        
+        $fournisseurs = Fournisseur::get(["id", "raison_sociale"]);
+
         return inertia("Financements/List", [
             "financements" => FinancementResource::collection($financements),
             "prefinancements" => PreFinancementResource::collection($prefinancements),
+            "fournisseurs" => $fournisseurs,
         ]);
     }
 
@@ -173,6 +175,7 @@ class FinancementController extends Controller
     function validatedFinancement(Financement $financement)
     {
         try {
+            Log::debug("Validation du financement", ["financement" => $financement]);
             DB::beginTransaction();
 
             if (!$financement) {
@@ -193,6 +196,59 @@ class FinancementController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::debug("Erreure lors de la suppression du financement", ["error" => $e->getMessage()]);
+            return back()->withErrors(["exception" => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Transfert du reste d'un financement
+     */
+    function transfertReste(Request $request, Financement $financement)
+    {
+        try {
+            DB::beginTransaction();
+
+            Log::info("Financement :", ["data" => $financement]);
+
+            if (!$financement) {
+                throw new \Exception("Ce financement n'existe pas");
+            }
+
+            $validated = $request->validate([
+                "reste" => "required|numeric",
+                "fournisseur_id" => ["required", "integer"],
+            ]);
+
+            if ($financement->fournisseur_id == $validated["fournisseur_id"]) {
+                throw new \Exception("Le transfert ne peut plus se faire sur le compte de " . Fournisseur::firstWhere("id", $validated["fournisseur_id"])?->raison_sociale);
+            }
+
+            $validated["montant"] = $validated["reste"];
+            $validated["date_financement"] = now();
+            $validated["validated_at"] = now();
+            $validated["validated_by"] = Auth::id();
+            $validated["prefinancement_id"] = $financement->prefinancement_id;
+
+            //Generation d'un financement au nouveau gestionnaire
+            $financement->financements()->create($validated);
+           
+            //Mise à jour du financement initial pour indiquer le montant transféré et le pré-financement lié
+            $financement->update([
+                "reste_transfere" => $financement->reste_transfere + $validated["reste"],
+            ]);
+
+            Log::info("Donnée validées", ["data" => $validated]);
+
+            Log::debug("Transfert du reste effecté pour le financement", ["financement" => $financement]);
+            DB::commit();
+            return redirect()->route("financement.index");
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            Log::debug("Erreure lors du transfert du financement", ["error" => $e->errors()]);
+            return back()->withErrors($e->errors());
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::debug("Erreure lors du transfert du financement", ["error" => $e->getMessage()]);
             return back()->withErrors(["exception" => $e->getMessage()]);
         }
     }

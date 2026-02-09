@@ -30,9 +30,7 @@ class PreFinancementController extends Controller
         //     $role->where("name", "Gestionnaire de fonds");
         // })->get();
 
-        $gestionnaires = GestionnaireFond::all(["id","raison_sociale"]);
-
-        // dd($gestionnaires);
+        $gestionnaires = GestionnaireFond::all(["id", "raison_sociale"]);
 
         return inertia("PreFinancements/List", [
             "financements" => PreFinancementResource::collection($preFinancements),
@@ -50,7 +48,7 @@ class PreFinancementController extends Controller
         //     $role->where("name", "Gestionnaire de fonds");
         // })->get();
 
-        $gestionnaires = GestionnaireFond::all(["id","raison_sociale"]);
+        $gestionnaires = GestionnaireFond::all(["id", "raison_sociale"]);
 
         return inertia("PreFinancements/Create", [
             "gestionnaires" => $gestionnaires
@@ -103,11 +101,8 @@ class PreFinancementController extends Controller
      */
     function edit(PreFinancement $prefinancement)
     {
-        // $gestionnaires = User::whereHas("roles", function ($role) {
-        //     $role->where("name", "Gestionnaire de fonds");
-        // })->get();
 
-        $gestionnaires = GestionnaireFond::all(["id","raison_sociale"]);
+        $gestionnaires = GestionnaireFond::all(["id", "raison_sociale"]);
 
         return inertia("PreFinancements/Update", [
             "financement" => $prefinancement,
@@ -209,7 +204,7 @@ class PreFinancementController extends Controller
             ]);
 
             if ($prefinancement->gestionnaire_id == $validated["gestionnaire_id"]) {
-                throw new \Exception("Le transfert ne peut plus se faire sur le compte de " . User::firstWhere("id", $validated["gestionnaire_id"])?->firstname);
+                throw new \Exception("Le transfert ne peut plus se faire sur le compte de " . GestionnaireFond::firstWhere("id", $validated["gestionnaire_id"])?->raison_sociale);
             }
 
             $validated["montant"] = $validated["reste"];
@@ -218,11 +213,10 @@ class PreFinancementController extends Controller
             $validated["validated_by"] = Auth::id();
 
             //Generation d'un pré-financement au nouveau gestionnaire
-            $newPrefinancement = PreFinancement::create($validated);
+            $prefinancement->prefinancements()->create($validated);
 
             $prefinancement->update([
-                "reste_transfere" => $validated["reste"],
-                "prefinancement_id" => $newPrefinancement->id
+                "reste_transfere" => $prefinancement->reste_transfere + $validated["reste"],
             ]);
 
             Log::info("Donnée validées", ["data" => $validated]);

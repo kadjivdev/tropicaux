@@ -63,6 +63,7 @@ Route::middleware('auth')->group(function () {
         // Financements
         Route::resource("financement", FinancementController::class);
         Route::patch("/financement/{financement}/validate", [FinancementController::class, "validatedFinancement"])->name("financement.validate");
+        Route::post("/financement/{financement}/transfert-reste", [FinancementController::class, "transfertReste"])->name("financement.transfert-reste");
 
         // Retour des Financements
         Route::resource("backfinancement", FinancementBackController::class);

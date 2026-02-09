@@ -28,18 +28,6 @@ class PreFinancement extends Model
         "campagne_id"
     ];
 
-    //Montant retournés
-    function backAmount()
-    {
-        return $this->financements->flatMap(function ($financement) {
-            return $financement->backFinancements->whereNotNull('validated_by');
-        })
-            ->sum('montant');
-    }
-
-    function reste() {
-        return ($this->montant-($this->financements->whereNotNull("validated_by")->sum("montant") + $this->reste_transfere)) + $this->backAmount();
-    }
 
     /**Cast */
     protected $casts = [
@@ -50,16 +38,43 @@ class PreFinancement extends Model
         'validated_at' => 'date'
     ];
 
+    //Montant retournés
+    function backAmount()
+    {
+        return
+            // les retours de financements
+            $this->financements
+            ->whereNotNull("validated_by")
+            ->sum(function ($financement) {
+                return $financement->backAmount();
+            })
+            -
+            // - les transferts effectués vers d'autres prefinancements
+            $this->prefinancements
+            ->whereNotNull("validated_by")
+            ->sum("montant");
+    }
+
+    function reste()
+    {
+        return $this->montant - $this->backAmount();
+    }
+
     /**Gestionnaire */
     function gestionnaire(): BelongsTo
     {
         return $this->belongsTo(GestionnaireFond::class, 'gestionnaire_id');
     }
 
-    /**Prefinancement generé par transfert  d'un autre prefinancement*/
-    function prefinancement(): HasOne
+    /**Prefinancements generé par transfert  d'un autre prefinancement*/
+    function prefinancements(): HasMany
     {
-        return $this->hasOne(PreFinancement::class, 'prefinancement_id');
+        return $this->hasMany(PreFinancement::class, 'prefinancement_id');
+    }
+
+    function prefinancement(): BelongsTo
+    {
+        return $this->belongsTo(PreFinancement::class, 'prefinancement_id');
     }
 
     /**Financements */

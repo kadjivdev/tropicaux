@@ -55,7 +55,7 @@ export default function List({ financements, gestionnaires }) {
 
         const reste = _financements.reduce((acc, financement) => {
             console.log("Le financement en cours :", financement);
-            return acc + financement.reste; // On ajoute 0 si "reste" est undefined ou null
+            return acc + financement._reste; // On ajoute 0 si "reste" est undefined ou null
         }, 0);
 
         setTotalMontant(montant.toLocaleString('fr-FR', { minimumFractionDigits: 2 }));
@@ -350,14 +350,14 @@ export default function List({ financements, gestionnaires }) {
                                                     </small>
                                                 }
                                             </td>
-                                            <td>{financement?.gestionnaire?.raison_sociale}`</td>
+                                            <td>{financement?.gestionnaire?.raison_sociale}</td>
                                             <td><span className="badge bg-light rounded text-dark rounded shadow-sm">{financement.montant}</span></td>
                                             <td><strong className="badge bg-light rounded text-dark rounded shadow-sm">{financement.montant_dispatche}</strong></td>
                                             <td><strong className="badge bg-light rounded text-danger rounded shadow-sm">{financement.back_amount}</strong></td>
                                             <td className='text-center'>
                                                 <span className="badge bg-light rounded text-success rounded shadow-sm">{financement.reste}</span>
                                                 {
-                                                    checkPermission("prefinancement.transfert") && financement.reste > 0 && <button className="btn btn-sm btn-light border rounded w-100 shadow text-center"
+                                                    checkPermission("prefinancement.transfert") && financement._reste > 0 && <button className="btn btn-sm btn-light border rounded w-100 shadow text-center"
                                                         onClick={(e) => transfertReste(e, financement)}> <CIcon icon={cilSend} className='text-success' /> Transferer </button>
                                                 }
                                             </td>
@@ -427,12 +427,19 @@ export default function List({ financements, gestionnaires }) {
                                         id="reste"
                                         type="number"
                                         className="mt-1 block w-full"
-                                        value={currentFinancement?.reste}
+                                        // value={currentFinancement?.reste}
+                                        onChange={(e) => setData('reste', e.target.value)}
+                                        max={currentFinancement?._reste}
+                                        min={0}
                                         autoComplete="reste"
-                                        readOnly={true}
+                                        // readOnly={true}
                                         required
                                     />
                                     <InputError className="mt-2" message={errors.reste} />
+
+                                    <div className="mt-2">
+                                        <span className="text-muted">Le montant à transferer ne peut excéder <strong>{currentFinancement?._reste} FCFA</strong> (le montant retourné du financement).</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

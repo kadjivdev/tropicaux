@@ -16,7 +16,9 @@ class PreFinancementResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        
+        $financementAmount = $this->financements
+            ->whereNotNull("validated_by")
+            ->sum("montant");
 
         return [
             "id" => $this->id,
@@ -24,9 +26,11 @@ class PreFinancementResource extends JsonResource
             "gestionnaire" => $this->gestionnaire,
             "prefinancement" => $this->prefinancement,
             "montant" => number_format($this->montant, 2, ",", " "),
-            "montant_dispatche" => number_format($this->financements->whereNotNull("validated_by")->sum("montant"), 2, ",", " "),
-            "back_amount" => number_format($this->backAmount(),2,","," ",),
-            "reste" => $this->reste(),
+            "montant_dispatche" => number_format($financementAmount, 2, ",", " "),
+            "_back_amount" => $this->backAmount(),
+            "back_amount" => number_format($this->backAmount(), 2, ",", " ",),
+            "_reste" => $this->reste(),
+            "reste" => number_format($this->reste(), 2, ",", " "),
             "date_financement" => Carbon::parse($this->date_financement)->locale('fr')->isoFormat("D MMMM YYYY"),
             "document" => $this->document,
             "validatedBy" => $this->validatedBy,
