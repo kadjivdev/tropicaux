@@ -43,21 +43,45 @@ class PreFinancement extends Model
     {
         return
             // les retours de financements
+            // $this->financements
+            // ->whereNotNull("validated_by")
+            // ->sum(function ($financement) {
+            //     return $financement->backAmount();
+            // });
             $this->financements
-            ->whereNotNull("validated_by")
-            ->sum(function ($financement) {
-                return $financement->backAmount();
+            ->flatMap(function ($financement) {
+                return $financement->backFinancements
+                    ->whereNotNull("validated_by");
             })
-            -
-            // - les transferts effectués vers d'autres prefinancements
-            $this->prefinancements
+            // ->whereNotNull("validated_by")
+            ->sum("montant");
+    }
+
+    /** Montant transféré */
+    function transferedAmount()
+    {
+        return $this->prefinancements
+            ->whereNotNull("validated_by")
+            ->sum("montant");
+    }
+
+    /** Montant dispatché */
+    function dispatchedAmount()
+    {
+        return $this->financements
             ->whereNotNull("validated_by")
             ->sum("montant");
     }
 
     function reste()
     {
-        return $this->montant - $this->backAmount();
+        return
+            // le reste (montant - financements)
+            ($this->montant - $this->dispatchedAmount())
+            // les retours
+            // + $this->backAmount()
+            // les montants déjà transférés vers les financements
+            + $this->transferedAmount();
     }
 
     /**Gestionnaire */

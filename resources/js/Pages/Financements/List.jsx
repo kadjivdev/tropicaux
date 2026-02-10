@@ -158,7 +158,7 @@ export default function List({ financements, prefinancements, fournisseurs }) {
         e.preventDefault();
 
         setCurrentFinancement(financement);
-        setData("reste", financement.reste)
+        setData("reste", financement.reste_back)
         setTransfert(true);
     }
 
@@ -188,7 +188,7 @@ export default function List({ financements, prefinancements, fournisseurs }) {
                         Swal.close();
                         Swal.fire({
                             title: '<span style="color: #2a7348;">Transfert réussi </span>',
-                            text: `Le reste (${currentFinancement?.back_amount} FCFA) du financement (${currentFinancement?.reference}) a été transferé avec succès.`,
+                            text: `Le reste (${currentFinancement?.reste_back} FCFA) du retour sur le financement (${currentFinancement?.reference}) a été transferé avec succès.`,
                             confirmButtonText: '😇 Fermer'
                         });
 
@@ -276,6 +276,7 @@ export default function List({ financements, prefinancements, fournisseurs }) {
                                     <th scope="col">Fournisseur</th>
                                     <th scope="col">Montant</th>
                                     <th scope="col">Montant retourné</th>
+                                    <th scope="col">Transféré</th>
                                     <th scope="col">Reste</th>
                                     <th scope="col">Date de financement</th>
                                     <th scope="col">Preuve</th>
@@ -339,6 +340,7 @@ export default function List({ financements, prefinancements, fournisseurs }) {
                                             <td>
                                                 <span className="badge bg-light rounded text-dark rounded shadow-sm"> {financement?.reference ?? '---'}</span>  <br />
                                                 {financement.financement && <span className="badge bg-light rounded text-info rounded shadow-sm"> (Transfert de : {financement.financement.reference})</span>}
+
                                             </td>
                                             <td><span className="badge bg-light rounded text-success rounded shadow-sm">{`${financement?.prefinancement?.reference}`} </span> </td>
                                             <td>{financement?.fournisseur?.raison_sociale ?? '---'}</td>
@@ -346,10 +348,11 @@ export default function List({ financements, prefinancements, fournisseurs }) {
                                             <td>
                                                 <span className="badge bg-light border rounded text-danger">{financement.back_amount} FCFA</span>
                                                 {
-                                                    checkPermission("prefinancement.transfert") && financement._back_amount > 0 && <button className="btn btn-sm btn-light border rounded w-100 shadow text-center"
-                                                        onClick={(e) => transfertReste(e, financement)}> <CIcon icon={cilSend} className='text-success' /> Transferer </button>
+                                                    checkPermission("prefinancement.transfert") && financement._reste_back > 0 && <button className="btn btn-sm btn-light border rounded w-100 shadow text-center"
+                                                        onClick={(e) => transfertReste(e, financement)}> <CIcon icon={cilSend} className='text-success' /> Transferer {financement._reste_back} FCFA </button>
                                                 }
                                             </td>
+                                            <td><strong className="badge bg-light rounded text-success rounded shadow-sm">{financement.transfered_amount}</strong></td>
                                             <td><span className="badge bg-light border rounded text-dark">{financement.reste} FCFA</span></td>
                                             <td>{financement.date_financement}</td>
                                             <td>
@@ -420,14 +423,14 @@ export default function List({ financements, prefinancements, fournisseurs }) {
                                         className="mt-1 block w-full"
                                         // value={currentFinancement?._back_amount}
                                         // autoComplete="reste"
-                                        max={currentFinancement?._back_amount}
+                                        max={currentFinancement?._reste_back}
                                         onChange={(e) => setData('reste', e.target.value)}
                                         min={0}
                                         required
                                     />
                                     <InputError className="mt-2" message={errors.reste} />
                                     <div className="mt-2">
-                                        <span className="text-muted">Le montant à transferer ne peut excéder <strong>{currentFinancement?.back_amount} FCFA</strong> (le montant retourné du financement).</span>
+                                        <span className="text-muted">Le montant à transferer ne peut excéder <strong>{currentFinancement?.reste_back} FCFA</strong> (le montant retourné du financement).</span>
                                     </div>
                                 </div>
                             </div>

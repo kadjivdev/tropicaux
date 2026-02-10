@@ -43,8 +43,8 @@ export default function Create({ fournisseurs, prefinancements }) {
         const selectedPreFinancement = prefinancements.data.find((s) => s.id === option.value);
         console.log("Prefinancement sélectionnée :", selectedPreFinancement);
 
-        setMaxAmount(selectedPreFinancement.reste)
-        setData("montant",selectedPreFinancement.reste)
+        setMaxAmount(selectedPreFinancement._reste)
+        setData("montant",selectedPreFinancement._reste)
     }
 
     // Change Amount

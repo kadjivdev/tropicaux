@@ -238,7 +238,6 @@ class FinancementController extends Controller
             ]);
 
             Log::info("Donnée validées", ["data" => $validated]);
-
             Log::debug("Transfert du reste effecté pour le financement", ["financement" => $financement]);
             DB::commit();
             return redirect()->route("financement.index");

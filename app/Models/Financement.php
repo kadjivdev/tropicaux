@@ -42,6 +42,14 @@ class Financement extends Model
             ->sum("montant");
     }
 
+    function reste()
+    {
+        return
+            // le montant du financement
+            ($this->montant + $this->backAmount())
+            - $this->transferedAmount();
+    }
+
     /**Fournisseur */
     function fournisseur(): BelongsTo
     {
@@ -72,6 +80,14 @@ class Financement extends Model
         return $this->hasMany(FinancementBack::class, 'financement_id');
     }
 
+    /** Montant transféré */
+    function transferedAmount()
+    {
+        return $this->financements
+            ->whereNotNull("validated_by")
+            ->sum("montant");
+    }
+
     /** Back amout */
     function backAmount()
     {
@@ -79,12 +95,21 @@ class Financement extends Model
             // retours
             $this->backFinancements
             ->whereNotNull("validated_by")
-            ->sum("montant")
-            -
-            // transfères
-            $this->financements
-            ->whereNotNull("validated_by")
             ->sum("montant");
+        // -
+        // retours transférés vers le prefinancement de ce financement
+        // $this->transferedAmount();
+        // -
+        // // transfères
+        // $this->financements
+        // ->whereNotNull("validated_by")
+        // ->sum("montant")
+        // -
+        // // les transfères éffectués sur le prefinancement de ce financement
+        // $this->prefinancement
+        // ->prefinancements
+        // ->whereNotNull("validated_by")
+        // ->sum("montant");
     }
 
     /**Handle document */

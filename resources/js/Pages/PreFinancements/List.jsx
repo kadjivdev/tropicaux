@@ -177,7 +177,7 @@ export default function List({ financements, gestionnaires }) {
 
         Swal.fire({
             title: '<span style="color: #facc15;">⚠️ Êtes-vous sûr ?</span>', // yellow text
-            text: `Le reste (${currentFinancement?.reste} FCFA) du pré-financement (${currentFinancement?.reference}) sera transféré de façon permanente !`,
+            text: ` (${data?.reste} FCFA) du pré-financement (${currentFinancement?.reference}) sera transféré de façon permanente !`,
             showCancelButton: true,
             confirmButtonColor: '#2a7348',
             cancelButtonColor: '#3085d6',
@@ -280,7 +280,7 @@ export default function List({ financements, gestionnaires }) {
                                     <th scope="col">Gestionnaire</th>
                                     <th scope="col">Montant</th>
                                     <th scope="col">Montant Dispatché</th>
-                                    <th scope="col">Retours</th>
+                                    <th scope="col">Transféré</th>
                                     <th scope="col">Reste</th>
                                     <th scope="col">Date de pré-financement</th>
                                     <th scope="col">Preuve</th>
@@ -353,7 +353,7 @@ export default function List({ financements, gestionnaires }) {
                                             <td>{financement?.gestionnaire?.raison_sociale}</td>
                                             <td><span className="badge bg-light rounded text-dark rounded shadow-sm">{financement.montant}</span></td>
                                             <td><strong className="badge bg-light rounded text-dark rounded shadow-sm">{financement.montant_dispatche}</strong></td>
-                                            <td><strong className="badge bg-light rounded text-danger rounded shadow-sm">{financement.back_amount}</strong></td>
+                                            <td><strong className="badge bg-light rounded text-danger rounded shadow-sm">{financement.transfered_amount}</strong></td>
                                             <td className='text-center'>
                                                 <span className="badge bg-light rounded text-success rounded shadow-sm">{financement.reste}</span>
                                                 {
@@ -438,7 +438,7 @@ export default function List({ financements, gestionnaires }) {
                                     <InputError className="mt-2" message={errors.reste} />
 
                                     <div className="mt-2">
-                                        <span className="text-muted">Le montant à transferer ne peut excéder <strong>{currentFinancement?._reste} FCFA</strong> (le montant retourné du financement).</span>
+                                        <span className="text-muted">Le montant à transferer ne peut excéder <strong>{currentFinancement?.reste} FCFA</strong> (le montant retourné du financement).</span>
                                     </div>
                                 </div>
                             </div>
