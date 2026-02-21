@@ -40,7 +40,8 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             RoleSeeder::class,
             ModePaiementSeeder::class,
-            AllPermissionToSuperAdminSeeder::class
+            AllPermissionToSuperAdminSeeder::class,
+            TypeDepenseGenenraleSeeder::class
         ]);
     }
 }

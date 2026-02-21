@@ -1,13 +1,12 @@
 import "./../../../public/fichiers/base.css";
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import CIcon from '@coreui/icons-react';
-import { cibAlipay, cibAsana, cibCashapp, cibCcAmazonPay, cilBlur, cilDollar, cilEuro, cilMoney, cibTrainerroad } from "@coreui/icons";
+import { cibAlipay, cibAsana, cibCashapp, cibCcAmazonPay, cilBlur, cibTrainerroad } from "@coreui/icons";
 import { Head } from '@inertiajs/react';
-import { cilWallet, cilSmilePlus, cilPeople } from "@coreui/icons";
 import { useEffect, useRef } from 'react';
 import Chart from "chart.js/auto";
 
-export default function Dashboard({ financementsAmount, fondSuperviseursAmount, depensesSuperviseursAmount, ventesAmount, ventes, chargements }) {
+export default function Dashboard({ financementsAmount, fondSuperviseursAmount, depensesSuperviseursAmount, ventesAmount, ventes, chargements,depensesGeneralesAmount }) {
     const chargementChartRef = useRef(null);
     const venteChartRef = useRef(null);
 
@@ -102,7 +101,13 @@ export default function Dashboard({ financementsAmount, fondSuperviseursAmount, 
                                     uk-scrollspy="cls: uk-animation-slide-top"
                                     className="shadow bg-dark border p-4 rounded-md border-sky-500 flex flex-col items-center justify-center">
                                     <p className="text-2xl mt-2 text-cursive font-bold"><strong className="text-danger"> {depensesSuperviseursAmount < 10 ? '0' + depensesSuperviseursAmount : depensesSuperviseursAmount} </strong></p>
-                                    <h2 className="text-xl text-gray-500"> <CIcon className="nav-icon text-success" icon={cibCashapp} /> Les Dépenses </h2>
+                                    <h2 className="text-xl text-gray-500"> <CIcon className="nav-icon text-success" icon={cibCashapp} /> Les Dépenses superviseurs</h2>
+                                </div>
+                                <div
+                                    uk-scrollspy="cls: uk-animation-slide-top"
+                                    className="shadow bg-dark border p-4 rounded-md border-sky-500 flex flex-col items-center justify-center">
+                                    <p className="text-2xl mt-2 text-cursive font-bold"><strong className="text-danger"> {depensesGeneralesAmount < 10 ? '0' + depensesGeneralesAmount : depensesGeneralesAmount} </strong></p>
+                                    <h2 className="text-xl text-gray-500"> <CIcon className="nav-icon text-success" icon={cibCashapp} /> Les Dépenses generales </h2>
                                 </div>
                                 <div
                                     uk-scrollspy="cls: uk-animation-slide-top"

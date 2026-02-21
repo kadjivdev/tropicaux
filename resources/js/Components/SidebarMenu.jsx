@@ -347,7 +347,34 @@ export default function SidebarMenu(props) {
                                         <span className="nav-icon">
                                             <span className="nav-icon-bullet"></span>
                                         </span>
-                                        Ajouter une dépense 
+                                        Ajouter une dépense
+                                    </Link>) : null}
+                                </CNavGroup> : null
+                            }
+
+                            <CNavTitle>GENERALITES</CNavTitle>
+                            {/* Dépenses ventes */}
+                            {checkPermission('depense.superviseur.view') || checkPermission('depense.superviseur.create') ?
+                                <CNavGroup
+                                    toggler={
+                                        <>
+                                            <CIcon customClassName="nav-icon text-success text-bold" icon={cibCashapp} /> Dépense generales
+                                        </>
+                                    }
+                                >
+                                    {checkPermission('depense.superviseur.view') ?
+                                        (<Link href={route('depense-generale.index')} className="nav-link">
+                                            <span className="nav-icon">
+                                                <span className="nav-icon-bullet text-danger"></span>
+                                            </span>
+                                            Liste des dépenses
+                                        </Link>) : null}
+
+                                    {checkPermission('depense.superviseur.create') ? (<Link href={route('depense-generale.create')} className="nav-link">
+                                        <span className="nav-icon">
+                                            <span className="nav-icon-bullet"></span>
+                                        </span>
+                                        Ajouter une dépense
                                     </Link>) : null}
                                 </CNavGroup> : null
                             }

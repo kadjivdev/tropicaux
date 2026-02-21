@@ -220,8 +220,8 @@ class PreFinancementController extends Controller
             ]);
 
             Log::info("Donnée validées", ["data" => $validated]);
-
             Log::debug("Transfert du reste effecté pour le pré-financement", ["prefinancement" => $prefinancement]);
+            
             DB::commit();
             return redirect()->route("prefinancement.index");
         } catch (\Illuminate\Validation\ValidationException $e) {

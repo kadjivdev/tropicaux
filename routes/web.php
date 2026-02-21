@@ -13,6 +13,7 @@ use App\Http\Controllers\FinancementBackController;
 use App\Http\Controllers\FinancementController;
 use App\Http\Controllers\FondSuperviseurController;
 use App\Http\Controllers\FournisseurController;
+use App\Http\Controllers\GeneralDepenseController;
 use App\Http\Controllers\GestionnaireFondController;
 use App\Http\Controllers\MagasinController;
 use App\Http\Controllers\PaiementModeController;
@@ -99,6 +100,9 @@ Route::middleware('auth')->group(function () {
         Route::resource("depense-vente", DepenseVenteController::class);
         Route::patch("/depense-vente/{depense}/validate", [DepenseVenteController::class, "validatedDepense"])->name("depense-vente.validate");
 
+        // Dépenses generales
+        Route::resource("depense-generale", GeneralDepenseController::class);
+        Route::patch("/depense-generale/{depense}/validate", [GeneralDepenseController::class, "validatedDepense"])->name("depense-generale.validate");
 
         // Profils utilisateurs
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
