@@ -32,11 +32,11 @@ class DashboardController extends Controller
         $chargements = Chargement::where("campagne_id", $sessionId)
             ->whereBetween("created_at", [now()->startOfWeek(), now()->startOfWeek()])
             ->get();
+            
         $ventes = Vente::where("campagne_id", $sessionId)
             ->whereBetween("created_at", [now()->startOfWeek(), now()->startOfWeek()])
             ->get();
 
-        // dd($depensesGeneralesAmount);
         return Inertia::render('Dashboard', [
             "financementsAmount" => number_format($financementsAmount, 2, ",", " "),
             "fondSuperviseursAmount" => number_format($fondSuperviseursAmount, 2, ",", " "),

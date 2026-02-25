@@ -30,14 +30,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::get("/debug", function () {
 
-    $preFinancement = PreFinancement::firstWhere("reference", "PREFINAN-1766738520-CE");
+    $preFinancement = PreFinancement::firstWhere("reference", "PREFINAN-1771843337-CE");
 
     if ($preFinancement) {
-        $preFinancement->update([
-            "montant" => 6258000,
-        ]);
+        $preFinancement->delete();
     }
-    return "regulation éffectuée avec succès";
+    return "PREFINAN-1771843337-CE supprimée avec succès";
 });
 
 Route::redirect('/', '/login');
