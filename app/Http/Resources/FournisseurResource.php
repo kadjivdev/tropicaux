@@ -15,13 +15,21 @@ class FournisseurResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $financementAmount = $this->financements()
+            ->whereNotNull("validated_at")
+            ->sum("montant");
+
         return [
             "id" => $this->id,
             "raison_sociale" => $this->raison_sociale,
             "phone" => $this->phone,
             "email" => $this->email,
             "adresse" => $this->adresse,
-            "createdBy" => $this->createdBy,//UserResource::collection(),
+            "financements_amount" => number_format($financementAmount, 2, ",", " "),
+            "_financements_amount" => $financementAmount,
+            "total_chargement_amount" => number_format($this->total_chargement_amount, 2, ",", " "),
+            "solde" => number_format($this->solde, 2, ",", " "),
+            "createdBy" => $this->createdBy,
             "created_at" => Carbon::parse($this->created_at)->locale("fr")->isoFormat("D MMMM YYYY"),
             "updated_at" => Carbon::parse($this->updated_at)->locale("fr")->isoFormat("D MMMM YYYY"),
         ];

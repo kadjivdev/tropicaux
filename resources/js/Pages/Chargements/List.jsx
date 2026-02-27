@@ -155,6 +155,7 @@ export default function List({ chargements }) {
                                     <th scope="col">Détails</th>
                                     <th scope="col">Fonds Superviseurs</th>
                                     <th scope="col">Dépenses Superviseurs</th>
+                                    <th scope="col">Montant</th>
                                     <th scope="col">Produit</th>
                                     <th scope="col">Chauffeur</th>
                                     <th scope="col">Superviseur</th>
@@ -257,6 +258,7 @@ export default function List({ chargements }) {
                                                     <CIcon icon={cilList} /> <strong> {chargement.total_depenses} FCFA</strong>
                                                 </Link>
                                             </td>
+                                            <td>{chargement.totalAmount}</td>
                                             <td>{chargement?.produit?.libelle ?? '---'}</td>
                                             <td>{`${chargement?.chauffeur?.raison_sociale}`}</td>
                                             <td>{`${chargement?.superviseur?.raison_sociale}`}</td>

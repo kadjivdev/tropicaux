@@ -46,7 +46,7 @@ export default function List({ fournisseur,total_amount }) {
                                 <tr>
                                     <th scope="col">N°</th>
                                     <th scope="col">Reference</th>
-                                    <th scope="col">Gestionnaire</th>
+                                    {/* <th scope="col">Gestionnaire</th> */}
                                     <th scope="col">Montant</th>
                                     <th scope="col">Date de financement</th>
                                     <th scope="col">Preuve</th>
@@ -61,7 +61,7 @@ export default function List({ fournisseur,total_amount }) {
                                         <tr key={financement.id}>
                                             <th scope="row">{index + 1}</th>
                                             <td><span className="badge bg-light rounded text-dark rounded shadow-sm"> {financement?.reference ?? '---'}</span> </td>
-                                            <td>{`${financement?.gestionnaire?.lastname} - ${financement?.gestionnaire?.firstname}`}</td>
+                                            {/* <td>{`${financement?.gestionnaire?.lastname} - ${financement?.gestionnaire?.firstname}`}</td> */}
                                             <td>{financement.montant}</td>
                                             <td>{financement.date_financement}</td>
                                             <td>

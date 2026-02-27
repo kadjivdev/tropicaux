@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ChargementResource;
 use App\Http\Resources\FournisseurResource;
 use App\Models\Fournisseur;
 use Illuminate\Http\Request;
@@ -32,7 +33,6 @@ class FournisseurController extends Controller
 
         $fournisseur->load([
             "financements" => fn($query) => $query->where("campagne_id", $sessionId),
-            "financements.gestionnaire",
             "financements.createdBy",
             "financements.validatedBy"
         ]);
@@ -42,6 +42,49 @@ class FournisseurController extends Controller
         return inertia("Fournisseurs/Financements", [
             'total_amount' => number_format($total_amount, 2, ",", " "),
             'fournisseur' => $fournisseur,
+        ]);
+    }
+
+    /**
+     * liste les chargements
+     */
+    function chargements(Fournisseur $fournisseur)
+    {
+        $sessionId = Session::get("campagne")?->id;
+
+        $fournisseur->load([
+            "chargementDetails" => fn($query) => $query->where("campagne_id", $sessionId),
+            "chargementDetails.createdBy",
+            "chargementDetails.chargement",
+            "chargementDetails.chargement.produit",
+            "chargementDetails.chargement.chauffeur",
+            "chargementDetails.chargement.superviseur",
+            "chargementDetails.chargement.createdBy",
+            "chargementDetails.chargement.validatedBy",
+        ]);
+
+        // return $fournisseur;
+
+        $chargements = $fournisseur->chargementDetails
+            ->pluck('chargement')
+            ->filter() //eliminer les vides(null)
+            ->whereNotNull('validated_by')
+            ->unique("reference")
+            ->values()
+            ->transform(function ($chargement) use ($fournisseur) {
+                // le montant total des details de ce fournisseur
+                $chargement->montant_chargement = $chargement->details
+                    ->where("fournisseur_id", $fournisseur->id)
+                    ->sum(fn($detail) => $detail->amount);
+                return $chargement;
+            });
+
+        // return ChargementResource::collection($chargements);
+
+        return inertia("Fournisseurs/Chargements", [
+            'total_amount' => number_format($fournisseur->total_chargement_amount, 2, ",", " "),
+            'fournisseur' => $fournisseur,
+            'chargements' => ChargementResource::collection($chargements),
         ]);
     }
 
@@ -97,7 +140,6 @@ class FournisseurController extends Controller
             return back()->withErrors(["error" => "Une erreur est survenue lors de l'enregistrement du fournisseur"]);
         }
     }
-
 
     /**
      * Edit

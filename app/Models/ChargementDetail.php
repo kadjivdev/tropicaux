@@ -11,6 +11,8 @@ class ChargementDetail extends Model
 {
     use SoftDeletes;
 
+    protected $appends = ["amount"];
+
     protected $fillable = [
         'chargement_id',
         'fournisseur_id',
@@ -48,6 +50,12 @@ class ChargementDetail extends Model
     function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /** Montant du chargement */
+    function getAmountAttribute()
+    {
+        return $this->tonnage * $this->prix_achat;
     }
 
     /**Boot */

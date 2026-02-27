@@ -12,6 +12,8 @@ class Chargement extends Model
 {
     use SoftDeletes;
 
+    protected $appends = ["total_amount"];
+
     protected $fillable = [
         'reference',
         'produit_id',
@@ -84,6 +86,13 @@ class Chargement extends Model
     function details(): HasMany
     {
         return $this->hasMany(ChargementDetail::class, "chargement_id");
+    }
+
+    /** Montant du chargement */
+    function getTotalAmountAttribute()
+    {
+        return $this->details
+            ->sum(fn($detail) => $detail->amount);
     }
 
     /**Fonds superviseur */

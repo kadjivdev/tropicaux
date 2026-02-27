@@ -31,7 +31,7 @@ class FinancementResource extends JsonResource
             "back_amount" => number_format($backAmount, 2, ",", " "),
             "montant_r" => $this->montant_r(),
             "transfered_amount" => number_format($this->transferedAmount(), 2, ",", " "),
-            "reste" => number_format($this->reste(), 2, ",", " "),
+            "reste" => number_format($this->reste, 2, ",", " "),
             "montant" => number_format($this->montant, 2, ",", " "),
             "date_financement" => Carbon::parse($this->date_financement)->locale('fr')->isoFormat("D MMMM YYYY"),
             "document" => $this->document,

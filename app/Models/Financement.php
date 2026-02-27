@@ -13,6 +13,8 @@ class Financement extends Model
 {
     use SoftDeletes;
 
+    protected $appends = ["reste"];
+
     protected $fillable = [
         "reference",
         'fournisseur_id',
@@ -42,7 +44,7 @@ class Financement extends Model
             ->sum("montant");
     }
 
-    function reste()
+    function getResteAttribute()
     {
         return
             // le montant du financement
