@@ -191,6 +191,31 @@ export default function SidebarMenu(props) {
                                 </CNavGroup> : null
                             }
 
+                            {/* Dépenses fournisseurs */}
+                            {checkPermission('depense.superviseur.view') || checkPermission('depense.superviseur.create') ?
+                                <CNavGroup
+                                    toggler={
+                                        <>
+                                            <CIcon customClassName="nav-icon text-success text-bold" icon={cibCashapp} /> Dépenses fournisseur
+                                        </>
+                                    }
+                                >
+                                    {checkPermission('depense.superviseur.view') ?
+                                        (<Link href={route('depense-fournisseur.index')} className="nav-link">
+                                            <span className="nav-icon">
+                                                <span className="nav-icon-bullet text-danger"></span>
+                                            </span>
+                                            Liste des dépenses
+                                        </Link>) : null}
+
+                                    {checkPermission('depense.superviseur.create') ? (<Link href={route('depense-fournisseur.create')} className="nav-link">
+                                        <span className="nav-icon">
+                                            <span className="nav-icon-bullet"></span>
+                                        </span>
+                                        Ajouter une dépense
+                                    </Link>) : null}
+                                </CNavGroup> : null
+                            }
 
                             <CNavTitle>CAMPAGNE OFFICIELLE</CNavTitle>
                             {/* Chargements */}

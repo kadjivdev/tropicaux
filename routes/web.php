@@ -7,6 +7,7 @@ use App\Http\Controllers\ChargementController;
 use App\Http\Controllers\ChauffeurController;
 use App\Http\Controllers\ConvoyeurController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DepenseFournisseurController;
 use App\Http\Controllers\DepenseSuperviseurController;
 use App\Http\Controllers\DepenseVenteController;
 use App\Http\Controllers\FinancementBackController;
@@ -81,6 +82,10 @@ Route::middleware('auth')->group(function () {
         // Dépenses superviseur
         Route::resource("depense-superviseur", DepenseSuperviseurController::class);
         Route::patch("/depense-superviseur/{depense}/validate", [DepenseSuperviseurController::class, "validatedDepense"])->name("depense-superviseur.validate");
+
+        // Dépenses fournisseur
+        Route::resource("depense-fournisseur", DepenseFournisseurController::class);
+        Route::patch("/depense-fournisseur/{depense}/validate", [DepenseFournisseurController::class, "validatedDepense"])->name("depense-fournisseur.validate");
 
         // Partenanires
         Route::resource("partenaire", PartenaireController::class);

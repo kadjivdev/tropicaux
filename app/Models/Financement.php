@@ -47,7 +47,6 @@ class Financement extends Model
     function getResteAttribute()
     {
         return
-            // le montant du financement
             ($this->montant + $this->backAmount())
             - $this->transferedAmount();
     }

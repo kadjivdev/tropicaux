@@ -12,7 +12,7 @@ class Fournisseur extends Model
 {
     use SoftDeletes;
 
-    protected $appends = ["total_chargement_amount","solde"];
+    protected $appends = ["total_chargement_amount", "solde"];
 
     protected $fillable = [
         'raison_sociale',
@@ -47,13 +47,25 @@ class Fournisseur extends Model
         return $this->hasMany(Financement::class, 'fournisseur_id');
     }
 
+    /**Depenses */
+    function depenses(): HasMany
+    {
+        return $this->hasMany(DepenseFournisseur::class, 'fournisseur_id');
+    }
     /**Solde fournisseur */
     function getSoldeAttribute()
     {
-        return $this->financements()
+        return
+            // les financements validés
+            $this->financements
             ->whereNotNull("validated_at")
-            ->sum("montant") -
-            $this->total_chargement_amount;
+            ->sum(fn($financement) => $financement->reste)
+            // le toatl des chargmeents
+            - $this->total_chargement_amount
+            // les depenses validées
+            - $this->depenses()
+            ->whereNotNull("validated_at")
+            ->sum("montant");
     }
 
     /**Createur */

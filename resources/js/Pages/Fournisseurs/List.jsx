@@ -84,6 +84,7 @@ export default function List({ fournisseurs }) {
                                     <th scope="col">Raison sociale</th>
                                     <th scope='col'>Financements</th>
                                     <th scope='col'>Chargements</th>
+                                    <th scope='col'>Depenses</th>
                                     <th scope='col'>Solde</th>
                                     <th scope="col">Phone</th>
                                     <th scope="col">Email</th>
@@ -113,6 +114,9 @@ export default function List({ fournisseurs }) {
                                                 >
                                                     <CIcon icon={cilList} /> {fournisseur.total_chargement_amount}
                                                 </Link>
+                                            </td>
+                                            <td className='text-center'>
+                                               <span className="badge bg-light border rounded shadow text-danger"> {fournisseur.depensesAmount}</span>  
                                             </td>
                                             <td className='text-center'>
                                                <span className="badge bg-light border rounded shadow text-success"> {fournisseur.solde}</span>  

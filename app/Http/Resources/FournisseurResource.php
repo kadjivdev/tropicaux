@@ -19,6 +19,10 @@ class FournisseurResource extends JsonResource
             ->whereNotNull("validated_at")
             ->sum("montant");
 
+        $depenses = $this->depenses()
+            ->whereNotNull("validated_at")
+            ->sum("montant");
+
         return [
             "id" => $this->id,
             "raison_sociale" => $this->raison_sociale,
@@ -27,6 +31,7 @@ class FournisseurResource extends JsonResource
             "adresse" => $this->adresse,
             "financements_amount" => number_format($financementAmount, 2, ",", " "),
             "_financements_amount" => $financementAmount,
+            "depensesAmount" =>  number_format($depenses, 2, ",", " "),
             "total_chargement_amount" => number_format($this->total_chargement_amount, 2, ",", " "),
             "solde" => number_format($this->solde, 2, ",", " "),
             "createdBy" => $this->createdBy,

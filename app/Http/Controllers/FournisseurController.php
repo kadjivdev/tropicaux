@@ -37,7 +37,9 @@ class FournisseurController extends Controller
             "financements.validatedBy"
         ]);
 
-        $total_amount = $fournisseur->financements->whereNotNull("validated_by")->sum("montant");
+        $total_amount = $fournisseur->financements
+            ->whereNotNull("validated_by")
+            ->sum(fn($financement) => $financement->reste);
 
         return inertia("Fournisseurs/Financements", [
             'total_amount' => number_format($total_amount, 2, ",", " "),
