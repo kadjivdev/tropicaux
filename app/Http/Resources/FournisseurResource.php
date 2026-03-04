@@ -17,7 +17,8 @@ class FournisseurResource extends JsonResource
     {
         $financementAmount = $this->financements()
             ->whereNotNull("validated_at")
-            ->sum("montant");
+            ->get()
+            ->sum(fn($financement) => $financement->reste);
 
         $depenses = $this->depenses()
             ->whereNotNull("validated_at")

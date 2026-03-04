@@ -46,9 +46,9 @@ class Financement extends Model
 
     function getResteAttribute()
     {
-        return
-            ($this->montant + $this->backAmount())
-            - $this->transferedAmount();
+        return $this->montant - $this->backAmount();
+        // ($this->montant + $this->backAmount())
+        // - $this->transferedAmount();
     }
 
     /**Fournisseur */
