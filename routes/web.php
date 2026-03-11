@@ -26,18 +26,18 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SuperviseurController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VenteController;
-use App\Http\Resources\PreFinancementResource;
-use App\Models\Fournisseur;
 use App\Models\PreFinancement;
 use Illuminate\Support\Facades\Route;
 
 Route::get("/debug", function () {
 
-    $prefinancement = PreFinancement::where("reference", "PREFINAN-1770046864-CE")->get();
+    $prefinancement = PreFinancement::firstWhere("reference", "PREFINAN-1773133188-CE");
 
-    return PreFinancementResource::collection($prefinancement);
+    if ($prefinancement) {
+        $prefinancement->delete();
+    }
 
-    return "PREFINAN-1771843337-CE supprimée avec succès";
+    return "PREFINAN-1773133188-CE supprimée avec succès";
 });
 
 Route::redirect('/', '/login');
