@@ -24,7 +24,10 @@ class DashboardController extends Controller
         $sessionId = Session::get("campagne")?->id;
         Log::debug("La session concernée :", ["session" => Session::get("campagne")?->id]);
 
-        $financementsAmount = Financement::where("campagne_id", $sessionId)->whereNotNull("validated_at")->sum("montant");
+        $financementsAmount = Financement::where("campagne_id", $sessionId)
+            ->whereNull("financement_id") // on fait l'exception des financements issus des transferts
+            ->whereNotNull("validated_at")
+            ->sum("montant");
         $fondSuperviseursAmount = FondSuperviseur::where("campagne_id", $sessionId)->whereNotNull("validated_at")->sum("montant");
         $depensesSuperviseursAmount = DepenseSuperviseur::where("campagne_id", $sessionId)->whereNotNull("validated_at")->sum("montant");
         $depensesGeneralesAmount = GeneralDepense::where("campagne_id", $sessionId)->whereNotNull("validated_at")->sum("montant");
@@ -32,7 +35,7 @@ class DashboardController extends Controller
         $chargements = Chargement::where("campagne_id", $sessionId)
             ->whereBetween("created_at", [now()->startOfWeek(), now()->startOfWeek()])
             ->get();
-            
+
         $ventes = Vente::where("campagne_id", $sessionId)
             ->whereBetween("created_at", [now()->startOfWeek(), now()->startOfWeek()])
             ->get();

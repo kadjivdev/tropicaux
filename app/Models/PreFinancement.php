@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Session;
 
@@ -69,19 +68,21 @@ class PreFinancement extends Model
     function dispatchedAmount()
     {
         return $this->financements
+            ->whereNull("financement_id")
             ->whereNotNull("validated_by")
             ->sum("montant");
     }
 
     function reste()
     {
-        return
+        return 
             // le reste (montant - financements)
             ($this->montant - $this->dispatchedAmount())
             // les retours
             // + $this->backAmount()
             // les montants déjà transférés vers les financements
-            + $this->transferedAmount();
+            // + $this->transferedAmount()
+        ;
     }
 
     /**Gestionnaire */

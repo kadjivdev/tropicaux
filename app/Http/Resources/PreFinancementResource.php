@@ -28,7 +28,7 @@ class PreFinancementResource extends JsonResource
             "prefinancement" => $this->prefinancement,
             // "_montant" => $this->montant,
             "montant" => number_format($this->montant, 2, ",", " "),
-            "montant_dispatche" => number_format($financementAmount, 2, ",", " "),
+            "montant_dispatche" => number_format($this->dispatchedAmount(), 2, ",", " "),
             // "_back_amount" => $this->backAmount(),
             "transfered_amount" => number_format($this->transferedAmount(), 2, ",", " "),
             // "back_amount" => number_format($this->backAmount(), 2, ",", " ",),

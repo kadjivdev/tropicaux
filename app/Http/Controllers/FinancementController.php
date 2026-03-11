@@ -229,7 +229,7 @@ class FinancementController extends Controller
             $validated["validated_by"] = Auth::id();
             $validated["prefinancement_id"] = $financement->prefinancement_id;
 
-            //Generation d'un financement au nouveau gestionnaire
+            //Generation d'un financement au nouveau fournisseur
             $financement->financements()->create($validated);
            
             //Mise à jour du financement initial pour indiquer le montant transféré et le pré-financement lié
@@ -239,6 +239,7 @@ class FinancementController extends Controller
 
             Log::info("Donnée validées", ["data" => $validated]);
             Log::debug("Transfert du reste effecté pour le financement", ["financement" => $financement]);
+
             DB::commit();
             return redirect()->route("financement.index");
         } catch (\Illuminate\Validation\ValidationException $e) {
