@@ -15,17 +15,18 @@ class DepenseResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-       return [
+        return [
             "id" => $this->id,
             "reference" => $this->reference,
-            "chargement" => $this->chargement ,
-            "superviseur" => $this->superviseur ,
+            "date" => $this->date ? Carbon::parse($this->date)->locale('fr')->isoFormat("D MMMM YYYY") : '---',
+            "chargement" => $this->chargement,
+            "superviseur" => $this->superviseur,
             "montant" => $this->montant,
             "commentaire" => $this->commentaire,
             "document" => $this->document,
             "createdBy" => $this->createdBy,
             "validatedBy" => $this->validatedBy,
-            "validated_at" => $this->validated_at?Carbon::parse($this->validated_at)->locale('fr')->isoFormat("D MMMM YYYY"):null
+            "validated_at" => $this->validated_at ? Carbon::parse($this->validated_at)->locale('fr')->isoFormat("D MMMM YYYY") : null
         ];
     }
 }

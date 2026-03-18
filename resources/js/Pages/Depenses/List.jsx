@@ -7,6 +7,8 @@ import Swal from 'sweetalert2';
 export default function List({ depenses }) {
     const permissions = usePage().props.auth.permissions;
 
+    console.log("Les depenses :", depenses);
+
     const checkPermission = (name) => {
         return permissions.some(per => per.name == name);
     }
@@ -125,6 +127,7 @@ export default function List({ depenses }) {
                                     <th scope="col">Chargement</th>
                                     <th scope="col">Superviseur</th>
                                     <th scope="col">Montant</th>
+                                    <th scope="col">Date d'opération</th>
                                     <th scope="col">Preuve</th>
                                     <th scope="col">Observation</th>
                                     <th scope="col">Inséré par</th>
@@ -188,6 +191,7 @@ export default function List({ depenses }) {
                                             <td><span className="badge bg-light rounded text-dark rounded shadow-sm"> {depense.chargement?.reference ?? '---'}</span> </td>
                                             <td>{depense?.superviseur?.raison_sociale ?? '---'}</td>
                                             <td>{depense.montant}</td>
+                                            <td>{depense.date}</td>
                                             <td>
                                                 {depense.document ? (
                                                     <a

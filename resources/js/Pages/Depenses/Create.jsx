@@ -28,6 +28,7 @@ export default function Create({ chargements, superviseurs }) {
         superviseur_id: "",
         montant: "",
         commentaire: '',
+        date: "",
         document: "",
     });
 
@@ -173,12 +174,27 @@ export default function Create({ chargements, superviseurs }) {
                                             <InputError className="mt-2" message={errors.superviseur_id} />
                                         </div>
                                         <div className='mb-3'>
+                                            <InputLabel htmlFor="date" value="Date"></InputLabel>
+                                            <TextInput
+                                                id="date"
+                                                type="date"
+                                                className="mt-1 block w-full"
+                                                name="date"
+                                                value={data.date}
+                                                placeholder="Ex: Date d'opération"
+                                                onChange={(e) => setData('date', e.target.value)}
+                                                autoComplete="date"
+                                            />
+
+                                            <InputError className="mt-2" message={errors.date} />
+                                        </div>
+                                        <div className='mb-3'>
                                             <InputLabel htmlFor="commentaire" value="Commentaire" > </InputLabel>
                                             <TextInput
                                                 id="commentaire"
                                                 className="mt-1 block w-full"
                                                 value={data.commentaire}
-                                                placeholder="Ex: Dépense effrectué sur le chargement"
+                                                placeholder="Ex: Dépense effectuée sur le chargement"
                                                 onChange={(e) => setData('commentaire', e.target.value)}
                                                 autoComplete="commentaire"
                                             />

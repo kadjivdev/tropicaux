@@ -39,6 +39,7 @@ return new class extends Migration
                 ->constrained('users')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
+            $table->date("date")->nullable();
             $table->date("validated_at")->nullable();
             $table->decimal("montant", 20, 2)->nullable();
             $table->text("document")->nullable();

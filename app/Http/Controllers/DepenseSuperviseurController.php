@@ -23,6 +23,7 @@ class DepenseSuperviseurController extends Controller
         $sessionId = Session::get("campagne")?->id;
 
         $depenses = DepenseSuperviseur::where("campagne_id", $sessionId)->get();
+
         return inertia("Depenses/List", [
             "depenses" => DepenseResource::collection($depenses)
         ]);
@@ -57,6 +58,7 @@ class DepenseSuperviseurController extends Controller
             "chargement_id" => ["required", "integer"],
             "superviseur_id" => ["required", "integer"],
             "montant" => ["required", "numeric"],
+            "date" => ["required","date"],
             "commentaire" => ["nullable"],
             "document" => ["nullable", "file", "mimes:pdf,png,jpg,jpeg"],
         ], [

@@ -20,6 +20,8 @@ class DepenseSuperviseur extends Model
         'document',
         'commentaire',
 
+        'date',
+
         'validated_by',
         'validated_at',
 
@@ -29,6 +31,7 @@ class DepenseSuperviseur extends Model
 
     /*Casts*/
     protected $casts = [
+        'date' => 'date',
         'montant' => 'decimal:2',
     ];
 
