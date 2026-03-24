@@ -199,7 +199,7 @@ export default function List({ depenses }) {
                                                     <span className="text-muted">---</span>
                                                 )}
                                             </td>
-                                            <td> <textarea rows={1} className='form-control' readOnly={true} placeholder={depense.commentaire || '---'}></textarea> </td>
+                                            <td> <p className='form-control' >{depense.commentaire || '---'}</p> </td>
                                             <td> <span className="badge bg-light border rounded text-dark">{`${depense.createdBy?.firstname} - ${depense.createdBy?.lastname}`}</span> </td>
                                             <td> <span className="badge bg-light border rounded text-dark">{`${depense.validated_at || '--'}`}</span> </td>
                                             <td> <span className="badge bg-light border rounded text-dark">{`${depense.validatedBy?.firstname || ''} - ${depense.validatedBy?.lastname || ''}`}</span> </td>
