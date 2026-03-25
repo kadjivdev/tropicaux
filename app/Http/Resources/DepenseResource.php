@@ -19,7 +19,7 @@ class DepenseResource extends JsonResource
             "id" => $this->id,
             "reference" => $this->reference,
             "date" => $this->date ? Carbon::parse($this->date)->locale('fr')->isoFormat("D MMMM YYYY") : '---',
-            "chargement" => $this->chargement,
+            "chargement" => $this->chargement->load("camions.camion"),
             "superviseur" => $this->superviseur,
             "montant" => $this->montant,
             "commentaire" => $this->commentaire,

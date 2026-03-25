@@ -125,6 +125,7 @@ export default function List({ depenses }) {
                                     <th scope="col text-center">Action</th>
                                     <th scope="col">Reference</th>
                                     <th scope="col">Chargement</th>
+                                    <th scope="col">Camions</th>
                                     <th scope="col">Superviseur</th>
                                     <th scope="col">Montant</th>
                                     <th scope="col">Date d'opération</th>
@@ -189,6 +190,11 @@ export default function List({ depenses }) {
                                             </td>
                                             <td><span className="badge bg-light rounded text-dark rounded shadow-sm"> {depense.reference ?? '---'}</span> </td>
                                             <td><span className="badge bg-light rounded text-dark rounded shadow-sm"> {depense.chargement?.reference ?? '---'}</span> </td>
+                                            <td>
+                                                <p className="rounded border text-dark">
+                                                    {depense.chargement.camions?.map((c, k) => (<span key={k} className="badge text-dark rounded border">{c.camion.libelle}</span>))}
+                                                </p>
+                                            </td>
                                             <td>{depense?.superviseur?.raison_sociale ?? '---'}</td>
                                             <td>{depense.montant}</td>
                                             <td>{depense.date}</td>
