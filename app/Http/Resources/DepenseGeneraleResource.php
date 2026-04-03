@@ -19,6 +19,7 @@ class DepenseGeneraleResource extends JsonResource
             "id" => $this->id,
             "reference" => $this->reference,
             "type" => $this->type,
+            "chargement" => $this->chargement,
             "montant" => $this->montant,
             "commentaire" => $this->commentaire,
             "document" => $this->document,

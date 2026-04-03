@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\DepenseGeneraleResource;
 use App\Http\Resources\DepenseVenteResource;
+use App\Models\Chargement;
 use App\Models\DepenseGeneraleType;
 use App\Models\DepenseVente;
 use App\Models\GeneralDepense;
@@ -37,8 +38,14 @@ class GeneralDepenseController extends Controller
     {
         $types = DepenseGeneraleType::get();
 
+        $sessionId = Session::get("campagne")?->id;
+        $chargements = Chargement::where("campagne_id", $sessionId)
+            ->whereNotNull("validated_by")
+            ->get();
+
         return inertia("DepenseGenerales/Create", [
             "types" => $types,
+            "chargements" => $chargements,
         ]);
     }
 

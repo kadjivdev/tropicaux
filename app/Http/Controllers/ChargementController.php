@@ -28,12 +28,10 @@ class ChargementController extends Controller
     {
         $sessionId = Session::get("campagne")?->id;
         $chargements = Chargement::where("campagne_id", $sessionId)->get();
-        
         return inertia("Chargements/List", [
             "chargements" => ChargementResource::collection($chargements)
         ]);
     }
-
 
     /**
      * Formulaire de création

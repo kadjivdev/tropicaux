@@ -269,6 +269,7 @@ export default function Create({ partenaires, modes, camions, chargements }) {
                                 {/* Le chargement */}
                                 <div className="row">
                                     <div className="col-12">
+                                        <span className="badge text-danger border text-center">Seuls les chargements ayant des camions non vendus s'affichent ici</span>
                                         <div className="mb-3">
                                             <InputLabel htmlFor="chargement_id" value="Le Chargement concerné" >  <span className="text-danger">*</span> </InputLabel>
                                             <Select
@@ -299,7 +300,7 @@ export default function Create({ partenaires, modes, camions, chargements }) {
                                 {/* Camions */}
                                 <div className="d-flex" style={{ justifyContent: 'space-between' }}>
                                     <span className="text-success"><CIcon icon={cilTruck} /> Détail des camions</span>
-                                    
+
                                 </div>
 
                                 <table className="table">

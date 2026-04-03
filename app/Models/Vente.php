@@ -66,7 +66,7 @@ class Vente extends Model
     /**Camions */
     function camions(): HasMany
     {
-        return $this->hasMany(VenteCamion::class, "vente_id");
+        return $this->hasMany(VenteCamion::class, "vente_id")->with("camion");
     }
 
     /**Modes de paiement */

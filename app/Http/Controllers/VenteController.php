@@ -31,7 +31,7 @@ class VenteController extends Controller
 
         return inertia("Ventes/List", [
             "ventes" => VenteResource::collection($ventes),
-            "chargements"=>$chargements
+            "chargements" => $chargements
         ]);
     }
 
@@ -45,10 +45,18 @@ class VenteController extends Controller
         $camions = Camion::all();
 
         $sessionId = Session::get("campagne")?->id;
+        $ventes = Vente::where("campagne_id", $sessionId)->get();
+
+        $sessionId = Session::get("campagne")?->id;
         $chargements = Chargement::with("camions")
             ->where("campagne_id", $sessionId)
-            // ->whereNotNull("validated_by")
-            ->get();
+            ->whereNotNull("validated_by")
+            ->get()
+            ->filter(function ($chargement) use ($ventes) {
+                // Garder les chargements qui ont au moins un camion non vendu
+                $camionsVendusIds = $ventes->pluck("camions")->flatten()->pluck("camion_id")->toArray();
+                return $chargement->camions->pluck("camion_id")->intersect($camionsVendusIds)->isEmpty();
+            })->values();
 
         return inertia("Ventes/Create", [
             "partenaires" => $partenaires,

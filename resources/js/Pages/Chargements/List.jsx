@@ -1,13 +1,15 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import CIcon from '@coreui/icons-react';
-import { cibAddthis, cilCheckCircle, cilList, cilMenu, cilPencil, cilTruck, cilUserX } from "@coreui/icons";
+import { cibAddthis, cilCart, cilCheckCircle, cilList, cilMenu, cilPencil, cilTruck, cilUserX } from "@coreui/icons";
 import Swal from 'sweetalert2';
 import Modal from '@/Components/Modal';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import SecondaryButton from '@/Components/SecondaryButton';
 import TextInput from '@/Components/TextInput';
+import Select from 'react-select'
 import { Textarea } from '@headlessui/react';
+import DataTable from 'datatables.net-bs5';
 
 export default function List({ chargements }) {
     const permissions = usePage().props.auth.permissions;
@@ -17,12 +19,27 @@ export default function List({ chargements }) {
 
     const [currentChargement, setCurrentChargement] = useState(null);
     const [showCamions, setShowCamions] = useState(false);
+    const [showVendus, setShowVendus] = useState(false);
     const [showDetails, setShowDetails] = useState(false);
+    const [searchItem, setSearchItem] = useState(null);
+
+    const statusOptions = [
+        { value: 'Non vendu', label: 'Non vendu' },
+        { value: 'Entièrement vendu', label: 'Entièrement vendu' },
+        { value: 'Partiellement vendu', label: 'Partiellement vendu' },
+    ];
 
     const showCamionsModal = (e, chargement) => {
         e.preventDefault();
         setCurrentChargement(chargement);
         setShowCamions(true);
+    }
+
+    const showVendusModal = (e, chargement) => {
+        console.log("Current chargement ", chargement?.camions_vendus?.map(cv => cv.camion?.libelle))
+        e.preventDefault();
+        setCurrentChargement(chargement);
+        setShowVendus(true);
     }
 
     const closeCamionModal = () => {
@@ -126,6 +143,100 @@ export default function List({ chargements }) {
         });
     }
 
+    const tableRef = useRef(null);
+    const dataTableInstance = useRef(null);
+
+    const filteredChargements = searchItem ? chargements.data?.filter(c => c.statut === searchItem) : chargements.data;
+    const totalMontant = filteredChargements?.reduce((total, chargement) => total + (chargement._total_amount || 0), 0);
+
+    useEffect(() => {
+        dataTableInstance.current = new DataTable(tableRef.current, {
+            pagingType: 'full_numbers',
+            responsive: true,
+            dom: `
+                    <'dt-top d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-2'
+                        <'dt-search mb-2 mb-sm-0'f>
+                        <'dt-buttons text-sm-end'B>
+                    >
+                    <'table-responsive'tr>
+                    <'d-flex flex-column flex-sm-row justify-content-between align-items-center mt-2'
+                        i
+                        p
+                    >
+            `,
+            pageLength: 15,
+            order: [
+                [0, 'desc']
+            ],
+            // columns: [null, null, null, null], // ⬅ match number of <th>
+            buttons: [
+                {
+                    extend: 'copy',
+                    className: 'btn btn-sm btn-dark',
+                    text: '<i class="fas fa-copy"></i> Copier'
+                },
+                {
+                    extend: 'excel',
+                    className: 'btn btn-sm btn-success',
+                    text: '<i class="fas fa-file-excel"></i> Excel'
+                },
+                {
+                    extend: 'pdf',
+                    className: 'btn btn-sm btn-danger',
+                    text: '<i class="fas fa-file-pdf"></i> PDF'
+                },
+                {
+                    extend: 'print',
+                    className: 'btn btn-sm btn-warning',
+                    text: '<i class="fas fa-print"></i> Imprimer'
+                }
+            ],
+            language: {
+                decimal: ",",
+                thousands: " ",
+                emptyTable: "Aucune donnée disponible",
+                info: "Affichage de _START_ à _END_ sur _TOTAL_ lignes",
+                infoEmpty: "Affichage de 0 à 0 sur 0 lignes",
+                infoFiltered: "(filtré de _MAX_ lignes au total)",
+                lengthMenu: "Afficher _MENU_ lignes",
+                loadingRecords: "Chargement...",
+                processing: "Traitement...",
+                search: "Rechercher :",
+                zeroRecords: "Aucun enregistrement trouvé",
+                paginate: {
+                    first: "<<",
+                    last: ">>",
+                    next: "Suivant",
+                    previous: "Précédent"
+                },
+                aria: {
+                    sortAscending: ": activer pour trier par ordre croissant",
+                    sortDescending: ": activer pour trier par ordre décroissant"
+                },
+                buttons: {
+                    copy: "Copier",
+                    excel: "Exporter Excel",
+                    pdf: "Exporter PDF",
+                    print: "Imprimer",
+                    colvis: "Visibilité colonnes"
+                }
+            }
+        });
+
+        return () => dataTableInstance.current?.destroy(true);
+    }, []);
+
+    useEffect(() => {
+        const table = dataTableInstance.current;
+        if (!table) return;
+
+        if (searchItem) {
+            table.column(5).search(`^${searchItem}$`, true, false).draw();
+        } else {
+            table.column(5).search('').draw();
+        }
+    }, [searchItem]);
+
     return (
         <AuthenticatedLayout
             header={
@@ -145,7 +256,30 @@ export default function List({ chargements }) {
                                 <Link className="btn w-50 bg-success bg-hover text-white" href={route("chargement.create")}> <CIcon className='' icon={cibAddthis} /> Ajouter</Link>
                             </div>) : null
                         }
-                        <table className="table table-striped" id='myTable' style={{ width: '100%' }}>
+
+                        {/* filtering */}
+                        <div className="row d-flex justify-content-center mb-3">
+                            <div className="col-md-6">
+                                <div className="mb-3">
+                                    <Select
+                                        placeholder="Filtrer par statut ..."
+                                        className="mt-1"
+                                        classNamePrefix="react-select"
+                                        isClearable
+                                        isSearchable
+                                        menuPortalTarget={document.body}
+                                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                                        options={statusOptions}
+                                        value={searchItem ? statusOptions.find(option => option.value === searchItem) : null}
+                                        onChange={(option) => setSearchItem(option ? option.value : null)}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4 className="">Montant total : <span className="badge bg-light text-success border rounded shadow">{(totalMontant || 0).toLocaleString()} FCFA</span> </h4>
+                        {/* liste */}
+                        <table ref={tableRef} className="table table-striped" id='chargementsTable' style={{ width: '100%' }}>
                             <thead>
                                 <tr>
                                     <th scope="col">N°</th>
@@ -153,9 +287,12 @@ export default function List({ chargements }) {
                                     <th scope="col">Reference</th>
                                     <th scope="col">Camions</th>
                                     <th scope="col">Détails</th>
+                                    <th scope="col">Vendus</th>
+                                    <th scope="col">Montant</th>
                                     <th scope="col">Fonds Superviseurs</th>
                                     <th scope="col">Dépenses Superviseurs</th>
-                                    <th scope="col">Montant</th>
+                                    <th scope="col">Dépenses Générales</th>
+                                    <th scope="col">Montant final</th>
                                     <th scope="col">Produit</th>
                                     <th scope="col">Chauffeur</th>
                                     <th scope="col">Superviseur</th>
@@ -170,7 +307,7 @@ export default function List({ chargements }) {
                             </thead>
                             <tbody>
                                 {
-                                    chargements.data.map((chargement, index) => (
+                                    chargements.data?.map((chargement, index) => (
                                         <tr key={chargement.id}>
                                             <th scope="row">{index + 1}</th>
                                             <td>
@@ -233,6 +370,7 @@ export default function List({ chargements }) {
                                                     <CIcon icon={cilTruck} />
                                                 </button>
                                             </td>
+
                                             <td>
                                                 <button
                                                     className='btn btn-sm btn-light border shadow-sm rounded text-success'
@@ -243,11 +381,23 @@ export default function List({ chargements }) {
                                                 </button>
                                             </td>
                                             <td className='text-center'>
+                                                {chargement.statut == 'Non vendu' && <span className='badge bg-danger'>Non vendu</span>}
+                                                {chargement.statut == 'Entièrement vendu' && <span className='badge bg-success'>Entièrement vendu</span>}
+                                                {chargement.statut == 'Partiellement vendu' && <span className='badge bg-warning'>Partiellement vendu</span>}
+
+                                                {chargement.statut != 'Non vendu' && (<button
+                                                    className='btn btn-sm btn-light border shadow-sm rounded text-success'
+                                                    onClick={(e) => showVendusModal(e, chargement)}>
+                                                    <CIcon icon={cilCart} />
+                                                </button>)}
+                                            </td>
+                                            <td><span className="badge bg-light text-danger rounded border shadow">{chargement.total_amount}</span></td>
+                                            <td className='text-center'>
                                                 <Link
                                                     href={route("chargement.fonds", chargement.id)}
                                                     className='btn btn-sm btn-light border shadow-sm rounded text-success'
                                                 >
-                                                   <CIcon icon={cilList} /> <strong> {chargement.total_fonds} FCFA</strong>
+                                                    <CIcon icon={cilList} /> <strong> {chargement.total_fonds} FCFA</strong>
                                                 </Link>
                                             </td>
                                             <td className='text-center'>
@@ -258,7 +408,8 @@ export default function List({ chargements }) {
                                                     <CIcon icon={cilList} /> <strong> {chargement.total_depenses} FCFA</strong>
                                                 </Link>
                                             </td>
-                                            <td>{chargement.totalAmount}</td>
+                                            <td className='text-center'><span className="badge bg-light border text-danger shadow">{chargement.total_depenses_generales} FCFA</span></td>
+                                            <td className='text-center'><span className="badge bg-light border text-danger shadow">{chargement.montant_final} FCFA</span></td>
                                             <td>{chargement?.produit?.libelle ?? '---'}</td>
                                             <td>{`${chargement?.chauffeur?.raison_sociale}`}</td>
                                             <td>{`${chargement?.superviseur?.raison_sociale}`}</td>
@@ -326,6 +477,60 @@ export default function List({ chargements }) {
 
                     <div className="mt-6 flex justify-end">
                         <SecondaryButton className='text-success' onClick={closeCamionModal}>
+                            Fermer
+                        </SecondaryButton>
+                    </div>
+                </form>
+            </Modal>
+
+            {/* Model des  camions vendus */}
+            <Modal show={showVendus} onClose={() => setShowVendus(false)}>
+                <form className="p-6">
+                    <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                        <CIcon className='text-success' icon={cilTruck} /> Liste des camions vendus sur le chargement <span className='badge bg-light rounded border shadow-sm text-success'>{currentChargement?.reference ?? '---'}</span>
+                    </h2>
+
+                    <div className="p-2">
+                        <table className="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">N°</th>
+                                    <th scope="col">Camion</th>
+                                    <th scope="col">Commentaire</th>
+                                </tr>
+                            </thead>
+                            <tbody id="camion">
+                                {
+                                    currentChargement?.camions_vendus?.length > 0 ?
+                                        currentChargement?.camions_vendus?.map((data, index) => (
+                                            <tr key={index}>
+                                                <td>{index + 1}</td>
+                                                <td>
+                                                    <TextInput
+                                                        type="text"
+                                                        className="mt-1 block w-full form-control"
+                                                        value={data.camion?.libelle}
+                                                        disabled={true}
+                                                    />
+                                                </td>
+
+                                                <td>
+                                                    <Textarea
+                                                        type="text"
+                                                        className="mt-1 block w-full form-control"
+                                                        value={data.commentaire}
+                                                        rows={1}
+                                                        disabled={true}
+                                                    />
+                                                </td>
+                                            </tr>
+                                        )) : <tr className='text-center'><td colSpan={3}>Aucun camion disponible</td></tr>}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div className="mt-6 flex justify-end">
+                        <SecondaryButton className='text-success' onClick={() => setShowVendus(false)}>
                             Fermer
                         </SecondaryButton>
                     </div>

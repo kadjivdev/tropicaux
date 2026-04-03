@@ -14,6 +14,7 @@ class GeneralDepense extends Model
     protected $fillable = [
         "reference",
         'type_id',
+        'chargement_id',
 
         'montant',
         'document',
@@ -35,6 +36,12 @@ class GeneralDepense extends Model
     function type(): BelongsTo
     {
         return $this->belongsTo(DepenseGeneraleType::class, 'type_id');
+    }
+
+    /**Chargement */
+    function chargement(): BelongsTo
+    {
+        return $this->belongsTo(Chargement::class, 'chargement_id');
     }
 
     /**HandleDocument */
@@ -89,6 +96,7 @@ class GeneralDepense extends Model
     {
         return [
             "type_id" => "required|exists:depense_generale_types,id",
+            "chargement_id" => "required|exists:chargements,id",
             "montant" => ["required", "numeric"],
             "commentaire" => ["nullable"],
             "document" => ["nullable", "file", "mimes:pdf,png,jpg,jpeg"],
@@ -100,6 +108,9 @@ class GeneralDepense extends Model
         return [
             'type_id.required' => 'Le type est obligatoire.',
             'type_id.exists'   => 'Le type sélectionné est invalide.',
+
+            'chargement_id.required' => 'Le chargement est obligatoire.',
+            'chargement_id.exists'   => 'Le chargement sélectionné est invalide.',
 
             'montant.required' => 'Le montant est obligatoire.',
             'montant.numeric'  => 'Le montant doit être un nombre valide.',

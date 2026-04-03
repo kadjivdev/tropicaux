@@ -36,9 +36,11 @@ class DashboardController extends Controller
             ->whereBetween("created_at", [now()->startOfWeek(), now()->startOfWeek()])
             ->get();
 
-        $ventes = Vente::where("campagne_id", $sessionId)
+        $weekVentes = Vente::where("campagne_id", $sessionId)
             ->whereBetween("created_at", [now()->startOfWeek(), now()->startOfWeek()])
             ->get();
+
+        $ventes = Vente::where("campagne_id", $sessionId)->get();
 
         return Inertia::render('Dashboard', [
             "financementsAmount" => number_format($financementsAmount, 2, ",", " "),
@@ -47,7 +49,7 @@ class DashboardController extends Controller
             "depensesGeneralesAmount" => number_format($depensesGeneralesAmount, 2, ",", " "),
             "ventesAmount" => number_format($ventes->whereNotNull("validated_at")->sum("montant_total"), 2, ",", " "),
             "chargements" => ChargementResource::collection($chargements),
-            "ventes" => VenteResource::collection($ventes),
+            "ventes" => VenteResource::collection($weekVentes),
         ]);
     }
 }

@@ -12,7 +12,7 @@ class Chargement extends Model
 {
     use SoftDeletes;
 
-    protected $appends = ["total_amount"];
+    protected $appends = ["total_amount", "montant_final"];
 
     protected $fillable = [
         'reference',
@@ -95,6 +95,18 @@ class Chargement extends Model
             ->sum(fn($detail) => $detail->amount);
     }
 
+    /** Montant final */
+    function getMontantFinalAttribute()
+    {
+        return $this->total_amount
+            // les depenses superviseurs
+            -
+            $this->depenses()->whereNotNull("validated_by")->sum("montant")
+            // les depenses generales
+            -
+            $this->depensesGenerales()->whereNotNull("validated_by")->sum("montant");
+    }
+
     /**Fonds superviseur */
     function fonds(): HasMany
     {
@@ -105,6 +117,12 @@ class Chargement extends Model
     function depenses(): HasMany
     {
         return $this->hasMany(DepenseSuperviseur::class, "chargement_id");
+    }
+
+    /**Depenses generales */
+    function depensesGenerales(): HasMany
+    {
+        return $this->hasMany(GeneralDepense::class, "chargement_id");
     }
 
     /**Camions */

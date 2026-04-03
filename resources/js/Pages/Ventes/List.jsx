@@ -178,9 +178,9 @@ export default function List({ ventes, chargements }) {
                             </div>) : null
                         }
 
-                        {/* filtrage via gestionnaire */}
+                        {/* filtrage via chargement */}
                         <div className="row d-flex justify-content-center">
-                            <div className="col-6">
+                            <div className="col-6 text-center">
                                 <Select
                                     placeholder="Rechercher un Chargement ..."
                                     className="form-control mt-1 block w-full"
@@ -213,13 +213,13 @@ export default function List({ ventes, chargements }) {
                                     <th scope="col">Partenaire</th>
                                     <th scope="col">Camions</th>
                                     <th scope="col">Mode paiements</th>
+                                    <th scope='col'>Montant</th>
+                                    <th scope='col'>Dépense</th>
+                                    <th scope='col'>Montant Total</th>
                                     <th scope="col">Prix</th>
                                     <th scope="col">Poids</th>
                                     <th scope="col">Nbre Sac rejete</th>
                                     <th scope="col">Prix unit Sac rejete</th>
-                                    <th scope='col'>Montant</th>
-                                    <th scope='col'>Dépense</th>
-                                    <th scope='col'>Montant Total</th>
                                     <th scope='col'>Commentaire</th>
                                     <th scope='col'>Preuve</th>
                                     <th scope="col">Inséré par</th>
@@ -300,13 +300,13 @@ export default function List({ ventes, chargements }) {
                                                     <CIcon icon={cilList} />
                                                 </button>
                                             </td>
+                                            <td> <span className="badge bg-light border rounded text-dark"> {vente.montant || '00'} </span></td>
+                                            <td> <span className="badge bg-light border rounded text-danger"> {vente.depense_total || '00'} </span></td>
+                                            <td> <span className="badge bg-light border rounded text-success"> {vente.montant_total || '00'} </span></td>
                                             <td> <span className="badge bg-light border rounded text-dark"> {vente.prix || '00'} </span></td>
                                             <td> <span className="badge bg-light border rounded text-dark"> {vente.poids || '00'} </span></td>
                                             <td> <span className="badge bg-light border rounded text-dark"> {vente.nbre_sac_rejete || '00'} </span></td>
                                             <td> <span className="badge bg-light border rounded text-dark"> {vente.prix_unitaire_sac_rejete || '00'} </span></td>
-                                            <td> <span className="badge bg-light border rounded text-dark"> {vente.montant || '00'} </span></td>
-                                            <td> <span className="badge bg-light border rounded text-danger"> {vente.depense_total || '00'} </span></td>
-                                            <td> <span className="badge bg-light border rounded text-success"> {vente.montant_total || '00'} </span></td>
                                             <td><textarea rows={1} className='form-control' disabled={true} placeholder={vente.commentaire || '--'}></textarea></td>
                                             <td>
                                                 {vente.document ? (

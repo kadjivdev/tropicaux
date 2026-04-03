@@ -9,7 +9,7 @@ import { cilSend, cilList, cibAddthis } from "@coreui/icons";
 import Swal from 'sweetalert2';
 import Select from 'react-select'
 
-export default function Create({ types }) {
+export default function Create({ types, chargements }) {
     const permissions = usePage().props.auth.permissions;
 
     const checkPermission = (name) => {
@@ -25,6 +25,7 @@ export default function Create({ types }) {
         progress
     } = useForm({
         type_id: "",
+        chargement_id: "",
         montant: "",
         commentaire: '',
         document: "",
@@ -113,6 +114,30 @@ export default function Create({ types }) {
                                             <InputError className="mt-2" message={errors.type_id} />
                                         </div>
 
+                                        <div className="mb-3">
+                                            <InputLabel htmlFor="chargement_id" value="Chargement" >  <span className="text-danger">*</span> </InputLabel>
+                                            <Select
+                                                placeholder="Rechercher un chargement ..."
+                                                name="chargement_id"
+                                                id="chargement_id"
+                                                required
+                                                className="form-control mt-1 block w-full"
+                                                options={chargements.map((chargement) => ({
+                                                    value: chargement.id,
+                                                    label: `${chargement.reference}`,
+                                                }))}
+                                                value={chargements
+                                                    .map((chargement) => ({
+                                                        value: chargement.id,
+                                                        label: `${chargement.reference}`,
+                                                    }))
+                                                    .find((option) => option.value === data.chargement_id)} // set selected option
+                                                onChange={(option) => setData('chargement_id', option.value)} // update state with id
+                                            />
+
+                                            <InputError className="mt-2" message={errors.chargement_id} />
+                                        </div>
+
                                         <div className='mb-3'>
                                             <InputLabel htmlFor="document" value="Document (preuve)" ></InputLabel>
                                             <TextInput
@@ -131,6 +156,7 @@ export default function Create({ types }) {
                                         </div>
                                     </div>
                                     <div className="col-md-6">
+
                                         <div className='mb-3'>
                                             <InputLabel htmlFor="montant" value="Le montant" >  <span className="text-danger">*</span> </InputLabel>
                                             <TextInput

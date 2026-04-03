@@ -123,6 +123,7 @@ export default function List({ depenses }) {
                                     <th scope="col text-center">Action</th>
                                     <th scope="col">Reference</th>
                                     <th scope="col">Type</th>
+                                    <th scope="col">Chargement</th>
                                     <th scope="col">Montant</th>
                                     <th scope="col">Preuve</th>
                                     <th scope="col">Observation</th>
@@ -185,6 +186,7 @@ export default function List({ depenses }) {
                                             </td>
                                             <td><span className="badge bg-light rounded text-dark rounded shadow-sm"> {depense.reference ?? '---'}</span> </td>
                                             <td><span className="badge bg-light rounded text-dark rounded shadow-sm"> {depense.type?.libelle ?? '---'}</span> </td>
+                                            <td><span className="badge bg-light rounded text-dark rounded shadow-sm"> {depense.chargement?.reference ?? '---'}</span> </td>
                                             <td>{depense.montant}</td>
                                             <td>
                                                 {depense.document ? (

@@ -123,8 +123,6 @@ export default function AuthenticatedLayout({ header, children, menu = true }) {
     const user = usePage().props.auth.user;
     const campagne = usePage().props.auth.campagne;
 
-    // console.log("La campagne en question :", campagne)
-
     const { post } = useForm();
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
