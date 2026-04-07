@@ -44,84 +44,87 @@ export default function AuthenticatedLayout({ header, children, menu = true }) {
     const [visible, setVisible] = useState(true)
 
     useEffect(() => {
-        let table = null;
         const tableElement = document.querySelector('#myTable');
-        if (tableElement) {
-            table = new DataTable(tableElement, {
-                pagingType: 'full_numbers', // Affiche "First, Prev, Next, Last" + numéros
-                responsive: true,
-                dom: `
-                        <'dt-top d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-2'
-                            <'dt-search mb-2 mb-sm-0'f>
-                            <'dt-buttons text-sm-end'B>
-                        >
-                        <'table-responsive'tr>
-                        <'d-flex flex-column flex-sm-row justify-content-between align-items-center mt-2'
-                            i
-                            p
-                        >
-                `,
-                pageLength: 15,
-                order: [
-                    [0, 'desc']
-                ],
-                // columns: [null, null, null, null], // ⬅ match number of <th>
-                buttons: [
-                    {
-                        extend: 'copy',
-                        className: 'btn btn-sm btn-dark',
-                        text: '<i class="fas fa-copy"></i> Copier'
-                    },
-                    {
-                        extend: 'excel',
-                        className: 'btn btn-sm btn-success',
-                        text: '<i class="fas fa-file-excel"></i> Excel'
-                    },
-                    {
-                        extend: 'pdf',
-                        className: 'btn btn-sm btn-danger',
-                        text: '<i class="fas fa-file-pdf"></i> PDF'
-                    },
-                    {
-                        extend: 'print',
-                        className: 'btn btn-sm btn-warning',
-                        text: '<i class="fas fa-print"></i> Imprimer'
-                    }
-                ],
-                language: {
-                    decimal: ",",
-                    thousands: " ",
-                    emptyTable: "Aucune donnée disponible",
-                    info: "Affichage de _START_ à _END_ sur _TOTAL_ lignes",
-                    infoEmpty: "Affichage de 0 à 0 sur 0 lignes",
-                    infoFiltered: "(filtré de _MAX_ lignes au total)",
-                    lengthMenu: "Afficher _MENU_ lignes",
-                    loadingRecords: "Chargement...",
-                    processing: "Traitement...",
-                    search: "Rechercher :",
-                    zeroRecords: "Aucun enregistrement trouvé",
-                    paginate: {
-                        first: "<<",
-                        last: ">>",
-                        next: "Suivant",
-                        previous: "Précédent"
-                    },
-                    aria: {
-                        sortAscending: ": activer pour trier par ordre croissant",
-                        sortDescending: ": activer pour trier par ordre décroissant"
-                    },
-                    buttons: {
-                        copy: "Copier",
-                        excel: "Exporter Excel",
-                        pdf: "Exporter PDF",
-                        print: "Imprimer",
-                        colvis: "Visibilité colonnes"
-                    }
-                }
-            });
+        if (!tableElement) {
+            return;
         }
 
-        return () => table?.destroy();
+        const tables = [new DataTable(tableElement, {
+            pagingType: 'full_numbers', // Affiche "First, Prev, Next, Last" + numéros
+            responsive: true,
+            dom: `
+                    <'dt-top d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-2'
+                        <'dt-search mb-2 mb-sm-0'f>
+                        <'dt-buttons text-sm-end'B>
+                    >
+                    <'table-responsive'tr>
+                    <'d-flex flex-column flex-sm-row justify-content-between align-items-center mt-2'
+                        i
+                        p
+                    >
+            `,
+            pageLength: 15,
+            order: [
+                [0, 'desc']
+            ],
+            // columns: [null, null, null, null], // ⬅ match number of <th>
+            buttons: [
+                {
+                    extend: 'copy',
+                    className: 'btn btn-sm btn-dark',
+                    text: '<i class="fas fa-copy"></i> Copier'
+                },
+                {
+                    extend: 'excel',
+                    className: 'btn btn-sm btn-success',
+                    text: '<i class="fas fa-file-excel"></i> Excel'
+                },
+                {
+                    extend: 'pdf',
+                    className: 'btn btn-sm btn-danger',
+                    text: '<i class="fas fa-file-pdf"></i> PDF'
+                },
+                {
+                    extend: 'print',
+                    className: 'btn btn-sm btn-warning',
+                    text: '<i class="fas fa-print"></i> Imprimer'
+                }
+            ],
+            language: {
+                decimal: ",",
+                thousands: " ",
+                emptyTable: "Aucune donnée disponible",
+                info: "Affichage de _START_ à _END_ sur _TOTAL_ lignes",
+                infoEmpty: "Affichage de 0 à 0 sur 0 lignes",
+                infoFiltered: "(filtré de _MAX_ lignes au total)",
+                lengthMenu: "Afficher _MENU_ lignes",
+                loadingRecords: "Chargement...",
+                processing: "Traitement...",
+                search: "Rechercher :",
+                zeroRecords: "Aucun enregistrement trouvé",
+                paginate: {
+                    first: "<<",
+                    last: ">>",
+                    next: "Suivant",
+                    previous: "Précédent"
+                },
+                aria: {
+                    sortAscending: ": activer pour trier par ordre croissant",
+                    sortDescending: ": activer pour trier par ordre décroissant"
+                },
+                buttons: {
+                    copy: "Copier",
+                    excel: "Exporter Excel",
+                    pdf: "Exporter PDF",
+                    print: "Imprimer",
+                    colvis: "Visibilité colonnes"
+                }
+            }
+        })];
+
+        return () => {
+            tables.forEach((table) => table.destroy());
+        };
     }, []);
 
     const user = usePage().props.auth.user;

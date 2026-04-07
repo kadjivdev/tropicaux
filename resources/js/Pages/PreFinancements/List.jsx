@@ -11,6 +11,7 @@ import TextInput from '@/Components/TextInput';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 import Select from 'react-select';
+import DataTable from 'datatables.net-bs5';
 
 export default function List({ financements, gestionnaires }) {
     const permissions = usePage().props.auth.permissions;
@@ -19,52 +20,148 @@ export default function List({ financements, gestionnaires }) {
         return permissions.some(per => per.name == name);
     }
 
-    const allFinancements = financements.data
-    const [_financements, setFinancements] = useState(financements.data)
+    const allFinancements = financements.data;
+    const [filterGestionnaireId, setFilterGestionnaireId] = useState(null);
+    const filteredFinancements = filterGestionnaireId
+        ? allFinancements.filter((f) => f.gestionnaire?.id == filterGestionnaireId)
+        : allFinancements;
 
     const [totalMontant, setTotalMontant] = useState(0);
     const [totalDispatch, setTotalDispatch] = useState(0);
     const [totalRetour, setTotalRetour] = useState(0);
     const [totalReste, setTotalReste] = useState(0);
 
-    // Function to clean and convert the formatted string to a valid number
+    const tableRef = useRef(null);
+    const dataTableInstance = useRef(null);
+
+    const escapeRegex = (text) => {
+        return String(text).replace(/[-\\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    };
+
     const parseAmount = (amount) => {
         if (typeof amount === 'string') {
-            // Remove spaces (thousands separator) and replace comma with dot for decimals
             return parseFloat(amount.replace(/\s/g, '').replace(',', '.')) || 0;
         }
         return 0;
     };
 
     useEffect(() => {
-        const montant = _financements.reduce((acc, financement) => {
-            console.log("Le financement en cours :", financement);
-            return acc + parseAmount(financement.montant); // On ajoute 0 si "reste" est undefined ou null
+        const montant = filteredFinancements.reduce((acc, financement) => {
+            return acc + parseAmount(financement.montant);
         }, 0);
 
-        const dispatch = _financements.reduce((acc, financement) => {
-            console.log("Le financement en cours :", financement);
-            return acc + parseAmount(financement.montant_dispatche); // On ajoute 0 si "reste" est undefined ou null
+        const dispatch = filteredFinancements.reduce((acc, financement) => {
+            return acc + parseAmount(financement.montant_dispatche);
         }, 0);
 
-
-        const retour = _financements.reduce((acc, financement) => {
-            console.log("Le financement en cours :", financement);
-            return acc + parseAmount(financement.back_amount); // On ajoute 0 si "reste" est undefined ou null
+        const retour = filteredFinancements.reduce((acc, financement) => {
+            return acc + parseAmount(financement.back_amount);
         }, 0);
 
-        const reste = _financements.reduce((acc, financement) => {
-            console.log("Le financement en cours :", financement);
-            return acc + financement._reste; // On ajoute 0 si "reste" est undefined ou null
+        const reste = filteredFinancements.reduce((acc, financement) => {
+            return acc + (financement._reste || 0);
         }, 0);
 
         setTotalMontant(montant.toLocaleString('fr-FR', { minimumFractionDigits: 2 }));
         setTotalDispatch(dispatch.toLocaleString('fr-FR', { minimumFractionDigits: 2 }));
         setTotalRetour(retour.toLocaleString('fr-FR', { minimumFractionDigits: 2 }));
         setTotalReste(reste.toLocaleString('fr-FR', { minimumFractionDigits: 2 }));
+    }, [filteredFinancements]);
 
-    }, [_financements]); // On relance l'effet à chaque changement de _financements
+    useEffect(() => {
+        dataTableInstance.current = new DataTable(tableRef.current, {
+            pagingType: 'full_numbers',
+            responsive: true,
+            dom: `
+                    <'dt-top d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-2'
+                        <'dt-search mb-2 mb-sm-0'f>
+                        <'dt-buttons text-sm-end'B>
+                    >
+                    <'table-responsive'tr>
+                    <'d-flex flex-column flex-sm-row justify-content-between align-items-center mt-2'
+                        i
+                        p
+                    >
+            `,
+            pageLength: 15,
+            order: [
+                [0, 'desc']
+            ],
+            buttons: [
+                {
+                    extend: 'copy',
+                    className: 'btn btn-sm btn-dark',
+                    text: '<i class="fas fa-copy"></i> Copier'
+                },
+                {
+                    extend: 'excel',
+                    className: 'btn btn-sm btn-success',
+                    text: '<i class="fas fa-file-excel"></i> Excel'
+                },
+                {
+                    extend: 'pdf',
+                    className: 'btn btn-sm btn-danger',
+                    text: '<i class="fas fa-file-pdf"></i> PDF'
+                },
+                {
+                    extend: 'print',
+                    className: 'btn btn-sm btn-warning',
+                    text: '<i class="fas fa-print"></i> Imprimer'
+                }
+            ],
+            language: {
+                decimal: ",",
+                thousands: " ",
+                emptyTable: "Aucune donnée disponible",
+                info: "Affichage de _START_ à _END_ sur _TOTAL_ lignes",
+                infoEmpty: "Affichage de 0 à 0 sur 0 lignes",
+                infoFiltered: "(filtré de _MAX_ lignes au total)",
+                lengthMenu: "Afficher _MENU_ lignes",
+                loadingRecords: "Chargement...",
+                processing: "Traitement...",
+                search: "Rechercher :",
+                zeroRecords: "Aucun enregistrement trouvé",
+                paginate: {
+                    first: "<<",
+                    last: ">>",
+                    next: "Suivant",
+                    previous: "Précédent"
+                },
+                aria: {
+                    sortAscending: ": activer pour trier par ordre croissant",
+                    sortDescending: ": activer pour trier par ordre décroissant"
+                },
+                buttons: {
+                    copy: "Copier",
+                    excel: "Exporter Excel",
+                    pdf: "Exporter PDF",
+                    print: "Imprimer",
+                    colvis: "Visibilité colonnes"
+                }
+            }
+        });
 
+        return () => {
+            dataTableInstance.current?.destroy(true);
+            dataTableInstance.current = null;
+        };
+    }, []);
+
+    useEffect(() => {
+        const table = dataTableInstance.current;
+        if (!table) {
+            return;
+        }
+
+        if (!filterGestionnaireId) {
+            table.column(3).search('').draw();
+            return;
+        }
+
+        const gestionnaire = gestionnaires.find((g) => g.id === filterGestionnaireId);
+        const searchValue = gestionnaire ? escapeRegex(gestionnaire.raison_sociale) : '';
+        table.column(3).search(`^${searchValue}$`, true, false).draw();
+    }, [filterGestionnaireId, gestionnaires]);
 
     const [currentFinancement, setCurrentFinancement] = useState(null);
     const [showTransfert, setTransfert] = useState(false);
@@ -220,15 +317,7 @@ export default function List({ financements, gestionnaires }) {
 
     // Filtrage
     const handleFiltre = (option) => {
-        setData('gestionnaire_id', option?.value ?? null);
-
-        if (!option) {
-            setFinancements(allFinancements);
-            return;
-        }
-
-        let newFinances = allFinancements.filter((f) => f.gestionnaire?.id == option.value);
-        setFinancements(newFinances);
+        setFilterGestionnaireId(option?.value ?? null);
     }
 
     return (
@@ -267,7 +356,7 @@ export default function List({ financements, gestionnaires }) {
                                             value: gestionnaire.id,
                                             label: `${gestionnaire.raison_sociale}`,
                                         }))
-                                        .find((option) => option.value === data.gestionnaire_id)} // set selected option
+                                        .find((option) => option.value === filterGestionnaireId)} // set selected option
                                     onChange={(option) => handleFiltre(option)} // update state with id
                                 />
                             </div>
@@ -280,7 +369,7 @@ export default function List({ financements, gestionnaires }) {
                             <strong className='border'>Total reste: </strong>     <span className="badge mx-3 bg-dark text-light shadow border rounded">{totalReste} FCFA</span>
                         </div>
 
-                        <table className="table table-striped" id='prefinancementTable' style={{ width: '100%' }}>
+                        <table className="table table-striped" id='prefinancementTable' ref={tableRef} style={{ width: '100%' }}>
                             <thead>
                                 <tr>
                                     <th scope="col">N°</th>
@@ -300,7 +389,7 @@ export default function List({ financements, gestionnaires }) {
                             </thead>
                             <tbody>
                                 {
-                                    _financements.map((financement, index) => (
+                                    allFinancements.map((financement, index) => (
                                         <tr key={financement.id}>
                                             <th scope="row">{index + 1}</th>
                                             <td>
