@@ -13,6 +13,8 @@ class Vente extends Model
 {
     use SoftDeletes;
 
+    protected $appends = ["total_amount"];
+
     protected $fillable = [
         "reference",
         'partenaire_id',
@@ -44,6 +46,13 @@ class Vente extends Model
         'montant_total' => 'decimal:2',
         'validated_at' => 'date'
     ];
+
+    // setters
+    function getTotalAmountAttribute()
+    {
+        $depenses = $this->depenses->whereNotNull("validated_at")->sum("montant");
+        return $this->montant - $depenses;
+    }
 
     /**Partenaire */
     function partenaire(): BelongsTo

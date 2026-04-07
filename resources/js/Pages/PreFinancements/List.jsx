@@ -4,7 +4,7 @@ import CIcon from '@coreui/icons-react';
 import { cibAddthis, cilCheckCircle, cilCloudDownload, cilList, cilMenu, cilPencil, cilSend, cilTruck, cilUserX } from "@coreui/icons";
 import Swal from 'sweetalert2';
 import Modal from '@/Components/Modal';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import SecondaryButton from '@/Components/SecondaryButton';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
@@ -64,6 +64,7 @@ export default function List({ financements, gestionnaires }) {
         setTotalReste(reste.toLocaleString('fr-FR', { minimumFractionDigits: 2 }));
 
     }, [_financements]); // On relance l'effet à chaque changement de _financements
+
 
     const [currentFinancement, setCurrentFinancement] = useState(null);
     const [showTransfert, setTransfert] = useState(false);
@@ -219,8 +220,15 @@ export default function List({ financements, gestionnaires }) {
 
     // Filtrage
     const handleFiltre = (option) => {
-        let newFinances = allFinancements.filter((f) => f.gestionnaire?.id == option.value)
-        setFinancements(newFinances)
+        setData('gestionnaire_id', option?.value ?? null);
+
+        if (!option) {
+            setFinancements(allFinancements);
+            return;
+        }
+
+        let newFinances = allFinancements.filter((f) => f.gestionnaire?.id == option.value);
+        setFinancements(newFinances);
     }
 
     return (
@@ -253,6 +261,7 @@ export default function List({ financements, gestionnaires }) {
                                         value: gestionnaire.id,
                                         label: `${gestionnaire.raison_sociale}`,
                                     }))}
+                                    isClearable={true}
                                     value={gestionnaires
                                         .map((gestionnaire) => ({
                                             value: gestionnaire.id,
@@ -271,7 +280,7 @@ export default function List({ financements, gestionnaires }) {
                             <strong className='border'>Total reste: </strong>     <span className="badge mx-3 bg-dark text-light shadow border rounded">{totalReste} FCFA</span>
                         </div>
 
-                        <table className="table table-striped" id='myTable' style={{ width: '100%' }}>
+                        <table className="table table-striped" id='prefinancementTable' style={{ width: '100%' }}>
                             <thead>
                                 <tr>
                                     <th scope="col">N°</th>

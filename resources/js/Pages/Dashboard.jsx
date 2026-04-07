@@ -6,7 +6,7 @@ import { Head } from '@inertiajs/react';
 import { useEffect, useRef } from 'react';
 import Chart from "chart.js/auto";
 
-export default function Dashboard({ financementsAmount, fondSuperviseursAmount, depensesSuperviseursAmount, ventesAmount, ventes, chargements,depensesGeneralesAmount }) {
+export default function Dashboard({ financementsAmount, globalAmount, depensesSuperviseursAmount, ventesAmount, ventes, chargements,depensesGeneralesAmount }) {
     const chargementChartRef = useRef(null);
     const venteChartRef = useRef(null);
 
@@ -94,8 +94,8 @@ export default function Dashboard({ financementsAmount, fondSuperviseursAmount, 
                                 <div
                                     uk-scrollspy="cls: uk-animation-slide-top"
                                     className="shadow bg-dark border p-4 rounded-md border-sky-500 flex flex-col items-center justify-center">
-                                    <p className="text-2xl mt-2 text-cursive font-bold"> <strong className="text-success"> {fondSuperviseursAmount < 10 ? '0' + fondSuperviseursAmount : fondSuperviseursAmount} </strong>  </p>
-                                    <h2 className="text-xl text-gray-500"> <CIcon className="nav-icon text-success" icon={cibCcAmazonPay} /> Fonds superviseurs </h2>
+                                    <p className="text-2xl mt-2 text-cursive font-bold"> <strong className="text-success"> {globalAmount < 10 ? '0' + globalAmount : globalAmount} </strong>  </p>
+                                    <h2 className="text-xl text-gray-500"> <CIcon className="nav-icon text-success" icon={cibCcAmazonPay} /> Montant Global Achat </h2>
                                 </div>
                                 <div
                                     uk-scrollspy="cls: uk-animation-slide-top"

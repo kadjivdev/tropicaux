@@ -28,9 +28,9 @@ class DashboardController extends Controller
             ->whereNull("financement_id") // on fait l'exception des financements issus des transferts
             ->whereNotNull("validated_at")
             ->sum("montant");
-        $fondSuperviseursAmount = FondSuperviseur::where("campagne_id", $sessionId)->whereNotNull("validated_at")->sum("montant");
         $depensesSuperviseursAmount = DepenseSuperviseur::where("campagne_id", $sessionId)->whereNotNull("validated_at")->sum("montant");
         $depensesGeneralesAmount = GeneralDepense::where("campagne_id", $sessionId)->whereNotNull("validated_at")->sum("montant");
+        $chargementsAmount = Chargement::where("campagne_id", $sessionId)->whereNotNull("validated_at")->get()->sum(fn($ch) => $ch->total_amount);
 
         $chargements = Chargement::where("campagne_id", $sessionId)
             ->whereBetween("created_at", [now()->startOfWeek(), now()->startOfWeek()])
@@ -42,9 +42,11 @@ class DashboardController extends Controller
 
         $ventes = Vente::where("campagne_id", $sessionId)->get();
 
+        $globalAmount = $chargementsAmount + $depensesSuperviseursAmount;
+
         return Inertia::render('Dashboard', [
             "financementsAmount" => number_format($financementsAmount, 2, ",", " "),
-            "fondSuperviseursAmount" => number_format($fondSuperviseursAmount, 2, ",", " "),
+            "globalAmount" => number_format($globalAmount, 2, ",", " "),
             "depensesSuperviseursAmount" => number_format($depensesSuperviseursAmount, 2, ",", " "),
             "depensesGeneralesAmount" => number_format($depensesGeneralesAmount, 2, ",", " "),
             "ventesAmount" => number_format($ventes->whereNotNull("validated_at")->sum("montant_total"), 2, ",", " "),

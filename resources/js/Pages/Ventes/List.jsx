@@ -10,7 +10,7 @@ import TextInput from '@/Components/TextInput';
 import { Textarea } from '@headlessui/react';
 import Select from 'react-select';
 
-export default function List({ ventes, chargements }) {
+export default function List({ ventes, chargements, total_amount }) {
     const permissions = usePage().props.auth.permissions;
 
     const checkPermission = (name) => {
@@ -23,6 +23,8 @@ export default function List({ ventes, chargements }) {
 
     const [showCamions, setShowCamions] = useState(false);
     const [showDetails, setShowDetails] = useState(false);
+
+    const [montantTotal, setMontantTotal] = useState(total_amount);
 
     const showCamionsModal = (e, vente) => {
         e.preventDefault();
@@ -45,19 +47,14 @@ export default function List({ ventes, chargements }) {
         setShowDetails(false);
     }
 
-    const {data, patch, delete: destroy } = useForm({})
-
-
-    const [totalMontant, setTotalMontant] = useState(0);
+    const { data, patch, delete: destroy } = useForm({})
 
     useEffect(() => {
-        const montant = _ventes.reduce((acc, vente) => {
-            console.log("La vente en cours :", vente);
-            return acc + parseAmount(vente.montant); // On ajoute 0 si "reste" est undefined ou null
-        }, 0);
-
-        setTotalMontant(montant.toLocaleString('fr-FR', { minimumFractionDigits: 2 }));
-    })
+        let montant = _ventes.reduce((acc, vente) => {
+            return acc + vente._total_amount; // On ajoute 0 si "reste" est undefined ou null
+        }, 0).toLocaleString('fr-FR', { minimumFractionDigits: 2 })
+        setMontantTotal(montant);
+    }, [_ventes]);
 
     const deleteVente = (e, vente) => {
         e.preventDefault();
@@ -143,15 +140,6 @@ export default function List({ ventes, chargements }) {
         });
     }
 
-    // Function to clean and convert the formatted string to a valid number
-    const parseAmount = (amount) => {
-        if (typeof amount === 'string') {
-            // Remove spaces (thousands separator) and replace comma with dot for decimals
-            return parseFloat(amount.replace(/\s/g, '').replace(',', '.')) || 0;
-        }
-        return 0;
-    };
-
     // Filtrage
     const handleFiltre = (option) => {
         let newVentes = allVentes.filter((v) => v.chargement?.id == option.value)
@@ -200,7 +188,7 @@ export default function List({ ventes, chargements }) {
                         </div>
 
                         <div className="border">
-                            <strong className='border'>Total ventes: </strong>     <span className="badge mx-3 bg-dark text-light shadow border rounded">{totalMontant} FCFA</span> <br />
+                            <strong className='border'>Total ventes: </strong>     <span className="badge mx-3 bg-dark text-light shadow border rounded">{montantTotal} FCFA</span> <br />
                         </div>
 
                         <table className="table table-striped" id='myTable' style={{ width: '100%' }}>
@@ -283,7 +271,9 @@ export default function List({ ventes, chargements }) {
                                             <td> <span className="badge bg-light border rounded text-dark"> {vente.reference} </span></td>
                                             <td> <span className="badge bg-light border rounded text-success"> {vente.chargement?.reference} </span></td>
                                             <td>{vente?.partenaire?.raison_sociale ?? '---'}</td>
-                                            <td>
+                                            <td className='text-center'>
+                                                <p className="border">{vente.camions.map(c => <small className='mx-1 border text-dark'>{c.camion?.libelle}</small>)}</p>
+
                                                 <button
                                                     className='btn btn-sm btn-light border shadow-sm rounded text-success'
                                                     onClick={(e) => showCamionsModal(e, vente)}
@@ -291,7 +281,7 @@ export default function List({ ventes, chargements }) {
                                                     <CIcon icon={cilTruck} />
                                                 </button>
                                             </td>
-                                            <td>
+                                            <td className='text-center'>
                                                 <button
                                                     className='btn btn-sm btn-light border shadow-sm rounded text-success'
                                                     href="#"
@@ -302,7 +292,7 @@ export default function List({ ventes, chargements }) {
                                             </td>
                                             <td> <span className="badge bg-light border rounded text-dark"> {vente.montant || '00'} </span></td>
                                             <td> <span className="badge bg-light border rounded text-danger"> {vente.depense_total || '00'} </span></td>
-                                            <td> <span className="badge bg-light border rounded text-success"> {vente.montant_total || '00'} </span></td>
+                                            <td> <span className="badge bg-light border rounded text-success"> {vente.total_amount || '00'} </span></td>
                                             <td> <span className="badge bg-light border rounded text-dark"> {vente.prix || '00'} </span></td>
                                             <td> <span className="badge bg-light border rounded text-dark"> {vente.poids || '00'} </span></td>
                                             <td> <span className="badge bg-light border rounded text-dark"> {vente.nbre_sac_rejete || '00'} </span></td>

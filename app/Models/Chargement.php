@@ -100,10 +100,10 @@ class Chargement extends Model
     {
         return $this->total_amount
             // les depenses superviseurs
-            -
+            +
             $this->depenses()->whereNotNull("validated_by")->sum("montant")
             // les depenses generales
-            -
+            +
             $this->depensesGenerales()->whereNotNull("validated_by")->sum("montant");
     }
 

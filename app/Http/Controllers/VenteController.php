@@ -24,6 +24,7 @@ class VenteController extends Controller
     {
         $sessionId = Session::get("campagne")?->id;
         $ventes = Vente::where("campagne_id", $sessionId)->get();
+
         $chargements = Chargement::with("camions")
             ->where("campagne_id", $sessionId)
             ->whereNotNull("validated_by")
@@ -31,7 +32,8 @@ class VenteController extends Controller
 
         return inertia("Ventes/List", [
             "ventes" => VenteResource::collection($ventes),
-            "chargements" => $chargements
+            "chargements" => $chargements,
+            "total_amount" => number_format($ventes->sum("total_amount"), 2, ',', ' '),
         ]);
     }
 

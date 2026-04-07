@@ -23,6 +23,7 @@ class VenteResource extends JsonResource
             "chargement" => $this->chargement,
             "prix" => $this->prix,
             "montant" => number_format($this->montant, 2, "."),
+            "_montant" => $this->montant,
             "document" => $this->document,
             "camions" => $this->camions->load("camion"),
             "modes" => $this->modes->load("mode"),
@@ -30,7 +31,8 @@ class VenteResource extends JsonResource
             "nbre_sac_rejete" => $this->nbre_sac_rejete,
             "prix_unitaire_sac_rejete" => $this->prix_unitaire_sac_rejete,
             "depense_total" => number_format($depenses, 2, "."), //depenses validées
-            "montant_total" => number_format($this->montant_total - $depenses, 2, "."),
+            "total_amount" => number_format($this->total_amount, 2, "."),
+            "_total_amount" => $this->total_amount,
             "commentaire" => $this->commentaire,
             "createdBy" => $this->createdBy,
             "validatedBy" => $this->validatedBy,

@@ -289,7 +289,7 @@ export default function List({ chargements }) {
                                     <th scope="col">Détails</th>
                                     <th scope="col">Vendus</th>
                                     <th scope="col">Montant</th>
-                                    <th scope="col">Fonds Superviseurs</th>
+                                    {/* <th scope="col">Fonds Superviseurs</th> */}
                                     <th scope="col">Dépenses Superviseurs</th>
                                     <th scope="col">Dépenses Générales</th>
                                     <th scope="col">Montant final</th>
@@ -362,7 +362,9 @@ export default function List({ chargements }) {
                                             <td className='text-center'>
                                                 <span className="badge bg-light rounded text-dark rounded shadow-sm"> {chargement?.reference ?? '---'}</span>
                                             </td>
-                                            <td>
+                                            <td className='text-center'>
+                                                <p className="border">{chargement.camions.map((c,index) => <small className='mx-1 border text-dark' key={index}>{c.camion?.libelle}</small>)}</p>
+
                                                 <button
                                                     className='btn btn-sm btn-light border shadow-sm rounded text-success'
                                                     onClick={(e) => showCamionsModal(e, chargement)}
@@ -392,14 +394,14 @@ export default function List({ chargements }) {
                                                 </button>)}
                                             </td>
                                             <td><span className="badge bg-light text-danger rounded border shadow">{chargement.total_amount}</span></td>
-                                            <td className='text-center'>
+                                            {/* <td className='text-center'>
                                                 <Link
                                                     href={route("chargement.fonds", chargement.id)}
                                                     className='btn btn-sm btn-light border shadow-sm rounded text-success'
                                                 >
                                                     <CIcon icon={cilList} /> <strong> {chargement.total_fonds} FCFA</strong>
                                                 </Link>
-                                            </td>
+                                            </td> */}
                                             <td className='text-center'>
                                                 <Link
                                                     href={route("chargement.depenses", chargement.id)}
