@@ -58,12 +58,14 @@ class Fournisseur extends Model
         return
             // les financements validés
             $this->financements
+            ->where("campagne_id", Session::get("campagne")?->id)
             ->whereNotNull("validated_at")
             ->sum(fn($financement) => $financement->reste)
             // le toatl des chargmeents
             - $this->total_chargement_amount
             // les depenses validées
             - $this->depenses()
+            ->where("campagne_id", Session::get("campagne")?->id)
             ->whereNotNull("validated_at")
             ->sum("montant");
     }
