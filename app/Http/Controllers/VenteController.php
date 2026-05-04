@@ -56,7 +56,7 @@ class VenteController extends Controller
             ->get()
             ->filter(function ($chargement) use ($ventes) {
                 // Garder les chargements qui ont au moins un camion non vendu
-                $camionsVendusIds = $ventes->pluck("camions")->flatten()->pluck("camion_id")->toArray();
+                $camionsVendusIds = $chargement->ventes->pluck("camions")->flatten()->pluck("camion_id")->toArray();
                 return $chargement->camions->pluck("camion_id")->intersect($camionsVendusIds)->isEmpty();
             })->values();
 
