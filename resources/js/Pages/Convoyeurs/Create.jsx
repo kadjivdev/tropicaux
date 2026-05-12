@@ -7,8 +7,6 @@ import InputError from '@/Components/InputError';
 import CIcon from '@coreui/icons-react';
 import { cilSend, cilList, cibAddthis } from "@coreui/icons";
 import Swal from 'sweetalert2';
-import { email } from 'react-admin';
-
 
 export default function Create({ }) {
     const permissions = usePage().props.auth.permissions;

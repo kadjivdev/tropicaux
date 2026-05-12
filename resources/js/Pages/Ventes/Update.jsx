@@ -11,7 +11,7 @@ import Select from 'react-select'
 import { Textarea } from '@headlessui/react';
 import { useEffect, useState } from 'react';
 
-export default function Create({ vente, partenaires, modes, camions, chargements }) {
+export default function Create({ vente, partenaires, modes, camions, chargements, types }) {
     const permissions = usePage().props.auth.permissions;
     const [i, setI] = useState(1);
     const [iCamion, setIcamion] = useState(1);
@@ -28,15 +28,17 @@ export default function Create({ vente, partenaires, modes, camions, chargements
         data,
         setData,
         errors,
-        patch,
+        post,
         processing,
         // progress
     } = useForm({
+        _method: 'patch',
         partenaire_id: vente.partenaire_id || "",
         chargement_id: vente.chargement_id || "",
+        type_vente_id: vente.type_vente_id,
         prix: vente.prix || "",
         montant: vente.montant || "",
-        document: vente.partenaire_id || "",
+        document: null,
         poids: vente.poids || "",
         nbre_sac_rejete: vente.nbre_sac_rejete || "",
         prix_unitaire_sac_rejete: vente.prix_unitaire_sac_rejete || '',
@@ -103,7 +105,8 @@ export default function Create({ vente, partenaires, modes, camions, chargements
         e.preventDefault();
         console.log("Data en json", data)
 
-        patch(route('vente.update', vente.id), {
+        post(route('vente.update', vente.id), {
+            forceFormData: true,
             onStart: () => {
                 Swal.fire({
                     title: '<span style="color: #facc15;">🫠 Opération en cours...</span>', // yellow text
@@ -139,7 +142,10 @@ export default function Create({ vente, partenaires, modes, camions, chargements
         setData('chargement_id', option.value)
         let chargementSelected = allChargements.find((c) => c.id == option.value)
 
-        setCamionLignes(chargementSelected.camions);
+        let camions = chargementSelected.camions.map((camion) => ({ ...camion, weight_rejet: '' }))
+
+        console.log(`Les camions : ${JSON.stringify(camions)}`)
+        setCamionLignes(camions);
     }
 
     return (
@@ -190,6 +196,30 @@ export default function Create({ vente, partenaires, modes, camions, chargements
                                             <InputError className="mt-2" message={errors.partenaire_id} />
                                         </div>
 
+                                        <div className="mb-3">
+                                            <InputLabel htmlFor="type_vente_id" value="Type" >  <span className="text-danger">*</span> </InputLabel>
+                                            <Select
+                                                placeholder="Rechercher un type de vente ..."
+                                                name="type_vente_id"
+                                                id="type_vente_id"
+                                                required
+                                                className="form-control mt-1 block w-full"
+                                                options={types.map((type) => ({
+                                                    value: type.id,
+                                                    label: `${type.libelle}`,
+                                                }))}
+                                                value={types
+                                                    .map((type) => ({
+                                                        value: type.id,
+                                                        label: `${type.libelle}`,
+                                                    }))
+                                                    .find((option) => option.value === data.type_vente_id)} // set selected option
+                                                onChange={(option) => setData('type_vente_id', option.value)} // update state with id
+                                            />
+
+                                            <InputError className="mt-2" message={errors.type_vente_id} />
+                                        </div>
+
                                         <div className='mb-3'>
                                             <InputLabel htmlFor="prix" value="Le Prix" >  <span className="text-danger">*</span> </InputLabel>
                                             <TextInput
@@ -212,9 +242,15 @@ export default function Create({ vente, partenaires, modes, camions, chargements
                                                 type="file"
                                                 id="document"
                                                 className="mt-1 block w-full"
-                                                onChange={(e) => setData('document', e.target.files[0])}
+                                                accept=".pdf,.png,.jpg,.jpeg"
+                                                onChange={(e) => setData('document', e.target.files[0] ?? null)}
                                                 autoComplete="document"
                                             />
+                                            {vente.document && (
+                                                <small className="text-muted d-block mt-1">
+                                                    Document actuel: <a href={vente.document} target="_blank" rel="noreferrer">ouvrir</a>
+                                                </small>
+                                            )}
                                             <InputError className="mt-2" message={errors.document} />
                                         </div>
 
@@ -310,6 +346,7 @@ export default function Create({ vente, partenaires, modes, camions, chargements
                                         <tr>
                                             <th scope="col">N°</th>
                                             <th scope="col">Camion</th>
+                                            <th scope="col">Poids de sac rejeté</th>
                                             <th scope="col">Commentaire</th>
                                             <th scope='col'>Action</th>
                                         </tr>
@@ -343,6 +380,25 @@ export default function Create({ vente, partenaires, modes, camions, chargements
                                                                     required
                                                                 />
                                                             </div>
+                                                        </td>
+
+                                                        <td className='mb-3'>
+                                                            <InputLabel htmlFor="weight_rejet" value="Poids de Sacs rejeté" ></InputLabel>
+                                                            <TextInput
+                                                                type="number"
+                                                                id="weight_rejet"
+                                                                name="weight_rejet"
+                                                                className="mt-1 block w-full"
+                                                                value={data.weight_rejet}
+                                                                placeholder="Ex: 3.0"
+                                                                onChange={(e) => {
+                                                                    const updated = [...ligneCamions];
+                                                                    updated[index].weight_rejet = e.target.value; // ou parseFloat(e.target.value) si tu veux un nombre
+                                                                    setCamionLignes(updated);
+                                                                }}
+                                                                autoComplete="weight_rejet"
+                                                                min={0}
+                                                            />
                                                         </td>
 
                                                         <td>

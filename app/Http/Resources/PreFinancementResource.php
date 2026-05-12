@@ -16,16 +16,13 @@ class PreFinancementResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $financementAmount = $this->financements
-            ->whereNull("financement_id")
-            ->whereNotNull("validated_by")
-            ->sum("montant");
 
         return [
             "id" => $this->id,
             "reference" => $this->reference,
             "gestionnaire" => $this->gestionnaire,
             "prefinancement" => $this->prefinancement,
+            "type" => $this->type,
             // "_montant" => $this->montant,
             "montant" => number_format($this->montant, 2, ",", " "),
             "montant_dispatche" => number_format($this->dispatchedAmount(), 2, ",", " "),

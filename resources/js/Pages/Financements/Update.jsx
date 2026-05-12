@@ -10,8 +10,10 @@ import Swal from 'sweetalert2';
 import Select from 'react-select'
 import { useState } from 'react';
 
-export default function Create({ fournisseurs,financement, prefinancements }) {
+export default function Create({ fournisseurs, financement, prefinancements,types }) {
     const permissions = usePage().props.auth.permissions;
+
+    console.log(financement)
 
     const checkPermission = (name) => {
         return permissions.some(per => per.name == name);
@@ -24,14 +26,17 @@ export default function Create({ fournisseurs,financement, prefinancements }) {
         setData,
         errors,
         patch,
+        post,
         processing,
         progress
     } = useForm({
+        _method: "put",
+        type_id: financement.type_id,
         fournisseur_id: financement.fournisseur_id || "",
         prefinancement_id: financement.prefinancement_id || "",
-        montant: financement.montant || "",
+        montant: financement._montant || "",
         date_financement: financement.date_financement || "",
-        // document: "",
+        document: "",
     });
 
     // Fields handling
@@ -42,7 +47,7 @@ export default function Create({ fournisseurs,financement, prefinancements }) {
         console.log("Prefinancement sélectionnée :", selectedPreFinancement);
 
         setMaxAmount(selectedPreFinancement.reste)
-        setData("montant",selectedPreFinancement.reste)
+        setData("montant", selectedPreFinancement.reste)
     }
 
     // Change Amount
@@ -66,7 +71,8 @@ export default function Create({ fournisseurs,financement, prefinancements }) {
     const submit = (e) => {
         e.preventDefault();
 
-        patch(route('financement.update',financement.id), {
+        post(route('financement.update', financement.id), {
+            forceFormData: true,
             onStart: () => {
                 Swal.fire({
                     title: '<span style="color: #facc15;">🫠 Opération en cours...</span>', // yellow text
@@ -140,6 +146,31 @@ export default function Create({ fournisseurs,financement, prefinancements }) {
                                                     }))
                                                     .find((option) => option.value === data.prefinancement_id)} // set selected option
                                                 onChange={(option) => changePreFinancement(option)} // update state with id
+                                            />
+
+                                            <InputError className="mt-2" message={errors.prefinancement_id} />
+                                        </div>
+
+                                        {/* types */}
+                                        <div className="mb-3">
+                                            <InputLabel htmlFor="type_id" value="Type de financement" ></InputLabel>
+                                            <Select
+                                                placeholder="Rechercher un type ..."
+                                                name="type_id"
+                                                id="type_id"
+                                                // required
+                                                className="form-control mt-1 block w-full"
+                                                options={types.map((type) => ({
+                                                    value: type.id,
+                                                    label: `${type.libelle}`,
+                                                }))}
+                                                value={types
+                                                    .map((type) => ({
+                                                        value: type.id,
+                                                        label: `${type.libelle}`,
+                                                    }))
+                                                    .find((option) => option.value === data.type_id)} // set selected option
+                                                onChange={(option) => setData("type_id", option.value)} // update state with id
                                             />
 
                                             <InputError className="mt-2" message={errors.prefinancement_id} />

@@ -52,6 +52,13 @@ class Fournisseur extends Model
     {
         return $this->hasMany(DepenseFournisseur::class, 'fournisseur_id');
     }
+
+    /**Les requetes */
+    function requetes(): HasMany
+    {
+        return $this->hasMany(SoldeRequest::class, "fournisseur_id");
+    }
+
     /**Solde fournisseur */
     function getSoldeAttribute()
     {
@@ -61,10 +68,18 @@ class Fournisseur extends Model
             ->where("campagne_id", Session::get("campagne")?->id)
             ->whereNotNull("validated_at")
             ->sum(fn($financement) => $financement->reste)
+
             // le toatl des chargmeents
             - $this->total_chargement_amount
+
             // les depenses validées
             - $this->depenses()
+            ->where("campagne_id", Session::get("campagne")?->id)
+            ->whereNotNull("validated_at")
+            ->sum("montant")
+
+            // les requetes
+            + $this->requetes()
             ->where("campagne_id", Session::get("campagne")?->id)
             ->whereNotNull("validated_at")
             ->sum("montant");

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\TypeVente;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -21,6 +22,7 @@ class VenteResource extends JsonResource
             "reference" => $this->reference,
             "partenaire" => $this->partenaire,
             "chargement" => $this->chargement,
+            "type" => $this->type,
             "prix" => $this->prix,
             "montant" => number_format($this->montant, 2, "."),
             "_montant" => $this->montant,

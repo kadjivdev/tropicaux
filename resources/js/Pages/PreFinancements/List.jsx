@@ -376,6 +376,7 @@ export default function List({ financements, gestionnaires }) {
                                     <th scope="col text-center">Action</th>
                                     <th scope="col">Reference</th>
                                     <th scope="col">Gestionnaire</th>
+                                    <th scope="col">Type</th>
                                     <th scope="col">Montant</th>
                                     <th scope="col">Montant Dispatché</th>
                                     <th scope="col">Transféré</th>
@@ -449,6 +450,7 @@ export default function List({ financements, gestionnaires }) {
                                                 }
                                             </td>
                                             <td>{financement?.gestionnaire?.raison_sociale}</td>
+                                            <td><span className="badge bg-light rounded text-dark rounded shadow-sm">{financement.type?.libelle || '---'}</span></td>
                                             <td><span className="badge bg-light rounded text-dark rounded shadow-sm">{financement.montant}</span></td>
                                             <td><strong className="badge bg-light rounded text-dark rounded shadow-sm">{financement.montant_dispatche}</strong></td>
                                             <td><strong className="badge bg-light rounded text-danger rounded shadow-sm">{financement.transfered_amount}</strong></td>

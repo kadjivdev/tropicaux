@@ -12,18 +12,6 @@ export default function List({ fournisseur, chargements, total_amount }) {
         return permissions.some(per => per.name == name);
     }
 
-    const getDate = (d) => {
-        let dateFr = null
-        if (d) {
-            const date = new Date(d);
-            dateFr = date.toLocaleString('fr-FR', {
-                dateStyle: 'short',
-                timeStyle: 'short'
-            });
-        }
-
-        return dateFr;
-    }
 
     return (
         <AuthenticatedLayout

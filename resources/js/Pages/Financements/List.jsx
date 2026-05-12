@@ -274,6 +274,7 @@ export default function List({ financements, prefinancements, fournisseurs }) {
                                     <th scope="col">Reference</th>
                                     <th scope="col">Pré-Financement</th>
                                     <th scope="col">Fournisseur</th>
+                                    <th scope="col">Type</th>
                                     <th scope="col">Montant</th>
                                     <th scope="col">Montant retourné</th>
                                     <th scope="col">Transféré</th>
@@ -340,10 +341,10 @@ export default function List({ financements, prefinancements, fournisseurs }) {
                                             <td>
                                                 <span className="badge bg-light rounded text-dark rounded shadow-sm"> {financement?.reference ?? '---'}</span>  <br />
                                                 {financement.financement && <span className="badge bg-light rounded text-info rounded shadow-sm"> (Transfert de : {financement.financement.reference})</span>}
-
                                             </td>
                                             <td><span className="badge bg-light rounded text-success rounded shadow-sm">{`${financement?.prefinancement?.reference}`} </span> </td>
                                             <td>{financement?.fournisseur?.raison_sociale ?? '---'}</td>
+                                            <td><span className="badge bg-light border rounded text-dark">{financement.type?.libelle || '---'} </span></td>
                                             <td><span className="badge bg-light border rounded text-dark">{financement.montant} FCFA</span></td>
                                             <td>
                                                 <span className="badge bg-light border rounded text-danger">{financement.back_amount} FCFA</span>

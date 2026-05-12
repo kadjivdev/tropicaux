@@ -87,6 +87,32 @@ export default function SidebarMenu(props) {
                                 </CNavGroup> : null
                             }
 
+                            {/* Requetes Fournisseurs */}
+                            {checkPermission('fournisseur.view') || checkPermission('fournisseur.create') ?
+                                <CNavGroup
+                                    toggler={
+                                        <>
+                                            <CIcon customClassName="nav-icon text-success" icon={cibMyspace} /> Requetes Fournisseurs
+                                        </>
+                                    }
+                                >
+                                    {checkPermission('fournisseur.view') ?
+                                        (<Link href={route('requete_fournisseur.index')} className="nav-link">
+                                            <span className="nav-icon">
+                                                <span className="nav-icon-bullet text-danger"></span>
+                                            </span>
+                                            Liste des requetes
+                                        </Link>) : null}
+
+                                    {checkPermission('fournisseur.create') ? (<Link href={route('requete_fournisseur.create')} className="nav-link">
+                                        <span className="nav-icon">
+                                            <span className="nav-icon-bullet"></span>
+                                        </span>
+                                        Ajouter une requete
+                                    </Link>) : null}
+                                </CNavGroup> : null
+                            }
+
                             {/* Gestionnaires des fonds */}
                             {checkPermission('gestionnaire.view') || checkPermission('gestionnaire.create') ?
                                 <CNavGroup
@@ -335,12 +361,23 @@ export default function SidebarMenu(props) {
                                     }
                                 >
                                     {checkPermission('vente.view') ?
-                                        (<Link href={route('vente.index')} className="nav-link">
-                                            <span className="nav-icon">
-                                                <span className="nav-icon-bullet text-danger"></span>
-                                            </span>
-                                            Liste des Ventes
-                                        </Link>) : null}
+                                        (
+                                            <>
+                                                <Link href={route('vente.index')} className="nav-link">
+                                                    <span className="nav-icon">
+                                                        <span className="nav-icon-bullet text-danger"></span>
+                                                    </span>
+                                                    Liste des Ventes
+                                                </Link>
+
+                                                <Link href={route('vente.venteSpeciales')} className="nav-link">
+                                                    <span className="nav-icon">
+                                                        <span className="nav-icon-bullet text-danger"></span>
+                                                    </span>
+                                                    Ventes spéciales
+                                                </Link>
+                                            </>
+                                        ) : null}
 
                                     {checkPermission('vente.create') ? (<Link href={route('vente.create')} className="nav-link">
                                         <span className="nav-icon">

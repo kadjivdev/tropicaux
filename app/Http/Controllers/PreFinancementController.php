@@ -8,6 +8,7 @@ use App\Models\GestionnaireFond;
 // use App\Models\Financement;
 // use App\Models\Fournisseur;
 use App\Models\PreFinancement;
+use App\Models\TypeFinancement;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,10 +27,6 @@ class PreFinancementController extends Controller
         $sessionId = Session::get("campagne")?->id;
         $preFinancements = PreFinancement::where("campagne_id", $sessionId)->get();
 
-        // $gestionnaires = User::whereHas("roles", function ($role) {
-        //     $role->where("name", "Gestionnaire de fonds");
-        // })->get();
-
         $gestionnaires = GestionnaireFond::all(["id", "raison_sociale"]);
 
         return inertia("PreFinancements/List", [
@@ -44,14 +41,12 @@ class PreFinancementController extends Controller
 
     function create()
     {
-        // $gestionnaires = User::whereHas("roles", function ($role) {
-        //     $role->where("name", "Gestionnaire de fonds");
-        // })->get();
 
         $gestionnaires = GestionnaireFond::all(["id", "raison_sociale"]);
 
         return inertia("PreFinancements/Create", [
-            "gestionnaires" => $gestionnaires
+            "gestionnaires" => $gestionnaires,
+            "types" => TypeFinancement::all()
         ]);
     }
 
@@ -62,10 +57,15 @@ class PreFinancementController extends Controller
     {
         $validated = $request->validate([
             "gestionnaire_id" => ["required", "integer"],
+            "type_id" => ["required", "integer", "exists:type_financements,id"],
+
             "montant" => ["required", "numeric"],
             "date_financement" => ["required", "date"],
             "document" => ["nullable", "file", "mimes:pdf,png,jpg,jpeg"],
         ], [
+            "type_id.required" => "Le type de financement est requis.",
+            "type_id.integer" => "Le type de financement doit être un entier.",
+
             "gestionnaire_id.required" => "Le gestionnaire est requis.",
             "gestionnaire_id.integer" => "Le gestionnaire doit être un entier.",
 
@@ -106,7 +106,8 @@ class PreFinancementController extends Controller
 
         return inertia("PreFinancements/Update", [
             "financement" => $prefinancement,
-            "gestionnaires" => $gestionnaires
+            "gestionnaires" => $gestionnaires,
+            "types" => TypeFinancement::all()
         ]);
     }
 
@@ -119,11 +120,16 @@ class PreFinancementController extends Controller
 
         try {
             $validated = $request->validate([
+                "type_id" => ["required", "integer", "exists:type_financements,id"],
+
                 "gestionnaire_id" => ["required", "integer"],
                 "montant" => ["required", "numeric"],
                 "date_financement" => ["required", "date"],
                 "document" => ["nullable", "file", "mimes:pdf,png,jpg,jpeg"],
             ], [
+                "type_id.required" => "Le type de financement est requis.",
+                "type_id.integer" => "Le type de financement doit être un entier.",
+
                 "gestionnaire_id.required" => "Le gestionnaire est requis.",
                 "gestionnaire_id.integer" => "Le gestionnaire doit être un entier.",
 
@@ -221,7 +227,7 @@ class PreFinancementController extends Controller
 
             Log::info("Donnée validées", ["data" => $validated]);
             Log::debug("Transfert du reste effecté pour le pré-financement", ["prefinancement" => $prefinancement]);
-            
+
             DB::commit();
             return redirect()->route("prefinancement.index");
         } catch (\Illuminate\Validation\ValidationException $e) {

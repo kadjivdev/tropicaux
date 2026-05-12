@@ -11,10 +11,9 @@ import Select from 'react-select'
 import { Textarea } from '@headlessui/react';
 import { useEffect, useState } from 'react';
 
-export default function Create({ partenaires, modes, camions, chargements }) {
+export default function Create({ partenaires, modes, camions, chargements, types }) {
     const permissions = usePage().props.auth.permissions;
     const [i, setI] = useState(1);
-    const [iCamion, setIcamion] = useState(1);
 
     const allChargements = chargements
     const [lignes, setLignes] = useState([]);
@@ -33,6 +32,7 @@ export default function Create({ partenaires, modes, camions, chargements }) {
     } = useForm({
         partenaire_id: "",
         chargement_id: "",
+        type_vente_id: "",
         prix: "",
         // montant: "",
         document: "",
@@ -43,19 +43,6 @@ export default function Create({ partenaires, modes, camions, chargements }) {
         modes: lignes,
         camions: ligneCamions,
     });
-
-    // Gestion des camions
-    const addCamionLine = (e) => {
-        e.preventDefault()
-
-        setCamionLignes([...ligneCamions, {
-            id: iCamion,
-            commentaire: '',
-        }]);
-
-        setIcamion(iCamion + 1)
-        console.log("initial lignes ", ligneCamions)
-    };
 
     useEffect(() => {
         setData("camions", ligneCamions);
@@ -136,7 +123,10 @@ export default function Create({ partenaires, modes, camions, chargements }) {
         setData('chargement_id', option.value)
         let chargementSelected = allChargements.find((c) => c.id == option.value)
 
-        setCamionLignes(chargementSelected.camions);
+        let camions = chargementSelected.camions.map((camion) => ({ ...camion, weight_rejet: '' }))
+
+        console.log(`Les camions : ${JSON.stringify(camions)}`)
+        setCamionLignes(camions);
     }
 
     return (
@@ -187,6 +177,30 @@ export default function Create({ partenaires, modes, camions, chargements }) {
                                             <InputError className="mt-2" message={errors.partenaire_id} />
                                         </div>
 
+                                        <div className="mb-3">
+                                            <InputLabel htmlFor="type_vente_id" value="Type" >  <span className="text-danger">*</span> </InputLabel>
+                                            <Select
+                                                placeholder="Rechercher un type de vente ..."
+                                                name="type_vente_id"
+                                                id="type_vente_id"
+                                                required
+                                                className="form-control mt-1 block w-full"
+                                                options={types.map((type) => ({
+                                                    value: type.id,
+                                                    label: `${type.libelle}`,
+                                                }))}
+                                                value={types
+                                                    .map((type) => ({
+                                                        value: type.id,
+                                                        label: `${type.libelle}`,
+                                                    }))
+                                                    .find((option) => option.value === data.type_vente_id)} // set selected option
+                                                onChange={(option) => setData('type_vente_id', option.value)} // update state with id
+                                            />
+
+                                            <InputError className="mt-2" message={errors.type_vente_id} />
+                                        </div>
+
                                         <div className='mb-3'>
                                             <InputLabel htmlFor="prix" value="Le Prix" >  <span className="text-danger">*</span> </InputLabel>
                                             <TextInput
@@ -217,6 +231,7 @@ export default function Create({ partenaires, modes, camions, chargements }) {
                                         </div>
 
                                     </div>
+
                                     <div className="col-md-6">
                                         <div className='mb-3'>
                                             <InputLabel htmlFor="poids" value="Le poids" > </InputLabel>
@@ -300,7 +315,6 @@ export default function Create({ partenaires, modes, camions, chargements }) {
                                 {/* Camions */}
                                 <div className="d-flex" style={{ justifyContent: 'space-between' }}>
                                     <span className="text-success"><CIcon icon={cilTruck} /> Détail des camions</span>
-
                                 </div>
 
                                 <table className="table">
@@ -308,6 +322,7 @@ export default function Create({ partenaires, modes, camions, chargements }) {
                                         <tr>
                                             <th scope="col">N°</th>
                                             <th scope="col">Camion</th>
+                                            <th scope="col">Poids de sac rejeté</th>
                                             <th scope="col">Commentaire</th>
                                             <th scope='col'>Action</th>
                                         </tr>
@@ -341,6 +356,25 @@ export default function Create({ partenaires, modes, camions, chargements }) {
                                                                     required
                                                                 />
                                                             </div>
+                                                        </td>
+
+                                                        <td className='mb-3'>
+                                                            <InputLabel htmlFor="weight_rejet" value="Poids de Sacs rejeté" ></InputLabel>
+                                                            <TextInput
+                                                                type="number"
+                                                                id="weight_rejet"
+                                                                name="weight_rejet"
+                                                                className="mt-1 block w-full"
+                                                                value={data.weight_rejet}
+                                                                placeholder="Ex: 3.0"
+                                                                onChange={(e) => {
+                                                                    const updated = [...ligneCamions];
+                                                                    updated[index].weight_rejet = e.target.value; // ou parseFloat(e.target.value) si tu veux un nombre
+                                                                    setCamionLignes(updated);
+                                                                }}
+                                                                autoComplete="weight_rejet"
+                                                                min={0}
+                                                            />
                                                         </td>
 
                                                         <td>

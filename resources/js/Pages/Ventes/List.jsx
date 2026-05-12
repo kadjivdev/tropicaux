@@ -17,6 +17,8 @@ export default function List({ ventes, chargements, total_amount }) {
         return permissions.some(per => per.name == name);
     }
 
+    console.log(ventes.data)
+    
     const allVentes = ventes.data;
     const [_ventes, setVentes] = useState(ventes.data);
     const [currentVente, setCurrentVente] = useState(null);
@@ -28,6 +30,9 @@ export default function List({ ventes, chargements, total_amount }) {
 
     const showCamionsModal = (e, vente) => {
         e.preventDefault();
+
+        console.log(vente)
+
         setCurrentVente(vente);
         setShowCamions(true);
     }
@@ -200,6 +205,7 @@ export default function List({ ventes, chargements, total_amount }) {
                                     <th scope="col">Chargement</th>
                                     <th scope="col">Partenaire</th>
                                     <th scope="col">Camions</th>
+                                    <th scope="col">Type</th>
                                     <th scope="col">Mode paiements</th>
                                     <th scope='col'>Montant</th>
                                     <th scope='col'>Dépense</th>
@@ -272,7 +278,7 @@ export default function List({ ventes, chargements, total_amount }) {
                                             <td> <span className="badge bg-light border rounded text-success"> {vente.chargement?.reference} </span></td>
                                             <td>{vente?.partenaire?.raison_sociale ?? '---'}</td>
                                             <td className='text-center'>
-                                                <p className="border">{vente.camions.map(c => <small className='mx-1 border text-dark'>{c.camion?.libelle}</small>)}</p>
+                                                <p className="border">{vente.camions.map((c, index) => <small className='mx-1 border text-dark' key={index}>{c.camion?.libelle}</small>)}</p>
 
                                                 <button
                                                     className='btn btn-sm btn-light border shadow-sm rounded text-success'
@@ -281,6 +287,7 @@ export default function List({ ventes, chargements, total_amount }) {
                                                     <CIcon icon={cilTruck} />
                                                 </button>
                                             </td>
+                                            <td>{vente?.type?.libelle ?? '---'}</td>
                                             <td className='text-center'>
                                                 <button
                                                     className='btn btn-sm btn-light border shadow-sm rounded text-success'
@@ -336,6 +343,7 @@ export default function List({ ventes, chargements, total_amount }) {
                                 <tr>
                                     <th scope="col">N°</th>
                                     <th scope="col">Camion</th>
+                                    <th scope="col">Poids de sac rejeté</th>
                                     <th scope="col">Commentaire</th>
                                 </tr>
                             </thead>
@@ -350,6 +358,15 @@ export default function List({ ventes, chargements, total_amount }) {
                                                         type="text"
                                                         className="mt-1 block w-full form-control"
                                                         value={data.camion?.libelle}
+                                                        disabled={true}
+                                                    />
+                                                </td>
+
+                                                <td>
+                                                    <TextInput
+                                                        type="number"
+                                                        className="mt-1 block w-full form-control"
+                                                        value={data?.weight_rejet || 0}
                                                         disabled={true}
                                                     />
                                                 </td>

@@ -24,7 +24,9 @@ class PreFinancement extends Model
         'user_id',
         'validated_by',
         'validated_at',
-        "campagne_id"
+        "campagne_id",
+
+        "type_id"
     ];
 
 
@@ -75,7 +77,7 @@ class PreFinancement extends Model
 
     function reste()
     {
-        return 
+        return
             // le reste (montant - financements)
             ($this->montant - $this->dispatchedAmount())
             // les retours
@@ -83,6 +85,12 @@ class PreFinancement extends Model
             // les montants déjà transférés vers les financements
             // + $this->transferedAmount()
         ;
+    }
+
+    /**Type */
+    function type(): BelongsTo
+    {
+        return $this->belongsTo(TypeFinancement::class, "type_id");
     }
 
     /**Gestionnaire */

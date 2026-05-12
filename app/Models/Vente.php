@@ -33,7 +33,9 @@ class Vente extends Model
         'validated_at',
 
         'user_id',
-        'campagne_id'
+        'campagne_id',
+
+        'type_vente_id'
     ];
 
     /*Casts*/
@@ -58,6 +60,12 @@ class Vente extends Model
     function partenaire(): BelongsTo
     {
         return $this->belongsTo(Partenaire::class, 'partenaire_id');
+    }
+
+    /**Type de vente */
+    function type(): BelongsTo
+    {
+        return $this->belongsTo(TypeVente::class, "type_vente_id");
     }
 
     /**Chargement */

@@ -14,6 +14,7 @@ class VenteCamion extends Model
     protected $fillable = [
         'vente_id',
         'camion_id',
+        'weight_rejet', //le poid de sac rejeté
 
         'commentaire',
         'user_id',

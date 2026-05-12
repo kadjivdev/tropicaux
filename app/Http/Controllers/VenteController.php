@@ -7,6 +7,7 @@ use App\Models\Camion;
 use App\Models\Chargement;
 use App\Models\PaiementMode;
 use App\Models\Partenaire;
+use App\Models\TypeVente;
 use App\Models\Vente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -31,6 +32,29 @@ class VenteController extends Controller
             ->get();
 
         return inertia("Ventes/List", [
+            "ventes" => VenteResource::collection($ventes),
+            "chargements" => $chargements,
+            "total_amount" => number_format($ventes->sum("total_amount"), 2, ',', ' '),
+        ]);
+    }
+
+    /**
+     * Liste des ventes spéciales
+     */
+
+    function venteSpeciales()
+    {
+        $sessionId = Session::get("campagne")?->id;
+        $ventes = Vente::where("campagne_id", $sessionId)
+            ->where("type_vente_id", 2) //les ventes spéciales
+            ->get();
+
+        $chargements = Chargement::with("camions")
+            ->where("campagne_id", $sessionId)
+            ->whereNotNull("validated_by")
+            ->get();
+
+        return inertia("Ventes/Speciale", [
             "ventes" => VenteResource::collection($ventes),
             "chargements" => $chargements,
             "total_amount" => number_format($ventes->sum("total_amount"), 2, ',', ' '),
@@ -65,6 +89,7 @@ class VenteController extends Controller
             "modes" => $modes,
             "camions" => $camions,
             "chargements" => $chargements,
+            "types" => TypeVente::all(),
         ]);
     }
 
@@ -78,6 +103,7 @@ class VenteController extends Controller
         $validated = $request->validate([
             "partenaire_id" => ["required", "integer"],
             "chargement_id" => ["required", "integer"],
+            "type_vente_id" => ["required", "integer"],
             "prix" => ["required", "numeric"],
             // "montant" => ["required", "numeric"],
             "document" => ["nullable", "file", "mimes:pdf,png,jpg,jpeg"],
@@ -96,6 +122,9 @@ class VenteController extends Controller
 
             "chargement_id.required" => "Le chargement est requis.",
             "chargement_id.integer" => "Le chargement doit être un entier.",
+
+            "type_vente_id.required" => "Le type de vente est requis.",
+            "type_vente_id.integer" => "Le type de vente doit être un entier.",
 
             "prix.required" => "Le prix est requis.",
             "prix.numeric" => "Le prix doit être un nombre.",
@@ -136,7 +165,12 @@ class VenteController extends Controller
             $vente->modes()->createMany($validated["modes"]);
 
             DB::commit();
-            Log::info("Nouvelle vente créé avec succès", ["vente_id" => $vente->id, "created_by" => auth()->user()->id]);
+            Log::info("Nouvelle vente créé avec succès", ["vente_id" => $vente->id, "created_by" => Auth::id()]);
+
+            // ventes spéciales
+            if ($request->type_vente_id == 2) {
+                return redirect()->route("vente.venteSpeciales");
+            }
             return redirect()->route("vente.index");
         } catch (\Illuminate\Validation\ValidationException $e) {
             Log::debug("Erreure lors de la création d'une vente", ["error" => $e->errors()]);
@@ -169,6 +203,7 @@ class VenteController extends Controller
             "modes" => $modes,
             "camions" => $camions,
             "chargements" => $chargements,
+            "types" => TypeVente::all(),
         ]);
     }
 
@@ -187,6 +222,7 @@ class VenteController extends Controller
                 "prix" => ["required", "numeric"],
                 "montant" => ["required", "numeric"],
                 "document" => ["nullable", "file", "mimes:pdf,png,jpg,jpeg"],
+                "type_vente_id" => ["required", "integer"],
 
                 "poids" => ["required", "numeric"],
                 "nbre_sac_rejete" => ["nullable", "numeric"],
@@ -199,6 +235,8 @@ class VenteController extends Controller
             ], [
                 "partenaire_id.required" => "Le partenaire est requis.",
                 "partenaire_id.integer" => "Le partenaire doit être un entier.",
+                "type_vente_id.required" => "Le type de vente est requis.",
+                "type_vente_id.integer" => "Le type de vente doit être un entier.",
 
                 "prix.required" => "Le prix est requis.",
                 "prix.numeric" => "Le prix doit être un nombre.",
@@ -246,8 +284,12 @@ class VenteController extends Controller
                 ->createMany($validated["modes"]);
 
             DB::commit();
-            Log::info("Nouvelle vente créé avec succès", ["vente_id" => $vente->id, "created_by" => auth()->user()->id]);
+            Log::info("Nouvelle vente créé avec succès", ["vente_id" => $vente->id, "created_by" => Auth::id()]);
 
+            // ventes spéciales
+            if ($request->type_vente_id == 2) {
+                return redirect()->route("vente.venteSpeciales");
+            }
             return redirect()->route("vente.index");
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
@@ -278,6 +320,11 @@ class VenteController extends Controller
             ]);
 
             DB::commit();
+
+            // ventes spéciales
+            if ($vente->type_vente_id == 2) {
+                return redirect()->route("vente.venteSpeciales");
+            }
             return redirect()->route("vente.index");
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
@@ -304,6 +351,10 @@ class VenteController extends Controller
             $vente->delete();
 
             DB::commit();
+            // ventes spéciales
+            if ($vente->type_vente_id == 2) {
+                return redirect()->route("vente.venteSpeciales");
+            }
             return redirect()->route("vente.index");
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();

@@ -23,21 +23,21 @@ use App\Http\Controllers\PreFinancementController;
 use App\Http\Controllers\ProduitController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SoldeRequestController;
 use App\Http\Controllers\SuperviseurController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VenteController;
-use App\Models\PreFinancement;
+use App\Models\TypeVente;
 use Illuminate\Support\Facades\Route;
 
 Route::get("/debug", function () {
 
-    $prefinancement = PreFinancement::firstWhere("reference", "PREFINAN-1773133188-CE");
+    TypeVente::insert([
+        ["libelle" => "Vente normale", "description" => ""],
+        ["libelle" => "Vente spéciale", "description" => ""]
+    ]);
 
-    if ($prefinancement) {
-        $prefinancement->delete();
-    }
-
-    return "PREFINAN-1773133188-CE supprimée avec succès";
+    return "Tyoes de ventes inserés";
 });
 
 Route::redirect('/', '/login');
@@ -75,6 +75,10 @@ Route::middleware('auth')->group(function () {
         Route::get("fournisseur/{fournisseur}/financements", [FournisseurController::class, "financements"])->name("fournisseur.financements");
         Route::get("fournisseur/{fournisseur}/chargements", [FournisseurController::class, "chargements"])->name("fournisseur.chargements");
 
+        // Requetes solde fournisseur
+        Route::resource("requete_fournisseur",SoldeRequestController::class);
+        Route::patch("/requete_fournisseur/{requete_fournisseur}/validate", [SoldeRequestController::class, "validateSoldeRequeste"])->name("requete_fournisseur.validate");
+
         // Chargements
         Route::resource("chargement", ChargementController::class);
         Route::patch("/chargement/{chargement}/validate", [ChargementController::class, "validatedChargement"])->name("chargement.validate");
@@ -100,6 +104,7 @@ Route::middleware('auth')->group(function () {
         // Ventes
         Route::resource("vente", VenteController::class);
         Route::patch("/vente/{vente}/validate", [VenteController::class, "validatedVente"])->name("vente.validate");
+        Route::get("/vente-speciales", [VenteController::class, "venteSpeciales"])->name("vente.venteSpeciales");
 
         // Dépenses ventes
         Route::resource("depense-vente", DepenseVenteController::class);

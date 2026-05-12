@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
 
-         /**
+        /**
          * Users
          */
         $user = User::factory()->create([
@@ -41,7 +41,8 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             ModePaiementSeeder::class,
             AllPermissionToSuperAdminSeeder::class,
-            TypeDepenseGenenraleSeeder::class
+            TypeDepenseGenenraleSeeder::class,
+            TypeFinancementSeeder::class
         ]);
     }
 }

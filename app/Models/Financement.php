@@ -27,7 +27,9 @@ class Financement extends Model
         'validated_at',
         "campagne_id",
         "reste_transfere",
-        "financement_id"
+        "financement_id",
+
+        "type_id"
     ];
 
     /**Cast */
@@ -55,6 +57,12 @@ class Financement extends Model
     function fournisseur(): BelongsTo
     {
         return $this->belongsTo(Fournisseur::class, 'fournisseur_id');
+    }
+
+    /**Type */
+    function type(): BelongsTo
+    {
+        return $this->belongsTo(TypeFinancement::class, "type_id");
     }
 
     /**Pre Financement */

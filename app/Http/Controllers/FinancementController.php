@@ -7,6 +7,7 @@ use App\Http\Resources\PreFinancementResource;
 use App\Models\Financement;
 use App\Models\Fournisseur;
 use App\Models\PreFinancement;
+use App\Models\TypeFinancement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -52,6 +53,7 @@ class FinancementController extends Controller
         return inertia("Financements/Create", [
             "fournisseurs" => $fournisseurs,
             "prefinancements" => PreFinancementResource::collection($prefinancements),
+            "types" => TypeFinancement::all()
         ]);
     }
 
@@ -61,14 +63,18 @@ class FinancementController extends Controller
     function store(Request $request)
     {
         $validated = $request->validate([
-            "fournisseur_id" => ["required", "integer"],
+            "fournisseur_id" => ["required", "integer", 'exists:fournisseurs,id'],
             "prefinancement_id" => ["required", "integer", "exists:pre_financements,id"],
+            "type_id" => ["required", "integer", "exists:type_financements,id"],
             "montant" => ["required", "numeric"],
             "date_financement" => ["required", "date"],
             "document" => ["nullable", "file", "mimes:pdf,png,jpg,jpeg"],
         ], [
             "fournisseur_id.required" => "Le fournisseur est requis.",
             "fournisseur_id.integer" => "Le fournisseur doit être un entier.",
+
+            "type_id.required" => "Le type de financement est requis.",
+            "type_id.integer" => "Le type de financement doit être un entier.",
 
             "prefinancement_id.required" => "Le pré financement est requis.",
             "prefinancement_id.integer" => "Le pré financement doit être un entier.",
@@ -118,7 +124,8 @@ class FinancementController extends Controller
         return inertia("Financements/Update", [
             'financement' => $financement,
             "fournisseurs" => $fournisseurs,
-            "prefinancements" => PreFinancementResource::collection($prefinancements)
+            "prefinancements" => PreFinancementResource::collection($prefinancements),
+            "types" => TypeFinancement::all()
         ]);
     }
 
@@ -131,14 +138,18 @@ class FinancementController extends Controller
 
         try {
             $validated = $request->validate([
-                "fournisseur_id" => ["required", "integer"],
+                "fournisseur_id" => ["required", "integer", 'exists:fournisseurs,id'],
                 "prefinancement_id" => ["required", "integer", "exists:pre_financements,id"],
+                "type_id" => ["required", "integer", "exists:type_financements,id"],
                 "montant" => ["required", "numeric"],
                 "date_financement" => ["required", "date"],
                 "document" => ["nullable", "file", "mimes:pdf,png,jpg,jpeg"],
             ], [
                 "fournisseur_id.required" => "Le fournisseur est requis.",
                 "fournisseur_id.integer" => "Le fournisseur doit être un entier.",
+
+                "type_id.required" => "Le type de financement est requis.",
+                "type_id.integer" => "Le type de financement doit être un entier.",
 
                 "prefinancement_id.required" => "Le pré financement est requis.",
                 "prefinancement_id.integer" => "Le pré financement doit être un entier.",
@@ -231,7 +242,7 @@ class FinancementController extends Controller
 
             //Generation d'un financement au nouveau fournisseur
             $financement->financements()->create($validated);
-           
+
             //Mise à jour du financement initial pour indiquer le montant transféré et le pré-financement lié
             $financement->update([
                 "reste_transfere" => $financement->reste_transfere + $validated["reste"],

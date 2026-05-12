@@ -9,7 +9,7 @@ import { cilSend, cilList, cilPencil } from "@coreui/icons";
 import Swal from 'sweetalert2';
 import Select from 'react-select'
 
-export default function Update({ financement,gestionnaires }) {
+export default function Update({ financement, gestionnaires, types }) {
     const permissions = usePage().props.auth.permissions;
 
     const checkPermission = (name) => {
@@ -21,18 +21,22 @@ export default function Update({ financement,gestionnaires }) {
         setData,
         errors,
         patch,
+        post,
         processing,
     } = useForm({
+        _method: "put",
+        type_id: financement.type_id,
         gestionnaire_id: financement.gestionnaire_id,
         montant: financement.montant,
         date_financement: new Date(financement.date_financement),
-        // document: financement.document,
+        document: financement.document,
     });
 
     const submit = (e) => {
         e.preventDefault();
 
-        patch(route('prefinancement.update',financement.id), {
+        post(route('prefinancement.update', financement.id), {
+            forceFormData: true,
             onStart: () => {
                 Swal.fire({
                     title: '<span style="color: #facc15;">🫠 Opération en cours...</span>', // yellow text
@@ -102,6 +106,31 @@ export default function Update({ financement,gestionnaires }) {
                                             />
                                             <InputError className="mt-2" message={errors.montant} />
                                         </div>
+
+                                        {/* types */}
+                                        <div className="mb-3">
+                                            <InputLabel htmlFor="type_id" value="Type de financement" ></InputLabel>
+                                            <Select
+                                                placeholder="Rechercher un type ..."
+                                                name="type_id"
+                                                id="type_id"
+                                                // required
+                                                className="form-control mt-1 block w-full"
+                                                options={types.map((type) => ({
+                                                    value: type.id,
+                                                    label: `${type.libelle}`,
+                                                }))}
+                                                value={types
+                                                    .map((type) => ({
+                                                        value: type.id,
+                                                        label: `${type.libelle}`,
+                                                    }))
+                                                    .find((option) => option.value === data.type_id)} // set selected option
+                                                onChange={(option) => setData("type_id", option.value)} // update state with id
+                                            />
+
+                                            <InputError className="mt-2" message={errors.prefinancement_id} />
+                                        </div>
                                     </div>
                                     <div className="col-md-6">
                                         <div className="mb-3">
@@ -137,13 +166,13 @@ export default function Update({ financement,gestionnaires }) {
                                                 value={data.date_financement}
                                                 onChange={(e) => setData('date_financement', e.target.value)}
                                                 autoComplete="date_financement"
-                                                // required
+                                            // required
                                             />
                                             <InputError className="mt-2" message={errors.date_financement} />
                                         </div>
                                     </div>
 
-                                    {/* <div className="col-12">
+                                    <div className="col-12">
                                         <div className='mb-3'>
                                             <InputLabel htmlFor="document" value="Document(preuve)" > </InputLabel>
                                             <TextInput
@@ -156,7 +185,7 @@ export default function Update({ financement,gestionnaires }) {
 
                                             <InputError className="mt-2" message={errors.document} />
                                         </div>
-                                    </div> */}
+                                    </div>
                                 </div>
 
                                 <div className="flex items-center gap-4">
