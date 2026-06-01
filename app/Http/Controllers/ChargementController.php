@@ -164,7 +164,7 @@ class ChargementController extends Controller
             "chauffeur_id" => ["required", "integer"],
             "superviseur_id" => ["required", "integer"],
             "convoyeur_id" => ["nullable", "integer"],
-            "magasin_id" => ["required", "integer"],
+            "magasin_id" => ["nullable", "integer"],
             "adresse" => ["required"],
             "observation" => ["nullable"],
 
