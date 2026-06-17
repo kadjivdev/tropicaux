@@ -25,6 +25,7 @@ class DashboardController extends Controller
         Log::debug("La session concernée :", ["session" => Session::get("campagne")?->id]);
 
         $financementsAmount = Financement::where("campagne_id", $sessionId)
+            ->where("fournisseur_id", '!=', 42)//on tinet pas compte des financements faits à la DG DE KADJIV
             ->whereNull("financement_id") // on fait l'exception des financements issus des transferts
             ->whereNotNull("validated_at")
             ->sum("montant");

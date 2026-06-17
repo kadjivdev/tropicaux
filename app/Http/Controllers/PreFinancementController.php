@@ -41,9 +41,7 @@ class PreFinancementController extends Controller
 
     function create()
     {
-
         $gestionnaires = GestionnaireFond::all(["id", "raison_sociale"]);
-
         return inertia("PreFinancements/Create", [
             "gestionnaires" => $gestionnaires,
             "types" => TypeFinancement::all()
@@ -57,13 +55,13 @@ class PreFinancementController extends Controller
     {
         $validated = $request->validate([
             "gestionnaire_id" => ["required", "integer"],
-            "type_id" => ["required", "integer", "exists:type_financements,id"],
+            "type_id" => ["nullable", "integer", "exists:type_financements,id"],
 
             "montant" => ["required", "numeric"],
             "date_financement" => ["required", "date"],
             "document" => ["nullable", "file", "mimes:pdf,png,jpg,jpeg"],
         ], [
-            "type_id.required" => "Le type de financement est requis.",
+            // "type_id.required" => "Le type de financement est requis.",
             "type_id.integer" => "Le type de financement doit être un entier.",
 
             "gestionnaire_id.required" => "Le gestionnaire est requis.",

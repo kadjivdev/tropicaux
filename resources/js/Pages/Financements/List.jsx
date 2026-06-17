@@ -14,6 +14,7 @@ import SecondaryButton from '@/Components/SecondaryButton';
 
 export default function List({ financements, prefinancements, fournisseurs }) {
     const permissions = usePage().props.auth.permissions;
+    const DG_KADJIV_ID = 42
 
     const checkPermission = (name) => {
         return permissions.some(per => per.name == name);
@@ -123,18 +124,24 @@ export default function List({ financements, prefinancements, fournisseurs }) {
     };
 
     useEffect(() => {
+        // on tient pas compte des financements faits à la DG KADJIV
+        const montant = _financements
+            .filter((f) => f.fournisseur?.id != DG_KADJIV_ID)
+            .reduce((acc, financement) => {
+                return acc + parseAmount(financement.montant); // On ajoute 0 si "reste" est undefined ou null
+            }, 0);
 
-        const montant = _financements.reduce((acc, financement) => {
-            return acc + parseAmount(financement.montant); // On ajoute 0 si "reste" est undefined ou null
-        }, 0);
+        const retour = _financements
+            .filter((f) => f.fournisseur?.id != DG_KADJIV_ID)
+            .reduce((acc, financement) => {
+                return acc + parseAmount(financement.back_amount); // On ajoute 0 si "reste" est undefined ou null
+            }, 0);
 
-        const retour = _financements.reduce((acc, financement) => {
-            return acc + parseAmount(financement.back_amount); // On ajoute 0 si "reste" est undefined ou null
-        }, 0);
-
-        const reste = _financements.reduce((acc, financement) => {
-            return acc + parseAmount(financement.reste); // On ajoute 0 si "reste" est undefined ou null
-        }, 0);
+        const reste = _financements
+            .filter((f) => f.fournisseur?.id != DG_KADJIV_ID)
+            .reduce((acc, financement) => {
+                return acc + parseAmount(financement.reste); // On ajoute 0 si "reste" est undefined ou null
+            }, 0);
 
         setTotalMontant(montant.toLocaleString('fr-FR', { minimumFractionDigits: 2 }));
         setTotalRetour(retour.toLocaleString('fr-FR', { minimumFractionDigits: 2 }));

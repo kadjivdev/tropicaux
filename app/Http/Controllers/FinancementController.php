@@ -66,7 +66,7 @@ class FinancementController extends Controller
         $validated = $request->validate([
             "fournisseur_id" => ["required", "integer", 'exists:fournisseurs,id'],
             "prefinancement_id" => ["required", "integer", "exists:pre_financements,id"],
-            "type_id" => ["required", "integer", "exists:type_financements,id"],
+            "type_id" => ["nullable", "integer", "exists:type_financements,id"],
             "montant" => ["required", "numeric"],
             "date_financement" => ["required", "date"],
             "document" => ["nullable", "file", "mimes:pdf,png,jpg,jpeg"],
@@ -74,7 +74,7 @@ class FinancementController extends Controller
             "fournisseur_id.required" => "Le fournisseur est requis.",
             "fournisseur_id.integer" => "Le fournisseur doit être un entier.",
 
-            "type_id.required" => "Le type de financement est requis.",
+            // "type_id.required" => "Le type de financement est requis.",
             "type_id.integer" => "Le type de financement doit être un entier.",
 
             "prefinancement_id.required" => "Le pré financement est requis.",
