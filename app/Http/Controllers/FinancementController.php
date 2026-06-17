@@ -24,7 +24,7 @@ class FinancementController extends Controller
     {
         $sessionId = Session::get("campagne")?->id;
 
-        $prefinancements = PreFinancement::all();
+        $prefinancements = PreFinancement::where("campagne_id", $sessionId)->get();
         $financements = Financement::where("campagne_id", $sessionId)->get();
         $fournisseurs = Fournisseur::get(["id", "raison_sociale"]);
 
@@ -45,6 +45,7 @@ class FinancementController extends Controller
 
         $sessionId = Session::get("campagne")?->id;
         $prefinancements = PreFinancement::whereNotNull("validated_by")
+            ->where("campagne_id", $sessionId)
             ->get()
             ->filter(function ($query) {
                 return $query->reste() > 0;
