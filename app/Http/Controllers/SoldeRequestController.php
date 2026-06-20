@@ -47,9 +47,11 @@ class SoldeRequestController extends Controller
     {
         try {
             Log::info("Debut de la création des requetes", ["data" => $request->all()]);
+            $sessionId = Session::get("campagne")?->id;
+
             DB::beginTransaction();
 
-            $requete = SoldeRequest::create($request->validated());
+            $requete = SoldeRequest::create(array_merge($request->validated(), ["campagne_id" => $sessionId]));
 
             DB::commit();
             Log::debug("Requete insereé avec succès!", ["data" => $requete]);
@@ -90,10 +92,12 @@ class SoldeRequestController extends Controller
     public function update(SoldeRequestRequest $request, SoldeRequest $requete_fournisseur)
     {
         try {
+            $sessionId = Session::get("campagne")?->id;
+
             Log::info("Debut de la modification des requetes", ["data" => $request->all()]);
             DB::beginTransaction();
 
-            $requete_fournisseur->update($request->validated());
+            $requete_fournisseur->update($request->validated(), ["campagne_id" => $sessionId]);
 
             DB::commit();
             Log::debug("Requete modifiée avec succès!", ["data" => $requete_fournisseur]);

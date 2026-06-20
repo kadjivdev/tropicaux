@@ -11,7 +11,6 @@ import Select from 'react-select'
 import { Textarea } from '@headlessui/react';
 import { useEffect } from 'react';
 
-
 export default function Create({ fournisseurs }) {
     const permissions = usePage().props.auth.permissions;
 
@@ -85,7 +84,7 @@ export default function Create({ fournisseurs }) {
                         <div className="bg-light p-3 rounded border mb-5">
                             {checkPermission('fournisseur.view') ?
                                 (<div className=" text-center  items-center gap-4">
-                                    <Link className="btn btn-sm bg-success bg-hover text-white" href={route("requete_fournisseur.index")}> <CIcon icon={cilArrowCircleLeft} /> Liste des rrequetes fournisseurs</Link>
+                                    <Link className="btn btn-sm bg-success bg-hover text-white" href={route("requete_fournisseur.index")}> <CIcon icon={cilArrowCircleLeft} /> Liste des requetes fournisseurs</Link>
                                 </div>) : null
                             }
 
