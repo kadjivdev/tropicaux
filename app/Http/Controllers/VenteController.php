@@ -103,7 +103,7 @@ class VenteController extends Controller
         $validated = $request->validate([
             "partenaire_id" => ["required", "integer"],
             "chargement_id" => ["required", "integer"],
-            "type_vente_id" => ["required", "integer"],
+            "type_vente_id" => ["nullable", "integer"],
             "prix" => ["required", "numeric"],
             // "montant" => ["required", "numeric"],
             "document" => ["nullable", "file", "mimes:pdf,png,jpg,jpeg"],
@@ -123,7 +123,7 @@ class VenteController extends Controller
             "chargement_id.required" => "Le chargement est requis.",
             "chargement_id.integer" => "Le chargement doit être un entier.",
 
-            "type_vente_id.required" => "Le type de vente est requis.",
+            "type_vente_id.nullable" => "Le type de vente peut être vide.",
             "type_vente_id.integer" => "Le type de vente doit être un entier.",
 
             "prix.required" => "Le prix est requis.",
@@ -222,7 +222,7 @@ class VenteController extends Controller
                 "prix" => ["required", "numeric"],
                 "montant" => ["required", "numeric"],
                 "document" => ["nullable", "file", "mimes:pdf,png,jpg,jpeg"],
-                "type_vente_id" => ["required", "integer"],
+                "type_vente_id" => ["nullable", "integer"],
 
                 "poids" => ["required", "numeric"],
                 "nbre_sac_rejete" => ["nullable", "numeric"],
@@ -235,7 +235,8 @@ class VenteController extends Controller
             ], [
                 "partenaire_id.required" => "Le partenaire est requis.",
                 "partenaire_id.integer" => "Le partenaire doit être un entier.",
-                "type_vente_id.required" => "Le type de vente est requis.",
+                
+                "type_vente_id.nullable" => "Le type de vente peut être vide.",
                 "type_vente_id.integer" => "Le type de vente doit être un entier.",
 
                 "prix.required" => "Le prix est requis.",

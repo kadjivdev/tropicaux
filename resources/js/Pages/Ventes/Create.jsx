@@ -178,12 +178,12 @@ export default function Create({ partenaires, modes, camions, chargements, types
                                         </div>
 
                                         <div className="mb-3">
-                                            <InputLabel htmlFor="type_vente_id" value="Type" >  <span className="text-danger">*</span> </InputLabel>
+                                            <InputLabel htmlFor="type_vente_id" value="Type" >  </InputLabel>
                                             <Select
                                                 placeholder="Rechercher un type de vente ..."
                                                 name="type_vente_id"
                                                 id="type_vente_id"
-                                                required
+                                                // required
                                                 className="form-control mt-1 block w-full"
                                                 options={types.map((type) => ({
                                                     value: type.id,

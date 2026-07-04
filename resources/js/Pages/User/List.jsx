@@ -78,7 +78,6 @@ export default function List({ users, roles }) {
     const submit = (e) => {
         e.preventDefault();
 
-
         post(route('affect.role'), {
             onStart: () => {
                 Swal.fire({
