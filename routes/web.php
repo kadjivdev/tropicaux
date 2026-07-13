@@ -27,17 +27,22 @@ use App\Http\Controllers\SoldeRequestController;
 use App\Http\Controllers\SuperviseurController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VenteController;
-use App\Models\TypeVente;
+use App\Models\SoldeRequest;
 use Illuminate\Support\Facades\Route;
 
 Route::get("/debug", function () {
+    $requetes = SoldeRequest::with(["validatedBy", "campagne"])
+        ->where("campagne_id", 3);
 
-    TypeVente::insert([
-        ["libelle" => "Vente normale", "description" => ""],
-        ["libelle" => "Vente spéciale", "description" => ""]
-    ]);
+    $requetes
+        ->each(function ($req) {
+            $req->update([
+                "validated_by" => null,
+                "validated_at" => null
+            ]);
+        });
 
-    return "Tyoes de ventes inserés";
+    return $requetes->get();
 });
 
 Route::redirect('/', '/login');
@@ -76,7 +81,7 @@ Route::middleware('auth')->group(function () {
         Route::get("fournisseur/{fournisseur}/chargements", [FournisseurController::class, "chargements"])->name("fournisseur.chargements");
 
         // Requetes solde fournisseur
-        Route::resource("requete_fournisseur",SoldeRequestController::class);
+        Route::resource("requete_fournisseur", SoldeRequestController::class);
         Route::patch("/requete_fournisseur/{requete_fournisseur}/validate", [SoldeRequestController::class, "validateSoldeRequeste"])->name("requete_fournisseur.validate");
 
         // Chargements

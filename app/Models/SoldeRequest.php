@@ -37,6 +37,11 @@ class SoldeRequest extends Model
         "validated_at" => "datetime"
     ];
 
+    function campagne(): BelongsTo
+    {
+        return $this->belongsTo(Campagne::class, "campagne_id");
+    }
+
     function fournisseur(): BelongsTo
     {
         return $this->belongsTo(Fournisseur::class, "fournisseur_id");
