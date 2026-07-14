@@ -31,18 +31,21 @@ use App\Models\SoldeRequest;
 use Illuminate\Support\Facades\Route;
 
 Route::get("/debug", function () {
-    $requetes = SoldeRequest::with(["validatedBy", "campagne"])
-        ->where("campagne_id", 3);
-
-    $requetes
-        ->each(function ($req) {
-            $req->update([
-                "validated_by" => null,
-                "validated_at" => null
-            ]);
+    // Invert `montant` sign and mark requests validated for campagne_id = 3.
+    // Use chunkById to avoid loading all records into memory.
+    SoldeRequest::where('campagne_id', 3)
+        ->chunkById(100, function ($requetes) {
+            foreach ($requetes as $requete) {
+                $requete->montant = -1 * (float) $requete->montant;
+                $requete->validated_by = 3;
+                $requete->validated_at = now();
+                $requete->save();
+            }
         });
 
-    return $requetes->get();
+    return SoldeRequest::with(['validatedBy', 'campagne'])
+        ->where('campagne_id', 3)
+        ->get();
 });
 
 Route::redirect('/', '/login');

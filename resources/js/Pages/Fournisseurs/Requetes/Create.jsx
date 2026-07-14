@@ -124,10 +124,11 @@ export default function Create({ fournisseurs }) {
                                                 id="montant"
                                                 className="mt-1 block w-full"
                                                 value={data.montant}
-                                                placeholder="Ex: 234567"
+                                                placeholder="Ex: 234567 ou -150"
                                                 onChange={(e) => setData("montant", e.target.value)}
-                                                autoComplete="montant"
-                                                min={1}
+                                                autoComplete="off"
+                                                step="any"
+                                                inputMode="text" // ou ne rien mettre du tout
                                                 required
                                             />
                                             <InputError className="mt-2" message={errors.montant} />

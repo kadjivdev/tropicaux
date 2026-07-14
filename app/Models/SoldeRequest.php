@@ -101,6 +101,9 @@ class SoldeRequest extends Model
                 Log::info("Preuve existe .....");
                 $model->preuve = $model->getPreuveUrl();
                 $model->saveQuietly(); // VERY IMPORTANT
+            } else {
+                $model->preuve = $model->getPreuveUrl();
+                $model->saveQuietly(); // VERY IMPORTANT
             }
         });
     }

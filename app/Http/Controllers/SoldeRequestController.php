@@ -80,6 +80,7 @@ class SoldeRequestController extends Controller
      */
     public function edit(SoldeRequest $requete_fournisseur)
     {
+        Log::debug("Debut de modification",["data"=>$requete_fournisseur]);
         return Inertia::render("Fournisseurs/Requetes/Update", [
             "fournisseurs" => Fournisseur::all(),
             "requete" => $requete_fournisseur
