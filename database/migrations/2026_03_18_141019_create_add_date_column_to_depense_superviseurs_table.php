@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('depense_superviseurs', function (Blueprint $table) {
-            $table->date("date")->nullable()->after("document");
+            // $table->date("date")->nullable()->after("document");
         });
     }
 

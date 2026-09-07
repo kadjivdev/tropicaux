@@ -285,7 +285,7 @@ export default function List({ financements, prefinancements, fournisseurs }) {
                                     <th scope="col">Montant</th>
                                     <th scope="col">Montant retourné</th>
                                     <th scope="col">Transféré</th>
-                                    <th scope="col">Reste</th>
+                                    <th scope="col">Reste sur financement</th>
                                     <th scope="col">Date de financement</th>
                                     <th scope="col">Preuve</th>
                                     <th scope="col">Inséré par</th>
